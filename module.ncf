@@ -11,4 +11,3 @@ loadLanguage=1
 
 [public-service]
 dependent=smart-contract,cross-chain,chain-manager
-

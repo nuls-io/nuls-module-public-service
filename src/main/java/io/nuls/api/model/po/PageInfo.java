@@ -1,5 +1,7 @@
 package io.nuls.api.model.po;
 
+import com.google.common.collect.Lists;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +16,7 @@ public class PageInfo<T> {
     private List<T> list;
 
     public PageInfo() {
-
+        list = Lists.newArrayList();
     }
 
     public PageInfo(int pageNumber, int pageSize, long totalCount, List<T> list) {
