@@ -25,6 +25,8 @@ public class AccountToken721Info {
     @JsonIgnore
     private boolean isNew;
 
+    private int tokenCount;
+
     public AccountToken721Info() {
 
     }
@@ -37,6 +39,14 @@ public class AccountToken721Info {
         this.contractAddress = contractAddress;
         this.tokenSet = new HashSet<>();
         this.isNew = true;
+    }
+
+    public int getTokenCount() {
+        return tokenSet.size();
+    }
+
+    public void setTokenCount(int tokenCount) {
+        this.tokenCount = tokenCount;
     }
 
     public String getKey() {

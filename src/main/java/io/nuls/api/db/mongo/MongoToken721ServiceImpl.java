@@ -42,8 +42,6 @@ public class MongoToken721ServiceImpl implements Token721Service {
         List<WriteModel<Document>> modelList = new ArrayList<>();
         for (AccountToken721Info tokenInfo : accountTokenInfos.values()) {
             Document document = DocumentTransferTool.toDocument(tokenInfo, "key");
-            //TODO pierre 余额存储
-            //document.put("balance", BigIntegerUtils.bigIntegerToString(tokenInfo.getBalance(), 32));
             if (tokenInfo.isNew()) {
                 modelList.add(new InsertOneModel(document));
             } else {
@@ -52,12 +50,12 @@ public class MongoToken721ServiceImpl implements Token721Service {
         }
         BulkWriteOptions options = new BulkWriteOptions();
         options.ordered(false);
-        mongoDBService.bulkWrite(ACCOUNT_TOKEN_TABLE + chainId, modelList, options);
+        mongoDBService.bulkWrite(ACCOUNT_TOKEN721_TABLE + chainId, modelList, options);
     }
 
     public PageInfo<AccountToken721Info> getAccountTokens(int chainId, String address, int pageNumber, int pageSize) {
         Bson query = Filters.eq("address", address);
-        Bson sort = Sorts.descending("balance");
+        Bson sort = Sorts.descending("tokenCount");
         List<Document> docsList = this.mongoDBService.pageQuery(ACCOUNT_TOKEN721_TABLE + chainId, query, sort, pageNumber, pageSize);
         List<AccountToken721Info> accountTokenList = new ArrayList<>();
         long totalCount = mongoDBService.getCount(ACCOUNT_TOKEN721_TABLE + chainId, query);
@@ -75,8 +73,7 @@ public class MongoToken721ServiceImpl implements Token721Service {
 
     public PageInfo<AccountToken721Info> getContractTokens(int chainId, String contractAddress, int pageNumber, int pageSize) {
         Bson query = Filters.eq("contractAddress", contractAddress);
-        //TODO pierre 余额处理
-        Bson sort = Sorts.descending("balance");
+        Bson sort = Sorts.descending("tokenCount");
         List<Document> docsList = this.mongoDBService.pageQuery(ACCOUNT_TOKEN721_TABLE + chainId, query, sort, pageNumber, pageSize);
         List<AccountToken721Info> accountTokenList = new ArrayList<>();
         long totalCount = mongoDBService.getCount(ACCOUNT_TOKEN721_TABLE + chainId, query);
