@@ -38,6 +38,8 @@ public class AccountInfo {
 
     private List<String> tokens;
 
+    private List<String> token721s;
+
     //是否是根据最新区块的交易新创建的账户，只为业务使用，不存储该字段
     @JsonIgnore
     private boolean isNew;
@@ -50,6 +52,7 @@ public class AccountInfo {
         Address address1 = new Address(address);
         this.type = address1.getAddressType();
         this.tokens = new ArrayList<>();
+        this.token721s = new ArrayList<>();
         this.isNew = true;
         this.totalOut = BigInteger.ZERO;
         this.totalIn = BigInteger.ZERO;
@@ -147,6 +150,14 @@ public class AccountInfo {
 
     public void setTokens(List<String> tokens) {
         this.tokens = tokens;
+    }
+
+    public List<String> getToken721s() {
+        return token721s;
+    }
+
+    public void setToken721s(List<String> token721s) {
+        this.token721s = token721s;
     }
 
     @JsonIgnore
