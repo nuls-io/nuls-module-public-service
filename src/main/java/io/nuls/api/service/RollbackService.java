@@ -77,6 +77,8 @@ public class RollbackService {
     private List<ChainInfo> chainInfoList = new ArrayList<>();
     //记录每个区块交易和账户地址的关系
     private Set<TxRelationInfo> txRelationInfoSet = new HashSet<>();
+    //记录每个跨链交易和账户地址的关系
+    private Set<String> crossTxHashSet = new HashSet<>();
     //处理每个交易时，过滤交易中的重复地址
     Set<String> addressSet = new HashSet<>();
 
@@ -338,6 +340,7 @@ public class RollbackService {
                 addressSet.add(input.getAddress());
                 calcBalance(chainId, input);
                 txRelationInfoSet.add(new TxRelationInfo(input.getAddress(), tx.getHash()));
+                crossTxHashSet.add(tx.getHash());
 
                 AssetInfo assetInfo = CacheManager.getRegisteredAsset(input.getAssetKey());
                 if (assetInfo.getChainId() != ApiContext.defaultChainId) {
@@ -919,6 +922,7 @@ public class RollbackService {
         punishService.rollbackPunishLog(chainId, punishTxHashList, blockInfo.getHeader().getHeight());
         aliasService.rollbackAliasList(chainId, aliasInfoList);
         transactionService.rollbackTxRelationList(chainId, txRelationInfoSet);
+        transactionService.rollbackCrossTxRelationList(chainId, crossTxHashSet);
         transactionService.rollbackTx(chainId, blockInfo.getHeader().getTxHashList());
         blockService.deleteBlockHeader(chainId, blockInfo.getHeader().getHeight());
 

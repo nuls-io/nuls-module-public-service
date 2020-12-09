@@ -380,6 +380,14 @@ public class MongoTransactionServiceImpl implements TransactionService, Initiali
         }
     }
 
+    @Override
+    public void rollbackCrossTxRelationList(int chainId, Set<String> txHashList) {
+        if (txHashList.isEmpty()) {
+            return;
+        }
+        mongoDBService.delete(CROSS_TX_RELATION_TABLE + chainId, Filters.in("txHash", txHashList));
+    }
+
 
     /**
      * 这种实现方式，效率低些
