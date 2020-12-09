@@ -29,6 +29,8 @@ public class ApiCache {
 
     private List<Nrc20Info> nrc20InfoList = new ArrayList<>();
 
+    private List<Nrc721Info> nrc721InfoList = new ArrayList<>();
+
     public ApiCache() {
         currentRound = new CurrentRound();
     }
@@ -55,6 +57,14 @@ public class ApiCache {
 
     public List<Nrc20Info> getNrc20InfoList() {
         return nrc20InfoList;
+    }
+
+    public List<Nrc721Info> getNrc721InfoList() {
+        return nrc721InfoList;
+    }
+
+    public void addNrc721Info(Nrc721Info nrc721Info) {
+        nrc721InfoList.add(nrc721Info);
     }
 
     public void addAgentInfo(AgentInfo agentInfo) {

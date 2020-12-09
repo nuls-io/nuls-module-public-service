@@ -50,6 +50,8 @@ public class SyncService {
     private ContractService contractService;
     @Autowired
     private TokenService tokenService;
+    @Autowired
+    private Token721Service token721Service;
 
     //记录每个区块打包交易涉及到的账户的余额变动
     private Map<String, AccountInfo> accountInfoMap = new HashMap<>();
@@ -77,8 +79,12 @@ public class SyncService {
     private List<ContractTxInfo> contractTxInfoList = new ArrayList<>();
     //记录每个区块智能合约相关的账户token信息
     private Map<String, AccountTokenInfo> accountTokenMap = new HashMap<>();
-    //记录合约转账信息
+    //记录每个区块智能合约相关的账户token721信息
+    private Map<String, AccountToken721Info> accountToken721Map = new HashMap<>();
+    //记录合约nrc20转账信息
     private List<TokenTransfer> tokenTransferList = new ArrayList<>();
+    //记录合约nrc721转账信息
+    private List<Token721Transfer> token721TransferList = new ArrayList<>();
     //记录链信息
     private List<ChainInfo> chainInfoList = new ArrayList<>();
     //处理每个交易时，过滤交易中的重复地址
@@ -335,10 +341,6 @@ public class SyncService {
                         AssetInfo asset = chainInfo.getDefaultAsset();
                         if (asset.getAssetId() == assetInfo.getAssetId()) {
                             asset.setLocalTotalCoins(asset.getLocalTotalCoins().subtract(input.getAmount()));
-                            if (asset.getChainId() == 123) {
-
-                                System.out.println("from:" + input.getAmount() + ",total:" + asset.getLocalTotalCoins());
-                            }
                         }
                         for (AssetInfo ass : chainInfo.getAssets()) {
                             if (ass.getAssetId() == assetInfo.getAssetId()) {
@@ -373,9 +375,6 @@ public class SyncService {
                             AssetInfo asset = chainInfo.getDefaultAsset();
                             if (asset.getAssetId() == assetInfo.getAssetId()) {
                                 asset.setLocalTotalCoins(asset.getLocalTotalCoins().add(output.getAmount()));
-                                if (asset.getChainId() == 123) {
-                                    System.out.println("to:" + output.getAmount() + ",total:" + asset.getLocalTotalCoins());
-                                }
                             }
                             for (AssetInfo ass : chainInfo.getAssets()) {
                                 if (ass.getAssetId() == assetInfo.getAssetId()) {
@@ -445,7 +444,7 @@ public class SyncService {
             createContractTxInfo(tx, contractInfo, callInfo.getMethodName());
 
             if (callInfo.getResultInfo().isSuccess()) {
-                processTokenTransfers(chainId, callInfo.getResultInfo().getTokenTransfers(), tx);
+                processTokenTransfers(chainId, callInfo.getResultInfo().getTokenTransfers(), callInfo.getResultInfo().getToken721Transfers(), tx);
             }
         }
     }
@@ -701,8 +700,9 @@ public class SyncService {
         contractResultList.add(contractInfo.getResultInfo());
         if (contractInfo.isSuccess()) {
             addNrc20Info(chainId, contractInfo);
+            addNrc721Info(chainId, contractInfo);
             contractInfoMap.put(contractInfo.getContractAddress(), contractInfo);
-            processTokenTransfers(chainId, contractInfo.getResultInfo().getTokenTransfers(), tx);
+            processTokenTransfers(chainId, contractInfo.getResultInfo().getTokenTransfers(), contractInfo.getResultInfo().getToken721Transfers(), tx);
         }
     }
 
@@ -719,6 +719,18 @@ public class SyncService {
         }
     }
 
+    private void addNrc721Info(int chainId, ContractInfo contractInfo) {
+        if (contractInfo.getTokenType() == TOKEN_TYPE_NRC721) {
+            Nrc721Info nrc721Info = new Nrc721Info();
+            nrc721Info.setContractAddress(contractInfo.getContractAddress());
+            nrc721Info.setSymbol(contractInfo.getSymbol());
+            nrc721Info.setName(contractInfo.getTokenName());
+
+            ApiCache apiCache = CacheManager.getCache(chainId);
+            apiCache.addNrc721Info(nrc721Info);
+        }
+    }
+
     private void processCallContract(int chainId, TransactionInfo tx) {
         processTransferTx(chainId, tx);
         ContractCallInfo callInfo = (ContractCallInfo) tx.getTxData();
@@ -729,7 +741,7 @@ public class SyncService {
         createContractTxInfo(tx, contractInfo, callInfo.getMethodName());
 
         if (callInfo.getResultInfo().isSuccess()) {
-            processTokenTransfers(chainId, callInfo.getResultInfo().getTokenTransfers(), tx);
+            processTokenTransfers(chainId, callInfo.getResultInfo().getTokenTransfers(), callInfo.getResultInfo().getToken721Transfers(), tx);
         }
     }
 
@@ -860,7 +872,12 @@ public class SyncService {
         chainInfoList.add(chainInfo);
     }
 
-    private void processTokenTransfers(int chainId, List<TokenTransfer> tokenTransfers, TransactionInfo tx) {
+    private void processTokenTransfers(int chainId, List<TokenTransfer> tokenTransfers, List<Token721Transfer> token721Transfers, TransactionInfo tx) {
+        processToken20Transfers(chainId, tokenTransfers, tx);
+        processToken721Transfers(chainId, token721Transfers, tx);
+    }
+
+    private void processToken20Transfers(int chainId, List<TokenTransfer> tokenTransfers, TransactionInfo tx) {
         if (tokenTransfers.isEmpty()) {
             return;
         }
@@ -891,6 +908,34 @@ public class SyncService {
         }
     }
 
+    private void processToken721Transfers(int chainId, List<Token721Transfer> tokenTransfers, TransactionInfo tx) {
+        if (tokenTransfers.isEmpty()) {
+            return;
+        }
+        Token721Transfer tokenTransfer;
+        ContractInfo contractInfo;
+        for (int i = 0; i < tokenTransfers.size(); i++) {
+            tokenTransfer = tokenTransfers.get(i);
+            tokenTransfer.setTxHash(tx.getHash());
+            tokenTransfer.setHeight(tx.getHeight());
+            tokenTransfer.setTime(tx.getCreateTime());
+
+            contractInfo = queryContractInfo(chainId, tokenTransfer.getContractAddress());
+            if (tokenTransfer.getToAddress() != null && !contractInfo.getOwners().contains(tokenTransfer.getToAddress())) {
+                contractInfo.getOwners().add(tokenTransfer.getToAddress());
+            }
+            contractInfo.setTransferCount(contractInfo.getTransferCount() + 1);
+
+            if (tokenTransfer.getFromAddress() != null) {
+                processAccountNrc721(chainId, contractInfo, tokenTransfer.getFromAddress(), tokenTransfer.getTokenId(), -1);
+            }
+            if (tokenTransfer.getToAddress() != null) {
+                processAccountNrc721(chainId, contractInfo, tokenTransfer.getToAddress(), tokenTransfer.getTokenId(), 1);
+            }
+            token721TransferList.add(tokenTransfer);
+        }
+    }
+
     private AccountTokenInfo processAccountNrc20(int chainId, ContractInfo contractInfo, String address, BigInteger value, int type) {
         AccountTokenInfo tokenInfo = queryAccountTokenInfo(chainId, address + contractInfo.getContractAddress());
         if (tokenInfo == null) {
@@ -911,6 +956,28 @@ public class SyncService {
 //        }
         if (!accountTokenMap.containsKey(tokenInfo.getKey())) {
             accountTokenMap.put(tokenInfo.getKey(), tokenInfo);
+        }
+
+        return tokenInfo;
+    }
+
+    private AccountToken721Info processAccountNrc721(int chainId, ContractInfo contractInfo, String address, String tokenId, int type) {
+        AccountToken721Info tokenInfo = queryAccountToken721Info(chainId, address + contractInfo.getContractAddress());
+        if (tokenInfo == null) {
+            AccountInfo accountInfo = queryAccountInfo(chainId, address);
+            accountInfo.getToken721s().add(contractInfo.getContractAddress() + "," + contractInfo.getSymbol());
+
+            tokenInfo = new AccountToken721Info(address, contractInfo.getContractAddress(), contractInfo.getTokenName(), contractInfo.getSymbol());
+        }
+
+        if (type == 1) {
+            tokenInfo.getTokenSet().add(tokenId);
+        } else {
+            tokenInfo.getTokenSet().remove(tokenId);
+        }
+
+        if (!accountToken721Map.containsKey(tokenInfo.getKey())) {
+            accountToken721Map.put(tokenInfo.getKey(), tokenInfo);
         }
 
         return tokenInfo;
@@ -1042,6 +1109,9 @@ public class SyncService {
 
         //存储token转账信息
         tokenService.saveTokenTransfers(chainId, tokenTransferList);
+
+        //存储token721转账信息
+        token721Service.saveTokenTransfers(chainId, token721TransferList);
 //        time2 = System.currentTimeMillis();
 //        System.out.println("-----------saveTokenTransfers, use: " + (time2 - time1) );
 //        time1 = System.currentTimeMillis();
@@ -1092,6 +1162,11 @@ public class SyncService {
 //        time2 = System.currentTimeMillis();
 //        System.out.println("-----------saveAccounts, use: " + (time2 - time1) );
 //        time1 = System.currentTimeMillis();
+
+        //存储账户token721信息
+        syncInfo.setStep(60);
+        chainService.updateStep(syncInfo);
+        token721Service.saveAccountTokens(chainId, accountToken721Map);
 
         //完成解析
         syncInfo.setStep(100);
@@ -1166,6 +1241,14 @@ public class SyncService {
         return accountTokenInfo;
     }
 
+    private AccountToken721Info queryAccountToken721Info(int chainId, String key) {
+        AccountToken721Info accountToken721Info = accountToken721Map.get(key);
+        if (accountToken721Info == null) {
+            accountToken721Info = token721Service.getAccountTokenInfo(chainId, key);
+        }
+        return accountToken721Info;
+    }
+
     private ChainInfo queryChainInfo(int chainId) {
         for (ChainInfo chainInfo : chainInfoList) {
             if (chainInfo != null) {
@@ -1193,7 +1276,9 @@ public class SyncService {
         contractResultList.clear();
         contractTxInfoList.clear();
         accountTokenMap.clear();
+        accountToken721Map.clear();
         tokenTransferList.clear();
+        token721TransferList.clear();
         chainInfoList.clear();
 
         ApiCache apiCache = CacheManager.getCache(chainId);
