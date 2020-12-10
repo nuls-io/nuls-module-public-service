@@ -107,6 +107,9 @@ public class MongoDBTableServiceImpl implements DBTableService {
         mongoDBService.createCollection(DBTableConstant.CONTRACT_RESULT_TABLE + chainId);
         mongoDBService.createCollection(DBTableConstant.STATISTICAL_TABLE + chainId);
 
+        mongoDBService.createCollection(DBTableConstant.ACCOUNT_TOKEN721_TABLE + chainId);
+        mongoDBService.createCollection(DBTableConstant.TOKEN721_TRANSFER_TABLE + chainId);
+
         for (int i = 0; i < TX_RELATION_SHARDING_COUNT; i++) {
             mongoDBService.createCollection(DBTableConstant.TX_RELATION_TABLE + chainId + "_" + i);
         }
@@ -139,6 +142,10 @@ public class MongoDBTableServiceImpl implements DBTableService {
         mongoDBService.createIndex(DBTableConstant.TOKEN_TRANSFER_TABLE + chainId, Indexes.descending("time"));
         mongoDBService.createIndex(DBTableConstant.TOKEN_TRANSFER_TABLE + chainId, Indexes.descending("contractAddress","fromAddress"));
         mongoDBService.createIndex(DBTableConstant.TOKEN_TRANSFER_TABLE + chainId, Indexes.descending("contractAddress","toAddress"));
+        // 账户token721表
+        mongoDBService.createIndex(DBTableConstant.ACCOUNT_TOKEN721_TABLE + chainId, Indexes.descending("tokenCount"));
+        // token721交易记录表
+        mongoDBService.createIndex(DBTableConstant.TOKEN721_TRANSFER_TABLE + chainId, Indexes.descending("time"));
         //跨链交易表索引
         mongoDBService.createIndex(DBTableConstant.CROSS_TX_RELATION_TABLE + chainId, Indexes.ascending("address"));
     }
