@@ -3,6 +3,7 @@ package io.nuls.api.db.mongo;
 import com.mongodb.client.model.*;
 import io.nuls.api.db.Token721Service;
 import io.nuls.api.model.po.AccountToken721Info;
+import io.nuls.api.model.po.Nrc721TokenIdInfo;
 import io.nuls.api.model.po.PageInfo;
 import io.nuls.api.model.po.Token721Transfer;
 import io.nuls.api.utils.DocumentTransferTool;
@@ -107,13 +108,13 @@ public class MongoToken721ServiceImpl implements Token721Service {
     }
 
     public PageInfo<Token721Transfer> getTokenTransfers(int chainId, String address, String contractAddress, int pageIndex, int pageSize) {
-        Bson filter;
+        Bson filter = null;
         if (StringUtils.isNotBlank(address) && StringUtils.isNotBlank(contractAddress)) {
             Bson addressFilter = Filters.or(Filters.eq("fromAddress", address), Filters.eq("toAddress", address));
             filter = Filters.and(Filters.eq("contractAddress", contractAddress), addressFilter);
         } else if (StringUtils.isNotBlank(contractAddress)) {
             filter = Filters.eq("contractAddress", contractAddress);
-        } else {
+        } else if (StringUtils.isNotBlank(address)) {
             filter = Filters.or(Filters.eq("fromAddress", address), Filters.eq("toAddress", address));
         }
         Bson sort = Sorts.descending("time");
@@ -125,6 +126,46 @@ public class MongoToken721ServiceImpl implements Token721Service {
         }
 
         PageInfo<Token721Transfer> pageInfo = new PageInfo<>(pageIndex, pageSize, totalCount, tokenTransfers);
+        return pageInfo;
+    }
+
+    @Override
+    public void saveTokenIds(int chainId, List<Nrc721TokenIdInfo> tokenIdInfos) {
+        if (tokenIdInfos.isEmpty()) {
+            return;
+        }
+        List<Document> documentList = new ArrayList<>();
+        for (Nrc721TokenIdInfo tokenIdInfo : tokenIdInfos) {
+            Document document = DocumentTransferTool.toDocument(tokenIdInfo, "key");
+            documentList.add(document);
+        }
+        InsertManyOptions options = new InsertManyOptions();
+        options.ordered(false);
+        mongoDBService.insertMany(TOKEN721_IDS_TABLE + chainId, documentList, options);
+
+    }
+
+    @Override
+    public void rollbackTokenIds(int chainId, List<Nrc721TokenIdInfo> tokenIdInfos) {
+        if (tokenIdInfos.isEmpty()) {
+            return;
+        }
+        for (Nrc721TokenIdInfo tokenIdInfo : tokenIdInfos) {
+            mongoDBService.delete(TOKEN721_IDS_TABLE + chainId, Filters.eq("_id", tokenIdInfo.getKey()));
+        }
+    }
+
+    @Override
+    public PageInfo<Nrc721TokenIdInfo> getContractTokenIds(int chainId, String contractAddress, int pageNumber, int pageSize) {
+        Bson query = Filters.eq("contractAddress", contractAddress);
+        Bson sort = Sorts.descending("time");
+        List<Document> docsList = this.mongoDBService.pageQuery(TOKEN721_IDS_TABLE + chainId, query, sort, pageNumber, pageSize);
+        List<Nrc721TokenIdInfo> tokenIdList = new ArrayList<>();
+        long totalCount = mongoDBService.getCount(TOKEN721_IDS_TABLE + chainId, query);
+        for (Document document : docsList) {
+            tokenIdList.add(DocumentTransferTool.toInfo(document, "key", Nrc721TokenIdInfo.class));
+        }
+        PageInfo<Nrc721TokenIdInfo> pageInfo = new PageInfo<>(pageNumber, pageSize, totalCount, tokenIdList);
         return pageInfo;
     }
 }

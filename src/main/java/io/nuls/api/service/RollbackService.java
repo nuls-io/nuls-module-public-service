@@ -2,6 +2,7 @@ package io.nuls.api.service;
 
 import io.nuls.api.ApiContext;
 import io.nuls.api.analysis.AnalysisHandler;
+import io.nuls.api.analysis.WalletRpcHandler;
 import io.nuls.api.constant.ApiConstant;
 import io.nuls.api.constant.ApiErrorCode;
 import io.nuls.api.db.*;
@@ -73,6 +74,8 @@ public class RollbackService {
     private List<String> tokenTransferHashList = new ArrayList<>();
     //记录合约nrc721转账信息
     private List<String> token721TransferHashList = new ArrayList<>();
+    //记录合约nrc721造币信息
+    private List<Nrc721TokenIdInfo> token721IdList = new ArrayList<>();
     //记录链信息
     private List<ChainInfo> chainInfoList = new ArrayList<>();
     //记录每个区块交易和账户地址的关系
@@ -780,6 +783,11 @@ public class RollbackService {
 
             if (tokenTransfer.getFromAddress() != null) {
                 processAccountNrc721(chainId, contractInfo, tokenTransfer.getFromAddress(), tokenTransfer.getTokenId(), 1);
+            } else {
+                //token721IdList
+                // from为空时，视为NRC721的造币
+                Nrc721TokenIdInfo tokenIdInfo = new Nrc721TokenIdInfo( tokenTransfer.getContractAddress(), null, null, tokenTransfer.getTokenId(), null, null);
+                token721IdList.add(tokenIdInfo);
             }
             if (tokenTransfer.getToAddress() != null) {
                 processAccountNrc721(chainId, contractInfo, tokenTransfer.getToAddress(), tokenTransfer.getTokenId(), -1);
@@ -794,9 +802,9 @@ public class RollbackService {
         }
 
         if (type == 1) {
-            tokenInfo.getTokenSet().add(tokenId);
+            tokenInfo.addToken(tokenId);
         } else {
-            tokenInfo.getTokenSet().remove(tokenId);
+            tokenInfo.removeToken(tokenId);
         }
 
         if (!accountToken721Map.containsKey(tokenInfo.getKey())) {
@@ -875,6 +883,12 @@ public class RollbackService {
         }
 
         if (syncInfo.isFinish()) {
+            token721Service.rollbackTokenIds(chainId, token721IdList);
+            syncInfo.setStep(70);
+            chainService.updateStep(syncInfo);
+        }
+
+        if (syncInfo.getStep() == 70) {
             token721Service.saveAccountTokens(chainId, accountToken721Map);
             syncInfo.setStep(60);
             chainService.updateStep(syncInfo);
@@ -1051,6 +1065,7 @@ public class RollbackService {
         tokenTransferHashList.clear();
         accountToken721Map.clear();
         token721TransferHashList.clear();
+        token721IdList.clear();
         chainInfoList.clear();
         txRelationInfoSet.clear();
     }

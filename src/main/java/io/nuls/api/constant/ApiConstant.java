@@ -123,4 +123,5 @@ public interface ApiConstant {
 
     int TOKEN_TYPE_NRC20 = 1;
     int TOKEN_TYPE_NRC721 = 2;
+    String EMPTY_STRING = "";
 }

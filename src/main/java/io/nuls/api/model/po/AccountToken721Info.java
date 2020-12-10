@@ -42,7 +42,7 @@ public class AccountToken721Info {
     }
 
     public int getTokenCount() {
-        return tokenSet.size();
+        return this.tokenCount;
     }
 
     public void setTokenCount(int tokenCount) {
@@ -111,5 +111,19 @@ public class AccountToken721Info {
 
     public void setNew(boolean aNew) {
         isNew = aNew;
+    }
+
+    public void addToken(String tokenId) {
+        boolean add = this.tokenSet.add(tokenId);
+        if (add) {
+            tokenCount++;
+        }
+    }
+
+    public void removeToken(String tokenId) {
+        boolean remove = this.tokenSet.remove(tokenId);
+        if (remove) {
+            tokenCount--;
+        }
     }
 }

@@ -22,4 +22,10 @@ public interface Token721Service {
 
     PageInfo<Token721Transfer> getTokenTransfers(int chainId, String address, String contractAddress, int pageIndex, int pageSize);
 
+    void saveTokenIds(int chainId, List<Nrc721TokenIdInfo> tokenIDInfos);
+
+    void rollbackTokenIds(int chainId, List<Nrc721TokenIdInfo> tokenIDInfos);
+
+    PageInfo<Nrc721TokenIdInfo> getContractTokenIds(int chainId, String contractAddress, int pageNumber, int pageSize);
+
 }

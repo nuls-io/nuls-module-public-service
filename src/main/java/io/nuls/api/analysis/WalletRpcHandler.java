@@ -249,6 +249,16 @@ public class WalletRpcHandler {
         contractInfo.setNrc20((Boolean) map.get("nrc20"));
         contractInfo.setTokenType((Integer) map.get("tokenType"));
         contractInfo.setDirectPayable((Boolean) map.get("directPayable"));
+        boolean isNrc721 = contractInfo.getTokenType() == TOKEN_TYPE_NRC721;
+        if (isNrc721) {
+            Object tokenName = map.get("nrc20TokenName");
+            tokenName = tokenName == null ? EMPTY_STRING : tokenName;
+            Object tokenSymbol = map.get("nrc20TokenSymbol");
+            tokenSymbol = tokenSymbol == null ? EMPTY_STRING : tokenSymbol;
+            contractInfo.setTokenName(tokenName.toString());
+            contractInfo.setSymbol(tokenSymbol.toString());
+            contractInfo.setOwners(new ArrayList<>());
+        }
         if (contractInfo.isNrc20()) {
             contractInfo.setTokenName(map.get("nrc20TokenName").toString());
             contractInfo.setSymbol(map.get("nrc20TokenSymbol").toString());
@@ -452,6 +462,24 @@ public class WalletRpcHandler {
         } catch (NulsException e) {
             Log.error(e.format());
             return Result.getSuccess(null).setData(BigInteger.ZERO);
+        }
+    }
+
+    public static String token721URI(int chainid, Object contractAddress, Object tokenId) {
+        try {
+            Result<Map> result = invokeView(chainid, contractAddress, "tokenURI", null, new Object[]{tokenId});
+            Map map = result.getData();
+            if (map == null) {
+                return EMPTY_STRING;
+            }
+            Object tokenURI = map.get("result");
+            if (tokenURI == null) {
+                return EMPTY_STRING;
+            }
+            return tokenURI.toString();
+        } catch (NulsException e) {
+            Log.error(e.format());
+            return EMPTY_STRING;
         }
     }
 

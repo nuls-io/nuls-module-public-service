@@ -191,6 +191,7 @@ public class AccountInfo {
         accountInfo.totalBalance = new BigInteger(this.totalBalance.toString());
         accountInfo.totalReward = new BigInteger(this.totalReward.toString());
         accountInfo.tokens = new ArrayList<>(this.tokens);
+        accountInfo.token721s = new ArrayList<>(this.token721s);
         accountInfo.lastReward =new BigInteger(this.lastReward.toString());
         return accountInfo;
     }

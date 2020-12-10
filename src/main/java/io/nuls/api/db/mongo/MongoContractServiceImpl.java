@@ -3,6 +3,7 @@ package io.nuls.api.db.mongo;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.model.*;
 import io.nuls.api.cache.ApiCache;
+import io.nuls.api.constant.ApiConstant;
 import io.nuls.api.constant.DBTableConstant;
 import io.nuls.api.db.ContractService;
 import io.nuls.api.manager.CacheManager;
@@ -42,6 +43,12 @@ public class MongoContractServiceImpl implements ContractService {
                     nrc20Info.setSymbol(document.getString("symbol"));
                     nrc20Info.setDecimal(document.getInteger("decimals"));
                     apiCache.addNrc20Info(nrc20Info);
+                } else if (ApiConstant.TOKEN_TYPE_NRC721 == document.getInteger("tokenType")) {
+                    Nrc721Info nrc721Info = new Nrc721Info();
+                    nrc721Info.setContractAddress(document.getString("_id"));
+                    nrc721Info.setSymbol(document.getString("symbol"));
+                    nrc721Info.setName(document.getString("tokenName"));
+                    apiCache.addNrc721Info(nrc721Info);
                 }
             }
         }

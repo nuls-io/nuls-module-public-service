@@ -2,6 +2,7 @@ package io.nuls.api.service;
 
 
 import io.nuls.api.ApiContext;
+import io.nuls.api.analysis.WalletRpcHandler;
 import io.nuls.api.cache.ApiCache;
 import io.nuls.api.constant.ApiConstant;
 import io.nuls.api.constant.ApiErrorCode;
@@ -85,6 +86,8 @@ public class SyncService {
     private List<TokenTransfer> tokenTransferList = new ArrayList<>();
     //记录合约nrc721转账信息
     private List<Token721Transfer> token721TransferList = new ArrayList<>();
+    //记录合约nrc721造币信息
+    private List<Nrc721TokenIdInfo> token721IdList = new ArrayList<>();
     //记录链信息
     private List<ChainInfo> chainInfoList = new ArrayList<>();
     //处理每个交易时，过滤交易中的重复地址
@@ -914,23 +917,38 @@ public class SyncService {
         }
         Token721Transfer tokenTransfer;
         ContractInfo contractInfo;
+        String contractAddress;
+        String tokenId;
         for (int i = 0; i < tokenTransfers.size(); i++) {
             tokenTransfer = tokenTransfers.get(i);
             tokenTransfer.setTxHash(tx.getHash());
             tokenTransfer.setHeight(tx.getHeight());
             tokenTransfer.setTime(tx.getCreateTime());
 
-            contractInfo = queryContractInfo(chainId, tokenTransfer.getContractAddress());
+            contractAddress = tokenTransfer.getContractAddress();
+            tokenId = tokenTransfer.getTokenId();
+            contractInfo = queryContractInfo(chainId, contractAddress);
             if (tokenTransfer.getToAddress() != null && !contractInfo.getOwners().contains(tokenTransfer.getToAddress())) {
                 contractInfo.getOwners().add(tokenTransfer.getToAddress());
             }
             contractInfo.setTransferCount(contractInfo.getTransferCount() + 1);
 
             if (tokenTransfer.getFromAddress() != null) {
-                processAccountNrc721(chainId, contractInfo, tokenTransfer.getFromAddress(), tokenTransfer.getTokenId(), -1);
+                processAccountNrc721(chainId, contractInfo, tokenTransfer.getFromAddress(), tokenId, -1);
+            } else {
+                // from为空时，视为NRC721的造币
+                Nrc721TokenIdInfo tokenIdInfo = new Nrc721TokenIdInfo(
+                        contractAddress,
+                        contractInfo.getTokenName(),
+                        contractInfo.getSymbol(),
+                        tokenId,
+                        WalletRpcHandler.token721URI(chainId, contractAddress, tokenId),
+                        tokenTransfer.getTime()
+                );
+                token721IdList.add(tokenIdInfo);
             }
             if (tokenTransfer.getToAddress() != null) {
-                processAccountNrc721(chainId, contractInfo, tokenTransfer.getToAddress(), tokenTransfer.getTokenId(), 1);
+                processAccountNrc721(chainId, contractInfo, tokenTransfer.getToAddress(), tokenId, 1);
             }
             token721TransferList.add(tokenTransfer);
         }
@@ -971,9 +989,9 @@ public class SyncService {
         }
 
         if (type == 1) {
-            tokenInfo.getTokenSet().add(tokenId);
+            tokenInfo.addToken(tokenId);
         } else {
-            tokenInfo.getTokenSet().remove(tokenId);
+            tokenInfo.removeToken(tokenId);
         }
 
         if (!accountToken721Map.containsKey(tokenInfo.getKey())) {
@@ -1168,6 +1186,11 @@ public class SyncService {
         chainService.updateStep(syncInfo);
         token721Service.saveAccountTokens(chainId, accountToken721Map);
 
+        //存储token721造币信息
+        syncInfo.setStep(70);
+        chainService.updateStep(syncInfo);
+        token721Service.saveTokenIds(chainId, token721IdList);
+
         //完成解析
         syncInfo.setStep(100);
         chainService.updateStep(syncInfo);
@@ -1279,6 +1302,7 @@ public class SyncService {
         accountToken721Map.clear();
         tokenTransferList.clear();
         token721TransferList.clear();
+        token721IdList.clear();
         chainInfoList.clear();
 
         ApiCache apiCache = CacheManager.getCache(chainId);

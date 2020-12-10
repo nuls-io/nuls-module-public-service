@@ -45,16 +45,12 @@ public interface DBTableConstant {
     String ROUND_ITEM_TABLE = "round_item_table_";
     //账户token信息表
     String ACCOUNT_TOKEN_TABLE = "account_token_table_";
-    //账户token信息表
-    String ACCOUNT_TOKEN721_TABLE = "account_token721_table_";
     //智能合约信息表
     String CONTRACT_TABLE = "contract_table_";
     //智能合约交易记录表
     String CONTRACT_TX_TABLE = "contract_tx_table_";
     //智能合约token转账记录表
     String TOKEN_TRANSFER_TABLE = "token_transfer_table_";
-    //智能合约token转账记录表
-    String TOKEN721_TRANSFER_TABLE = "token721_transfer_table_";
     //智能合约结果记录
     String CONTRACT_RESULT_TABLE = "contract_result_table_";
     //统计表
@@ -62,6 +58,12 @@ public interface DBTableConstant {
 
     String CHAIN_STATISTICAL_TABLE = "chain_statistical_table";
 
+    //token721的造币信息表
+    String TOKEN721_IDS_TABLE = "token721_ids_table_";
+    //账户token721信息表
+    String ACCOUNT_TOKEN721_TABLE = "account_token721_table_";
+    //智能合约token721转账记录表
+    String TOKEN721_TRANSFER_TABLE = "token721_transfer_table_";
 
     //---------------------------------字段(field)------------------------------
     //new_info表，最新统计的时间点

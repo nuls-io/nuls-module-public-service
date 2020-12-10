@@ -526,8 +526,13 @@ public class AnalysisHandler {
         contractInfo.setDirectPayable((Boolean) map.get("directPayable"));
         boolean isNrc721 = contractInfo.getTokenType() == TOKEN_TYPE_NRC721;
         if (isNrc721) {
-            contractInfo.setTokenName(map.get("nrc20TokenName").toString());
-            contractInfo.setSymbol(map.get("nrc20TokenSymbol").toString());
+            Object tokenName = map.get("nrc20TokenName");
+            tokenName = tokenName == null ? EMPTY_STRING : tokenName;
+            Object tokenSymbol = map.get("nrc20TokenSymbol");
+            tokenSymbol = tokenSymbol == null ? EMPTY_STRING : tokenSymbol;
+            contractInfo.setTokenName(tokenName.toString());
+            contractInfo.setSymbol(tokenSymbol.toString());
+            contractInfo.setOwners(new ArrayList<>());
         }
         if (contractInfo.isNrc20()) {
             contractInfo.setTokenName(map.get("nrc20TokenName").toString());
