@@ -128,6 +128,21 @@ public class ContractController {
         return RpcResult.success(CacheManager.getCache(chainId).getNrc20InfoList());
     }
 
+    @RpcMethod("getNrc721List")
+    public RpcResult getNrc721List(List<Object> params) {
+        int chainId;
+        try {
+            chainId = (int) params.get(0);
+        } catch (Exception e) {
+            return RpcResult.paramError("[chainId] is invalid");
+        }
+        if (!CacheManager.isChainExist(chainId)) {
+            return RpcResult.dataNotFound();
+        }
+        return RpcResult.success(CacheManager.getCache(chainId).getNrc721InfoList());
+    }
+
+
     @RpcMethod("getAccountTokens")
     public RpcResult getAccountTokens(List<Object> params) {
         VerifyUtils.verifyParams(params, 4);
