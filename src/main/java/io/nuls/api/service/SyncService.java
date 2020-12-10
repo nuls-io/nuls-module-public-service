@@ -711,8 +711,8 @@ public class SyncService {
             Nrc20Info nrc20Info = new Nrc20Info();
             nrc20Info.setContractAddress(contractInfo.getContractAddress());
             nrc20Info.setSymbol(contractInfo.getSymbol());
-            nrc20Info.setDecimal(nrc20Info.getDecimal());
-            nrc20Info.setTotalSupply(nrc20Info.getTotalSupply());
+            nrc20Info.setDecimal(contractInfo.getDecimals());
+            nrc20Info.setTotalSupply(contractInfo.getTotalSupply());
 
             ApiCache apiCache = CacheManager.getCache(chainId);
             apiCache.addNrc20Info(nrc20Info);
