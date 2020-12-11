@@ -792,7 +792,8 @@ public class RollbackService {
                 processAccountNrc721(chainId, contractInfo, tokenTransfer.getToAddress(), tokenTransfer.getTokenId(), -1);
             }
             if (isMint) {
-                //token721IdList
+                // 减少发行总量
+                contractInfo.setTotalSupply(new BigInteger(contractInfo.getTotalSupply()).subtract(BigInteger.ONE).toString());
                 // from为空时，视为NRC721的造币
                 tokenIdInfo = new Nrc721TokenIdInfo(tokenTransfer.getContractAddress(), null, null, tokenTransfer.getTokenId(), null, null, null);
             } else {

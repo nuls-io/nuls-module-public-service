@@ -70,14 +70,16 @@ public class ContractController {
         if (contractInfo == null) {
             rpcResult.setError(new RpcResultError(RpcErrorCode.DATA_NOT_EXISTS));
         } else {
-            Integer assetIdOfNRC20 = WalletRpcHandler.getAssetIdOfNRC20(contractAddress);
-            if (assetIdOfNRC20 != null && assetIdOfNRC20.intValue() != 0) {
-                boolean crossAssets = WalletRpcHandler.isCrossAssets(chainId, assetIdOfNRC20);
-                contractInfo.setCrossAsset(crossAssets);
-                Result<BigInteger> result = WalletRpcHandler.tokenTotalSupply(chainId, contractAddress);
-                if (result.isSuccess()) {
-                    BigInteger totalSupply = result.getData();
-                    contractInfo.setTotalSupply(totalSupply.toString());
+            if (ApiConstant.TOKEN_TYPE_NRC20 == contractInfo.getTokenType()) {
+                Integer assetIdOfNRC20 = WalletRpcHandler.getAssetIdOfNRC20(contractAddress);
+                if (assetIdOfNRC20 != null && assetIdOfNRC20.intValue() != 0) {
+                    boolean crossAssets = WalletRpcHandler.isCrossAssets(chainId, assetIdOfNRC20);
+                    contractInfo.setCrossAsset(crossAssets);
+                    Result<BigInteger> result = WalletRpcHandler.tokenTotalSupply(chainId, contractAddress);
+                    if (result.isSuccess()) {
+                        BigInteger totalSupply = result.getData();
+                        contractInfo.setTotalSupply(totalSupply.toString());
+                    }
                 }
             }
             ApiCache apiCache = CacheManager.getCache(chainId);

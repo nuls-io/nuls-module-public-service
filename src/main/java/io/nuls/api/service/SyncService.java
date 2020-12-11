@@ -944,6 +944,8 @@ public class SyncService {
                 processAccountNrc721(chainId, contractInfo, tokenTransfer.getToAddress(), tokenId, 1);
             }
             if (isMint) {
+                // 增加发行总量
+                contractInfo.setTotalSupply(new BigInteger(contractInfo.getTotalSupply()).add(BigInteger.ONE).toString());
                 // from为空时，视为NRC721的造币
                 tokenIdInfo = new Nrc721TokenIdInfo(
                         contractAddress,
@@ -956,7 +958,7 @@ public class SyncService {
                 );
             } else {
                 // 更新token的拥有者
-                tokenIdInfo = new Nrc721TokenIdInfo( contractAddress, null, null, tokenId, null, null, tokenTransfer.getToAddress());
+                tokenIdInfo = new Nrc721TokenIdInfo(contractAddress, null, null, tokenId, null, null, tokenTransfer.getToAddress());
             }
             token721IdList.add(tokenIdInfo);
             token721TransferList.add(tokenTransfer);
