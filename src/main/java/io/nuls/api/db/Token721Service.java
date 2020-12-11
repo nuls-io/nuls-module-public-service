@@ -26,6 +26,8 @@ public interface Token721Service {
 
     void rollbackTokenIds(int chainId, List<Nrc721TokenIdInfo> tokenIDInfos);
 
+    Nrc721TokenIdInfo getContractTokenId(int chainId, String contractAddress, String tokenId);
+
     PageInfo<Nrc721TokenIdInfo> getContractTokenIds(int chainId, String contractAddress, int pageNumber, int pageSize);
 
 }

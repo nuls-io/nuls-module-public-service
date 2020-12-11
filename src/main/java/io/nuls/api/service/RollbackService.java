@@ -179,7 +179,7 @@ public class RollbackService {
     }
 
     private void processTxs(int chainId, List<TransactionInfo> txs) {
-        for (int i = 0; i < txs.size(); i++) {
+        for (int i = txs.size() - 1; i >=0 ; i--) {
             TransactionInfo tx = txs.get(i);
             if (tx.getType() == TxType.COIN_BASE) {
                 processCoinBaseTx(chainId, tx);
@@ -775,23 +775,30 @@ public class RollbackService {
 
         Token721Transfer tokenTransfer;
         ContractInfo contractInfo;
+        Nrc721TokenIdInfo tokenIdInfo;
         for (int i = 0; i < tokenTransfers.size(); i++) {
             tokenTransfer = tokenTransfers.get(i);
 
             contractInfo = queryContractInfo(chainId, tokenTransfer.getContractAddress());
             contractInfo.setTransferCount(contractInfo.getTransferCount() - 1);
 
+            boolean isMint = false;
             if (tokenTransfer.getFromAddress() != null) {
                 processAccountNrc721(chainId, contractInfo, tokenTransfer.getFromAddress(), tokenTransfer.getTokenId(), 1);
             } else {
-                //token721IdList
-                // from为空时，视为NRC721的造币
-                Nrc721TokenIdInfo tokenIdInfo = new Nrc721TokenIdInfo( tokenTransfer.getContractAddress(), null, null, tokenTransfer.getTokenId(), null, null);
-                token721IdList.add(tokenIdInfo);
+                isMint = true;
             }
             if (tokenTransfer.getToAddress() != null) {
                 processAccountNrc721(chainId, contractInfo, tokenTransfer.getToAddress(), tokenTransfer.getTokenId(), -1);
             }
+            if (isMint) {
+                //token721IdList
+                // from为空时，视为NRC721的造币
+                tokenIdInfo = new Nrc721TokenIdInfo(tokenTransfer.getContractAddress(), null, null, tokenTransfer.getTokenId(), null, null, null);
+            } else {
+                tokenIdInfo = new Nrc721TokenIdInfo(tokenTransfer.getContractAddress(), null, null, tokenTransfer.getTokenId(), null, null, tokenTransfer.getFromAddress());
+            }
+            token721IdList.add(tokenIdInfo);
         }
     }
 

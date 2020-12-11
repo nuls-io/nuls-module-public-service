@@ -2,6 +2,7 @@ package io.nuls.api.rpc.controller;
 
 import io.nuls.api.analysis.WalletRpcHandler;
 import io.nuls.api.cache.ApiCache;
+import io.nuls.api.constant.ApiConstant;
 import io.nuls.api.db.ContractService;
 import io.nuls.api.db.Token721Service;
 import io.nuls.api.db.TokenService;
@@ -352,7 +353,9 @@ public class ContractController {
         if (!CacheManager.isChainExist(chainId)) {
             return RpcResult.dataNotFound();
         }
-        return RpcResult.success(CacheManager.getCache(chainId).getNrc721InfoList());
+        params.add(ApiConstant.TOKEN_TYPE_NRC721);
+        params.add(false);
+        return this.getContractList(params);
     }
 
     @RpcMethod("getAccountToken721s")
@@ -594,6 +597,48 @@ public class ContractController {
             }
             RpcResult result = new RpcResult();
             result.setResult(pageInfo);
+            return result;
+        } catch (Exception e) {
+            LoggerUtil.commonLog.error(e);
+            return RpcResult.failed(RpcErrorCode.SYS_UNKNOWN_EXCEPTION);
+        }
+    }
+
+    @RpcMethod("getToken721Id")
+    public RpcResult getToken721Id(List<Object> params) {
+        VerifyUtils.verifyParams(params, 3);
+        int chainId;
+        String contractAddress, tokenId;
+        try {
+            chainId = (int) params.get(0);
+        } catch (Exception e) {
+            return RpcResult.paramError("[chainId] is invalid");
+        }
+        try {
+            contractAddress = (String) params.get(1);
+        } catch (Exception e) {
+            return RpcResult.paramError("[contractAddress] is invalid");
+        }
+        try {
+            tokenId = String.valueOf(params.get(2));
+        } catch (Exception e) {
+            return RpcResult.paramError("[tokenId] is invalid");
+        }
+        if (!AddressTool.validAddress(chainId, contractAddress)) {
+            return RpcResult.paramError("[contractAddress] is invalid");
+        }
+        if (StringUtils.isBlank(tokenId)) {
+            return RpcResult.paramError("[tokenId] is invalid");
+        }
+
+        try {
+            RpcResult result = new RpcResult();
+            Nrc721TokenIdInfo tokenIdInfo = token721Service.getContractTokenId(chainId, contractAddress, tokenId);
+            if (tokenIdInfo == null) {
+                result.setError(new RpcResultError(RpcErrorCode.DATA_NOT_EXISTS));
+                return result;
+            }
+            result.setResult(tokenIdInfo);
             return result;
         } catch (Exception e) {
             LoggerUtil.commonLog.error(e);

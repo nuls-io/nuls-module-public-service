@@ -16,7 +16,12 @@ public class Nrc721TokenIdInfo {
 
     private Long time;
 
-    public Nrc721TokenIdInfo(String contractAddress, String name, String symbol, String tokenId, String tokenURI, Long time) {
+    private String owner;
+
+    public Nrc721TokenIdInfo() {
+    }
+
+    public Nrc721TokenIdInfo(String contractAddress, String name, String symbol, String tokenId, String tokenURI, Long time, String owner) {
         this.key = contractAddress + tokenId;
         this.contractAddress = contractAddress;
         this.name = name;
@@ -24,6 +29,15 @@ public class Nrc721TokenIdInfo {
         this.tokenId = tokenId;
         this.tokenURI = tokenURI;
         this.time = time;
+        this.owner = owner;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 
     public Long getTime() {

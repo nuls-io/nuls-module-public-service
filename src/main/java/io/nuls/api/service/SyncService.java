@@ -919,6 +919,7 @@ public class SyncService {
         ContractInfo contractInfo;
         String contractAddress;
         String tokenId;
+        Nrc721TokenIdInfo tokenIdInfo;
         for (int i = 0; i < tokenTransfers.size(); i++) {
             tokenTransfer = tokenTransfers.get(i);
             tokenTransfer.setTxHash(tx.getHash());
@@ -933,23 +934,31 @@ public class SyncService {
             }
             contractInfo.setTransferCount(contractInfo.getTransferCount() + 1);
 
+            boolean isMint = false;
             if (tokenTransfer.getFromAddress() != null) {
                 processAccountNrc721(chainId, contractInfo, tokenTransfer.getFromAddress(), tokenId, -1);
             } else {
+                isMint = true;
+            }
+            if (tokenTransfer.getToAddress() != null) {
+                processAccountNrc721(chainId, contractInfo, tokenTransfer.getToAddress(), tokenId, 1);
+            }
+            if (isMint) {
                 // from为空时，视为NRC721的造币
-                Nrc721TokenIdInfo tokenIdInfo = new Nrc721TokenIdInfo(
+                tokenIdInfo = new Nrc721TokenIdInfo(
                         contractAddress,
                         contractInfo.getTokenName(),
                         contractInfo.getSymbol(),
                         tokenId,
                         WalletRpcHandler.token721URI(chainId, contractAddress, tokenId),
-                        tokenTransfer.getTime()
+                        tokenTransfer.getTime(),
+                        tokenTransfer.getToAddress()
                 );
-                token721IdList.add(tokenIdInfo);
+            } else {
+                // 更新token的拥有者
+                tokenIdInfo = new Nrc721TokenIdInfo( contractAddress, null, null, tokenId, null, null, tokenTransfer.getToAddress());
             }
-            if (tokenTransfer.getToAddress() != null) {
-                processAccountNrc721(chainId, contractInfo, tokenTransfer.getToAddress(), tokenId, 1);
-            }
+            token721IdList.add(tokenIdInfo);
             token721TransferList.add(tokenTransfer);
         }
     }

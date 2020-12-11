@@ -134,15 +134,21 @@ public class MongoToken721ServiceImpl implements Token721Service {
         if (tokenIdInfos.isEmpty()) {
             return;
         }
-        List<Document> documentList = new ArrayList<>();
+        List<WriteModel<Document>> modelList = new ArrayList<>();
         for (Nrc721TokenIdInfo tokenIdInfo : tokenIdInfos) {
-            Document document = DocumentTransferTool.toDocument(tokenIdInfo, "key");
-            documentList.add(document);
+            if (tokenIdInfo.getTime() != null) {
+                Document document = DocumentTransferTool.toDocument(tokenIdInfo, "key");
+                modelList.add(new InsertOneModel(document));
+            } else {
+                Bson query = Filters.eq("_id", tokenIdInfo.getKey());
+                Document currentDocument = mongoDBService.findOne(TOKEN721_IDS_TABLE + chainId, query);
+                currentDocument.put("owner", tokenIdInfo.getOwner());
+                modelList.add(new ReplaceOneModel<>(Filters.eq("_id", tokenIdInfo.getKey()), currentDocument));
+            }
         }
-        InsertManyOptions options = new InsertManyOptions();
+        BulkWriteOptions options = new BulkWriteOptions();
         options.ordered(false);
-        mongoDBService.insertMany(TOKEN721_IDS_TABLE + chainId, documentList, options);
-
+        mongoDBService.bulkWrite(TOKEN721_IDS_TABLE + chainId, modelList, options);
     }
 
     @Override
@@ -150,9 +156,34 @@ public class MongoToken721ServiceImpl implements Token721Service {
         if (tokenIdInfos.isEmpty()) {
             return;
         }
+        List<WriteModel<Document>> modelList = new ArrayList<>();
         for (Nrc721TokenIdInfo tokenIdInfo : tokenIdInfos) {
-            mongoDBService.delete(TOKEN721_IDS_TABLE + chainId, Filters.eq("_id", tokenIdInfo.getKey()));
+            if (tokenIdInfo.getOwner() == null) {
+                mongoDBService.delete(TOKEN721_IDS_TABLE + chainId, Filters.eq("_id", tokenIdInfo.getKey()));
+            } else {
+                // 回滚token的拥有者
+                Bson query = Filters.eq("_id", tokenIdInfo.getKey());
+                Document currentDocument = mongoDBService.findOne(TOKEN721_IDS_TABLE + chainId, query);
+                currentDocument.put("owner", tokenIdInfo.getOwner());
+                modelList.add(new ReplaceOneModel<>(Filters.eq("_id", tokenIdInfo.getKey()), currentDocument));
+            }
         }
+        if (!modelList.isEmpty()) {
+            BulkWriteOptions options = new BulkWriteOptions();
+            options.ordered(false);
+            mongoDBService.bulkWrite(TOKEN721_IDS_TABLE + chainId, modelList, options);
+        }
+    }
+
+    @Override
+    public Nrc721TokenIdInfo getContractTokenId(int chainId, String contractAddress, String tokenId) {
+        Bson query = Filters.eq("_id", contractAddress + tokenId);
+        Document document = mongoDBService.findOne(TOKEN721_IDS_TABLE + chainId, query);
+        if (document == null) {
+            return null;
+        }
+        Nrc721TokenIdInfo tokenIdInfo = DocumentTransferTool.toInfo(document, "key", Nrc721TokenIdInfo.class);
+        return tokenIdInfo;
     }
 
     @Override
