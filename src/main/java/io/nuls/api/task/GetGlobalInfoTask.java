@@ -23,28 +23,34 @@ public class GetGlobalInfoTask implements Runnable {
 
     @Override
     public void run() {
-        Result<Map<String, Object>> result = WalletRpcHandler.getBlockGlobalInfo(chainId);
-        if (result == null || result.isFailed()) {
-            Log.error("----------GetGlobalInfoTask getBlockGlobalInfo error----------");
-            return;
-        }
-        Map<String, Object> map = result.getData();
-        ApiContext.localHeight = Long.parseLong(map.get("localHeight").toString());
-        ApiContext.networkHeight = Long.parseLong(map.get("networkHeight").toString());
+        try{
+            Result<Map<String, Object>> result = WalletRpcHandler.getBlockGlobalInfo(chainId);
+            if (result == null || result.isFailed()) {
+                Log.error("----------GetGlobalInfoTask getBlockGlobalInfo error----------");
+                return;
+            }
+            Map<String, Object> map = result.getData();
+            ApiContext.localHeight = Long.parseLong(map.get("localHeight").toString());
+            ApiContext.networkHeight = Long.parseLong(map.get("networkHeight").toString());
 
-        if (ApiContext.magicNumber == 0) {
-            result = WalletRpcHandler.getNetworkInfo(chainId);
-            map = result.getData();
-            ApiContext.magicNumber = Integer.parseInt(map.get("magicNumber").toString());
+            if (ApiContext.magicNumber == 0) {
+                result = WalletRpcHandler.getNetworkInfo(chainId);
+                map = result.getData();
+                ApiContext.magicNumber = Integer.parseInt(map.get("magicNumber").toString());
+            }
+
+            transferService = ServiceManager.get(ProtocolProvider.class);
+            io.nuls.base.api.provider.Result<VersionInfo> res = transferService.getVersion(new GetVersionReq());
+            if (res.isSuccess()) {
+                VersionInfo info = res.getData();
+                ApiContext.localProtocolVersion = info.getLocalProtocolVersion();
+            } else {
+                Log.error("----------GetGlobalInfoTask getVersion fail----------" + res.getMessage());
+            }
+        }catch (Exception e) {
+            Log.error("----------GetGlobalInfoTask error----------");
+            Log.error(e);
         }
 
-        transferService = ServiceManager.get(ProtocolProvider.class);
-        io.nuls.base.api.provider.Result<VersionInfo> res = transferService.getVersion(new GetVersionReq());
-        if (res.isSuccess()) {
-            VersionInfo info = res.getData();
-            ApiContext.localProtocolVersion = info.getLocalProtocolVersion();
-        } else {
-            Log.error("----------GetGlobalInfoTask getVersion fail----------" + res.getMessage());
-        }
     }
 }
