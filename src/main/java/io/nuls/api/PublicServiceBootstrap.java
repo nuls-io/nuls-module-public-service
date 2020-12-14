@@ -21,7 +21,6 @@
 package io.nuls.api;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.google.common.cache.Cache;
 import io.nuls.api.analysis.WalletRpcHandler;
 import io.nuls.api.constant.config.ApiConfig;
 import io.nuls.api.db.mongo.MongoChainServiceImpl;
