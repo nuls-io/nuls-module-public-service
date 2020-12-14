@@ -76,8 +76,8 @@ public class ChainController {
 //            }
 //        }
         ;
-        return RpcResult.success(chainInfoList.stream().map(d->{
-            if(d.getChainId() == 9){
+        return RpcResult.success(chainInfoList.stream().map(d -> {
+            if (d.getChainId() == 9) {
                 d.setChainName("NerveNetwork");
             }
             return d;
@@ -122,6 +122,9 @@ public class ChainController {
         map.put("chainId", chainId);
         map.put("networkHeight", ApiContext.networkHeight);
         map.put("localHeight", ApiContext.localHeight);
+
+        map.put("currentProtocolVersion", ApiContext.protocolVersion);
+        map.put("localProtocolVersion", ApiContext.localProtocolVersion);
 
         ApiCache apiCache = CacheManager.getCache(chainId);
         AssetInfo assetInfo = apiCache.getChainInfo().getDefaultAsset();

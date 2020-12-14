@@ -69,6 +69,8 @@ public class ApiContext {
 
     public static int protocolVersion = 1;
 
+    public static int localProtocolVersion = 1;
+
     public static int maxAliveConnect;
 
     public static int maxWaitTime;

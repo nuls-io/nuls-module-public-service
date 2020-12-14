@@ -51,7 +51,7 @@ public class TransactionInfo {
             }
         }
         if (coinFroms != null && !coinFroms.isEmpty()) {
-            CoinFromInfo input = coinFroms.get(coinFroms.size() -1);
+            CoinFromInfo input = coinFroms.get(0);
             this.symbol = input.getSymbol();
             this.decimal = input.getDecimal();
         }
