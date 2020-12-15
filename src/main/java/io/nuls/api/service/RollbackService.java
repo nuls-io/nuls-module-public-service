@@ -778,6 +778,9 @@ public class RollbackService {
         Nrc721TokenIdInfo tokenIdInfo;
         for (int i = 0; i < tokenTransfers.size(); i++) {
             tokenTransfer = tokenTransfers.get(i);
+            tokenTransfer.setTxHash(tx.getHash());
+            tokenTransfer.setHeight(tx.getHeight());
+            tokenTransfer.setTime(tx.getCreateTime());
 
             contractInfo = queryContractInfo(chainId, tokenTransfer.getContractAddress());
             contractInfo.setTransferCount(contractInfo.getTransferCount() - 1);
@@ -814,7 +817,7 @@ public class RollbackService {
                         tokenTransfer.getTime(),
                         tokenTransfer.getToAddress()
                 );
-            }else {
+            } else {
                 // 转账回滚
                 tokenIdInfo = new Nrc721TokenIdInfo(tokenTransfer.getContractAddress(), null, null, tokenTransfer.getTokenId(), null, null, tokenTransfer.getFromAddress());
             }

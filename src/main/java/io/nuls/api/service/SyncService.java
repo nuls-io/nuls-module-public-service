@@ -959,7 +959,7 @@ public class SyncService {
                         tokenTransfer.getTime(),
                         tokenTransfer.getToAddress()
                 );
-            } if (isBurn) {
+            } else if (isBurn) {
                 // 减少发行总量
                 contractInfo.setTotalSupply(new BigInteger(contractInfo.getTotalSupply()).subtract(BigInteger.ONE).toString());
                 // 销毁
