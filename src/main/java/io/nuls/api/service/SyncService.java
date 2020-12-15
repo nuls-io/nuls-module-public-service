@@ -935,6 +935,7 @@ public class SyncService {
             contractInfo.setTransferCount(contractInfo.getTransferCount() + 1);
 
             boolean isMint = false;
+            boolean isBurn = false;
             if (tokenTransfer.getFromAddress() != null) {
                 processAccountNrc721(chainId, contractInfo, tokenTransfer.getFromAddress(), tokenId, -1);
             } else {
@@ -942,6 +943,8 @@ public class SyncService {
             }
             if (tokenTransfer.getToAddress() != null) {
                 processAccountNrc721(chainId, contractInfo, tokenTransfer.getToAddress(), tokenId, 1);
+            } else {
+                isBurn = true;
             }
             if (isMint) {
                 // 增加发行总量
@@ -956,6 +959,11 @@ public class SyncService {
                         tokenTransfer.getTime(),
                         tokenTransfer.getToAddress()
                 );
+            } if (isBurn) {
+                // 减少发行总量
+                contractInfo.setTotalSupply(new BigInteger(contractInfo.getTotalSupply()).subtract(BigInteger.ONE).toString());
+                // 销毁
+                tokenIdInfo = new Nrc721TokenIdInfo(contractAddress, null, null, tokenId, null, null, null);
             } else {
                 // 更新token的拥有者
                 tokenIdInfo = new Nrc721TokenIdInfo(contractAddress, null, null, tokenId, null, null, tokenTransfer.getToAddress());

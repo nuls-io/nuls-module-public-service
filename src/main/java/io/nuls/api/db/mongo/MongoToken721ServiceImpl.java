@@ -137,13 +137,18 @@ public class MongoToken721ServiceImpl implements Token721Service {
         List<WriteModel<Document>> modelList = new ArrayList<>();
         for (Nrc721TokenIdInfo tokenIdInfo : tokenIdInfos) {
             if (tokenIdInfo.getTime() != null) {
+                // 造币
                 Document document = DocumentTransferTool.toDocument(tokenIdInfo, "key");
                 modelList.add(new InsertOneModel(document));
-            } else {
+            } else if (tokenIdInfo.getOwner() != null) {
+                // 转账
                 Bson query = Filters.eq("_id", tokenIdInfo.getKey());
                 Document currentDocument = mongoDBService.findOne(TOKEN721_IDS_TABLE + chainId, query);
                 currentDocument.put("owner", tokenIdInfo.getOwner());
                 modelList.add(new ReplaceOneModel<>(Filters.eq("_id", tokenIdInfo.getKey()), currentDocument));
+            } else {
+                // 销毁
+                modelList.add(new DeleteOneModel<>(Filters.eq("_id", tokenIdInfo.getKey())));
             }
         }
         BulkWriteOptions options = new BulkWriteOptions();
@@ -158,14 +163,19 @@ public class MongoToken721ServiceImpl implements Token721Service {
         }
         List<WriteModel<Document>> modelList = new ArrayList<>();
         for (Nrc721TokenIdInfo tokenIdInfo : tokenIdInfos) {
-            if (tokenIdInfo.getOwner() == null) {
-                mongoDBService.delete(TOKEN721_IDS_TABLE + chainId, Filters.eq("_id", tokenIdInfo.getKey()));
-            } else {
-                // 回滚token的拥有者
+            if (tokenIdInfo.getTime() != null) {
+                // 销毁回滚
+                Document document = DocumentTransferTool.toDocument(tokenIdInfo, "key");
+                modelList.add(new InsertOneModel(document));
+            } else if (tokenIdInfo.getOwner() != null) {
+                // 转账回滚token的拥有者
                 Bson query = Filters.eq("_id", tokenIdInfo.getKey());
                 Document currentDocument = mongoDBService.findOne(TOKEN721_IDS_TABLE + chainId, query);
                 currentDocument.put("owner", tokenIdInfo.getOwner());
                 modelList.add(new ReplaceOneModel<>(Filters.eq("_id", tokenIdInfo.getKey()), currentDocument));
+            } else {
+                // 造币回滚
+                modelList.add(new DeleteOneModel<>(Filters.eq("_id", tokenIdInfo.getKey())));
             }
         }
         if (!modelList.isEmpty()) {

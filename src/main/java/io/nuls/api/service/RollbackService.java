@@ -783,6 +783,7 @@ public class RollbackService {
             contractInfo.setTransferCount(contractInfo.getTransferCount() - 1);
 
             boolean isMint = false;
+            boolean isBurn = false;
             if (tokenTransfer.getFromAddress() != null) {
                 processAccountNrc721(chainId, contractInfo, tokenTransfer.getFromAddress(), tokenTransfer.getTokenId(), 1);
             } else {
@@ -790,13 +791,31 @@ public class RollbackService {
             }
             if (tokenTransfer.getToAddress() != null) {
                 processAccountNrc721(chainId, contractInfo, tokenTransfer.getToAddress(), tokenTransfer.getTokenId(), -1);
+            } else {
+                isBurn = true;
             }
             if (isMint) {
+                // 造币回滚
                 // 减少发行总量
                 contractInfo.setTotalSupply(new BigInteger(contractInfo.getTotalSupply()).subtract(BigInteger.ONE).toString());
                 // from为空时，视为NRC721的造币
                 tokenIdInfo = new Nrc721TokenIdInfo(tokenTransfer.getContractAddress(), null, null, tokenTransfer.getTokenId(), null, null, null);
-            } else {
+            } else if (isBurn) {
+                // 销毁回滚
+                // 增加发行总量
+                contractInfo.setTotalSupply(new BigInteger(contractInfo.getTotalSupply()).add(BigInteger.ONE).toString());
+                // from为空时，视为NRC721的造币
+                tokenIdInfo = new Nrc721TokenIdInfo(
+                        tokenTransfer.getContractAddress(),
+                        contractInfo.getTokenName(),
+                        contractInfo.getSymbol(),
+                        tokenTransfer.getTokenId(),
+                        WalletRpcHandler.token721URI(chainId, tokenTransfer.getContractAddress(), tokenTransfer.getTokenId()),
+                        tokenTransfer.getTime(),
+                        tokenTransfer.getToAddress()
+                );
+            }else {
+                // 转账回滚
                 tokenIdInfo = new Nrc721TokenIdInfo(tokenTransfer.getContractAddress(), null, null, tokenTransfer.getTokenId(), null, null, tokenTransfer.getFromAddress());
             }
             token721IdList.add(tokenIdInfo);
