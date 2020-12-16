@@ -13,9 +13,7 @@ import io.nuls.core.model.StringUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static io.nuls.api.constant.DBTableConstant.*;
 
@@ -134,10 +132,16 @@ public class MongoToken721ServiceImpl implements Token721Service {
         if (tokenIdInfos.isEmpty()) {
             return;
         }
+        Set<String> insertKeys = new HashSet<>();
         List<WriteModel<Document>> modelList = new ArrayList<>();
         for (Nrc721TokenIdInfo tokenIdInfo : tokenIdInfos) {
             if (tokenIdInfo.getTime() != null) {
                 // 造币
+                boolean notExist = insertKeys.add(tokenIdInfo.getKey());
+                if (!notExist) {
+                    // 已存在，跳过
+                    continue;
+                }
                 Bson query = Filters.eq("_id", tokenIdInfo.getKey());
                 Document currentDocument = mongoDBService.findOne(TOKEN721_IDS_TABLE + chainId, query);
                 if (currentDocument == null) {
@@ -168,10 +172,16 @@ public class MongoToken721ServiceImpl implements Token721Service {
         if (tokenIdInfos.isEmpty()) {
             return;
         }
+        Set<String> insertKeys = new HashSet<>();
         List<WriteModel<Document>> modelList = new ArrayList<>();
         for (Nrc721TokenIdInfo tokenIdInfo : tokenIdInfos) {
             if (tokenIdInfo.getTime() != null) {
                 // 销毁回滚
+                boolean notExist = insertKeys.add(tokenIdInfo.getKey());
+                if (!notExist) {
+                    // 已存在，跳过
+                    continue;
+                }
                 Bson query = Filters.eq("_id", tokenIdInfo.getKey());
                 Document currentDocument = mongoDBService.findOne(TOKEN721_IDS_TABLE + chainId, query);
                 if (currentDocument == null) {
