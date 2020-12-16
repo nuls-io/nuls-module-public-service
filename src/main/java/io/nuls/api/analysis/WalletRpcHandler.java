@@ -465,6 +465,42 @@ public class WalletRpcHandler {
         }
     }
 
+    public static String tokenName(int chainid, Object contractAddress) {
+        try {
+            Result<Map> result = invokeView(chainid, contractAddress, "name", null, null);
+            Map map = result.getData();
+            if (map == null) {
+                return EMPTY_STRING;
+            }
+            Object tokenName = map.get("result");
+            if (tokenName == null) {
+                return EMPTY_STRING;
+            }
+            return tokenName.toString();
+        } catch (NulsException e) {
+            Log.error(e.format());
+            return EMPTY_STRING;
+        }
+    }
+
+    public static String tokenSymbol(int chainid, Object contractAddress) {
+        try {
+            Result<Map> result = invokeView(chainid, contractAddress, "symbol", null, null);
+            Map map = result.getData();
+            if (map == null) {
+                return EMPTY_STRING;
+            }
+            Object tokenSymbol = map.get("result");
+            if (tokenSymbol == null) {
+                return EMPTY_STRING;
+            }
+            return tokenSymbol.toString();
+        } catch (NulsException e) {
+            Log.error(e.format());
+            return EMPTY_STRING;
+        }
+    }
+
     public static String token721URI(int chainid, Object contractAddress, Object tokenId) {
         try {
             Result<Map> result = invokeView(chainid, contractAddress, "tokenURI", null, new Object[]{tokenId});

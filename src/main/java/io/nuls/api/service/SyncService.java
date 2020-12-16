@@ -18,6 +18,7 @@ import io.nuls.core.constant.TxType;
 import io.nuls.core.core.annotation.Autowired;
 import io.nuls.core.core.annotation.Component;
 import io.nuls.core.exception.NulsRuntimeException;
+import io.nuls.core.model.StringUtils;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -724,8 +725,15 @@ public class SyncService {
 
     private void addNrc721Info(int chainId, ContractInfo contractInfo) {
         if (contractInfo.getTokenType() == TOKEN_TYPE_NRC721) {
+            String contractAddress = contractInfo.getContractAddress();
+            if (StringUtils.isBlank(contractInfo.getTokenName())) {
+                contractInfo.setTokenName(WalletRpcHandler.tokenName(chainId, contractAddress));
+            }
+            if (StringUtils.isBlank(contractInfo.getSymbol())) {
+                contractInfo.setSymbol(WalletRpcHandler.tokenSymbol(chainId, contractAddress));
+            }
             Nrc721Info nrc721Info = new Nrc721Info();
-            nrc721Info.setContractAddress(contractInfo.getContractAddress());
+            nrc721Info.setContractAddress(contractAddress);
             nrc721Info.setSymbol(contractInfo.getSymbol());
             nrc721Info.setName(contractInfo.getTokenName());
 
