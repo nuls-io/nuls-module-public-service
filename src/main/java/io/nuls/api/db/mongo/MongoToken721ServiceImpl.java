@@ -138,8 +138,12 @@ public class MongoToken721ServiceImpl implements Token721Service {
         for (Nrc721TokenIdInfo tokenIdInfo : tokenIdInfos) {
             if (tokenIdInfo.getTime() != null) {
                 // 造币
-                Document document = DocumentTransferTool.toDocument(tokenIdInfo, "key");
-                modelList.add(new InsertOneModel(document));
+                Bson query = Filters.eq("_id", tokenIdInfo.getKey());
+                Document currentDocument = mongoDBService.findOne(TOKEN721_IDS_TABLE + chainId, query);
+                if (currentDocument == null) {
+                    Document document = DocumentTransferTool.toDocument(tokenIdInfo, "key");
+                    modelList.add(new InsertOneModel(document));
+                }
             } else if (tokenIdInfo.getOwner() != null) {
                 // 转账
                 Bson query = Filters.eq("_id", tokenIdInfo.getKey());
@@ -165,8 +169,12 @@ public class MongoToken721ServiceImpl implements Token721Service {
         for (Nrc721TokenIdInfo tokenIdInfo : tokenIdInfos) {
             if (tokenIdInfo.getTime() != null) {
                 // 销毁回滚
-                Document document = DocumentTransferTool.toDocument(tokenIdInfo, "key");
-                modelList.add(new InsertOneModel(document));
+                Bson query = Filters.eq("_id", tokenIdInfo.getKey());
+                Document currentDocument = mongoDBService.findOne(TOKEN721_IDS_TABLE + chainId, query);
+                if (currentDocument == null) {
+                    Document document = DocumentTransferTool.toDocument(tokenIdInfo, "key");
+                    modelList.add(new InsertOneModel(document));
+                }
             } else if (tokenIdInfo.getOwner() != null) {
                 // 转账回滚token的拥有者
                 Bson query = Filters.eq("_id", tokenIdInfo.getKey());
