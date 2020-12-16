@@ -155,6 +155,9 @@ public class MongoToken721ServiceImpl implements Token721Service {
                 modelList.add(new DeleteOneModel<>(Filters.eq("_id", tokenIdInfo.getKey())));
             }
         }
+        if (modelList.isEmpty()) {
+            return;
+        }
         BulkWriteOptions options = new BulkWriteOptions();
         options.ordered(false);
         mongoDBService.bulkWrite(TOKEN721_IDS_TABLE + chainId, modelList, options);
