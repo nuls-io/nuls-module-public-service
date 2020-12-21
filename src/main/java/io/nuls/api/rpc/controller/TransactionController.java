@@ -308,9 +308,6 @@ public class TransactionController {
                 return RpcResult.dataNotFound();
             }
             int type = this.extractTxTypeFromTx(txHex);
-            if(type == CROSS_CHAIN){
-                return RpcResult.failed(CommonCodeConstanst.PARAMETER_ERROR,"Cross-chain tx pause support");
-            }
             Result result = Result.getSuccess(null);
             CallContractData call = null;
             String contract = null, txHash = null;
