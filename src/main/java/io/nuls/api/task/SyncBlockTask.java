@@ -19,6 +19,8 @@ public class SyncBlockTask implements Runnable {
     private SyncService syncService;
 
     private RollbackService rollbackService;
+    //记录同步出错次数
+    private int syncErrorCount = 0;
 
     public SyncBlockTask(int chainId) {
         this.chainId = chainId;
@@ -28,6 +30,10 @@ public class SyncBlockTask implements Runnable {
 
     @Override
     public void run() {
+        if (syncErrorCount >= 10) {
+            LoggerUtil.commonLog.info("------- syncErrorCount > 10,  sync block stop --------");
+            return;
+        }
         if (!ApiContext.isReady) {
             LoggerUtil.commonLog.info("------- ApiModule wait for successful cross-chain networking  --------");
             return;
@@ -41,6 +47,7 @@ public class SyncBlockTask implements Runnable {
                 rollbackService.rollbackBlock(chainId, syncInfo.getBestHeight());
             }
         } catch (Exception e) {
+            syncErrorCount++;
             Log.error(e);
             return;
         }
@@ -50,7 +57,8 @@ public class SyncBlockTask implements Runnable {
             try {
                 running = syncBlock();
             } catch (Exception e) {
-                Log.error(e);
+                Log.error(e.getMessage(), e);
+                syncErrorCount++;
                 running = false;
             }
         }

@@ -7,6 +7,7 @@ import io.nuls.api.db.*;
 import io.nuls.api.manager.CacheManager;
 import io.nuls.api.model.po.*;
 import io.nuls.api.utils.DBUtil;
+import io.nuls.api.utils.LoggerUtil;
 import io.nuls.base.basic.AddressTool;
 import io.nuls.core.constant.TxType;
 import io.nuls.core.core.annotation.Autowired;
@@ -75,6 +76,8 @@ public class RollbackService {
 
     public boolean rollbackBlock(int chainId, long blockHeight) {
         clear();
+
+        LoggerUtil.commonLog.info("-----rollbackBlock height :" + blockHeight);
         BlockHexInfo blockHexInfo = blockService.getBlockHexInfo(chainId, blockHeight);
         if (blockHexInfo == null) {
             blockService.deleteBlockHeader(chainId, blockHeight);

@@ -20,6 +20,13 @@
 
 package io.nuls.api;
 
+import io.nuls.api.model.po.AgentInfo;
+import io.nuls.api.model.po.BlockHeaderInfo;
+import io.nuls.api.model.po.PageInfo;
+import io.nuls.api.model.po.PocRound;
+import io.nuls.api.model.po.mini.MiniAccountInfo;
+import io.nuls.api.model.po.mini.MiniBlockHeaderInfo;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -109,4 +116,27 @@ public class ApiContext {
     //销毁地址公钥
     public static byte[] blackHolePublicKey;
 
+    public static List<MiniBlockHeaderInfo> blockList;
+
+    public static PageInfo<AgentInfo> agentPageInfo;
+
+    public static PageInfo<MiniAccountInfo> miniAccountPageInfo;
+
+    public static List<PocRound> roundList;
+
+    public static void addAndRemoveLastBlockHeader(BlockHeaderInfo headerInfo) {
+        MiniBlockHeaderInfo mini = new MiniBlockHeaderInfo(headerInfo);
+        if (blockList.size() >= 15) {
+            blockList.remove(blockList.size() - 1);
+        }
+        blockList.add(0, mini);
+    }
+
+    public static void addAndRemoveLastRound(PocRound round) {
+
+        if (roundList.size() >= 5) {
+            roundList.remove(roundList.size() - 1);
+        }
+        roundList.add(0, round);
+    }
 }

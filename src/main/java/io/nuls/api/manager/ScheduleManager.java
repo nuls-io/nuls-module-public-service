@@ -1,8 +1,12 @@
 package io.nuls.api.manager;
 
 import io.nuls.api.ApiContext;
+import io.nuls.api.db.mongo.MongoAccountLedgerServiceImpl;
+import io.nuls.api.db.mongo.MongoAgentServiceImpl;
+import io.nuls.api.db.mongo.MongoTransactionServiceImpl;
 import io.nuls.api.task.*;
 import io.nuls.core.core.annotation.Component;
+import io.nuls.core.core.ioc.SpringLiteContext;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -36,5 +40,9 @@ public class ScheduleManager {
         executorService.scheduleAtFixedRate(new UnConfirmTxTask(ApiContext.defaultChainId), 1, 2, TimeUnit.MINUTES);
         executorService.scheduleAtFixedRate(new StatisticalRewardTask(ApiContext.defaultChainId), 1, 60, TimeUnit.MINUTES);
         executorService.scheduleAtFixedRate(new GetGlobalInfoTask(ApiContext.defaultChainId), 5, 10, TimeUnit.SECONDS);
+
+        MongoAgentServiceImpl mongoAgentService = SpringLiteContext.getBean(MongoAgentServiceImpl.class);
+        MongoAccountLedgerServiceImpl accountLedgerService = SpringLiteContext.getBean(MongoAccountLedgerServiceImpl.class);
+        executorService.scheduleAtFixedRate(new RefreshCacheTask(ApiContext.defaultChainId, mongoAgentService, accountLedgerService), 10, 10, TimeUnit.MINUTES);
     }
 }

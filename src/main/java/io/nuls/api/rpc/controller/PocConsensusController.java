@@ -20,9 +20,11 @@
 
 package io.nuls.api.rpc.controller;
 
+import io.nuls.api.ApiContext;
 import io.nuls.api.analysis.WalletRpcHandler;
 import io.nuls.api.cache.ApiCache;
 import io.nuls.api.constant.ApiConstant;
+import io.nuls.api.constant.config.ApiConfig;
 import io.nuls.api.db.*;
 import io.nuls.api.manager.CacheManager;
 import io.nuls.api.model.po.*;
@@ -48,6 +50,8 @@ import static io.nuls.api.constant.DBTableConstant.CONSENSUS_LOCKED;
 @Controller
 public class PocConsensusController {
 
+    @Autowired
+    private ApiConfig apiConfig;
     @Autowired
     private RoundManager roundManager;
     @Autowired
@@ -150,7 +154,7 @@ public class PocConsensusController {
         if (pageNumber <= 0) {
             pageNumber = 1;
         }
-        if (pageSize <= 0 || pageSize > 1000) {
+        if (pageSize <= 0 || pageSize > 500) {
             pageSize = 10;
         }
 
@@ -160,7 +164,12 @@ public class PocConsensusController {
             return new RpcResult().setResult(pageInfo);
         }
 
-        pageInfo = agentService.getAgentList(chainId, type, pageNumber, pageSize);
+        if (apiConfig.getChainId() == chainId && type == 0 && pageNumber == 1 && pageSize > 50) {
+            pageInfo = ApiContext.agentPageInfo;
+        } else {
+            pageInfo = agentService.getAgentList(chainId, type, pageNumber, pageSize);
+        }
+
         for (AgentInfo agentInfo : pageInfo.getList()) {
             long count = punishService.getYellowCount(chainId, agentInfo.getAgentAddress());
             if (agentInfo.getTotalPackingCount() != 0 || count != 0) {
@@ -172,12 +181,12 @@ public class PocConsensusController {
                 agentInfo.setCreditValue(clientResult.getData().getCreditValue());
                 agentInfo.setDepositCount(clientResult.getData().getDepositCount());
                 agentInfo.setStatus(clientResult.getData().getStatus());
-                if (agentInfo.getAgentAlias() == null) {
-                    AliasInfo info = aliasService.getAliasByAddress(chainId, agentInfo.getAgentAddress());
-                    if (null != info) {
-                        agentInfo.setAgentAlias(info.getAlias());
-                    }
-                }
+//                if (agentInfo.getAgentAlias() == null) {
+//                    AliasInfo info = aliasService.getAliasByAddress(chainId, agentInfo.getAgentAddress());
+//                    if (null != info) {
+//                        agentInfo.setAgentAlias(info.getAlias());
+//                    }
+//                }
             }
         }
         Collections.sort(pageInfo.getList(), AgentComparator.getInstance());
@@ -751,7 +760,7 @@ public class PocConsensusController {
         if (pageNumber <= 0) {
             pageNumber = 1;
         }
-        if (pageSize <= 0 || pageSize > 1000) {
+        if (pageSize <= 0 || pageSize > 100) {
             pageSize = 10;
         }
 
@@ -759,7 +768,13 @@ public class PocConsensusController {
             return RpcResult.success(new PageInfo<>(pageNumber, pageSize));
         }
         long count = roundService.getTotalCount(chainId);
-        List<PocRound> roundList = roundService.getRoundList(chainId, pageNumber, pageSize);
+        List<PocRound> roundList;
+        if (chainId == apiConfig.getChainId() && pageNumber == 1 && pageSize == 5) {
+            roundList = ApiContext.roundList;
+        } else {
+            roundList = roundService.getRoundList(chainId, pageNumber, pageSize);
+        }
+
         PageInfo<PocRound> pageInfo = new PageInfo<>();
         pageInfo.setPageNumber(pageNumber);
         pageInfo.setPageSize(pageSize);

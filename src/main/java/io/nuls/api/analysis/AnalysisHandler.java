@@ -258,6 +258,9 @@ public class AnalysisHandler {
         if (resultInfoMap != null) {
             resultInfo = resultInfoMap.get(info.getHash());
         }
+        if (resultInfo == null && tx.getType() == 16) {
+            throw new Exception("-----执行合约未查询到智能合约执行结果 交易hash: " + tx.getHash());
+        }
         if (resultInfo == null) {
             if (info.getType() == TxType.YELLOW_PUNISH) {
                 info.setTxDataList(toYellowPunish(tx));

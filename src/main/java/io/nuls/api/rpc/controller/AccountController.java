@@ -23,6 +23,7 @@ package io.nuls.api.rpc.controller;
 import io.nuls.api.ApiContext;
 import io.nuls.api.analysis.WalletRpcHandler;
 import io.nuls.api.cache.ApiCache;
+import io.nuls.api.constant.config.ApiConfig;
 import io.nuls.api.db.*;
 import io.nuls.api.manager.CacheManager;
 import io.nuls.api.model.po.*;
@@ -49,7 +50,8 @@ import java.util.stream.Collectors;
  */
 @Controller
 public class AccountController {
-
+    @Autowired
+    private ApiConfig apiConfig;
     @Autowired
     private AccountService accountService;
     @Autowired
@@ -425,7 +427,12 @@ public class AccountController {
 
         PageInfo<MiniAccountInfo> pageInfo;
         if (CacheManager.isChainExist(chainId)) {
-            pageInfo = accountLedgerService.getAssetRanking(chainId, assetChainId, assetId, pageNumber, pageSize);
+            if (chainId == apiConfig.getChainId() && assetChainId == apiConfig.getChainId() && assetId == apiConfig.getAssetId()
+                    && pageNumber == 1 && pageSize == 15) {
+                pageInfo = ApiContext.miniAccountPageInfo;
+            } else {
+                pageInfo = accountLedgerService.getAssetRanking(chainId, assetChainId, assetId, pageNumber, pageSize);
+            }
         } else {
             pageInfo = new PageInfo<>(pageNumber, pageSize);
         }

@@ -1,5 +1,7 @@
 package io.nuls.api.model.po.mini;
 
+import io.nuls.api.model.po.BlockHeaderInfo;
+
 import java.math.BigInteger;
 
 public class MiniBlockHeaderInfo {
@@ -19,6 +21,22 @@ public class MiniBlockHeaderInfo {
     private int size;
 
     private BigInteger reward;
+
+
+    public MiniBlockHeaderInfo() {
+    }
+
+    public MiniBlockHeaderInfo(BlockHeaderInfo info) {
+        this.height = info.getHeight();
+        this.createTime = info.getCreateTime();
+        this.txCount = info.getTxCount();
+        this.agentHash = info.getAgentHash();
+        this.agentId = info.getAgentId();
+        this.agentAlias = info.getAgentAlias();
+        this.size = info.getSize();
+        this.reward = info.getReward();
+    }
+
 
     public long getHeight() {
         return height;
