@@ -7,7 +7,6 @@ import io.nuls.api.constant.ApiConstant;
 import io.nuls.api.constant.ApiErrorCode;
 import io.nuls.api.db.*;
 import io.nuls.api.db.mongo.MongoAccountServiceImpl;
-import io.nuls.api.db.mongo.MongoChainServiceImpl;
 import io.nuls.api.manager.CacheManager;
 import io.nuls.api.model.po.*;
 import io.nuls.api.utils.DBUtil;

@@ -87,6 +87,7 @@ public class RoundManager {
         apiCache.setCurrentRound(currentRound);
         mongoRoundServiceImpl.updateRoundItem(chainId, item);
         this.mongoRoundServiceImpl.updateRound(chainId, currentRound.toPocRound());
+        ApiContext.addAndRemoveLastRound(currentRound);
     }
 
 
@@ -231,7 +232,7 @@ public class RoundManager {
         mongoRoundServiceImpl.saveRoundItemList(chainId, round.getItemList());
         PocRound pocRound = round.toPocRound();
         mongoRoundServiceImpl.saveRound(chainId, pocRound);
-        ApiContext.addAndRemoveLastRound(pocRound);
+        ApiContext.addAndRemoveLastRound(currentRound);
     }
 
 

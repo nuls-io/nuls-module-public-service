@@ -770,7 +770,10 @@ public class PocConsensusController {
         long count = roundService.getTotalCount(chainId);
         List<PocRound> roundList;
         if (chainId == apiConfig.getChainId() && pageNumber == 1 && pageSize == 5) {
-            roundList = ApiContext.roundList;
+            roundList = new ArrayList<>();
+            for (CurrentRound round : ApiContext.roundList) {
+                roundList.add(round.toPocRound());
+            }
         } else {
             roundList = roundService.getRoundList(chainId, pageNumber, pageSize);
         }
@@ -805,6 +808,14 @@ public class PocConsensusController {
         if (roundIndex == 1) {
             return getFirstRound(chainId);
         }
+        //查看所查询的round是否在缓存里
+        for (CurrentRound round : ApiContext.roundList) {
+            if(round.getIndex() == roundIndex) {
+                return new RpcResult().setResult(round);
+            }
+        }
+
+        //查询数据库
         CurrentRound round = new CurrentRound();
         PocRound pocRound = roundService.getRound(chainId, roundIndex);
         if (pocRound == null) {

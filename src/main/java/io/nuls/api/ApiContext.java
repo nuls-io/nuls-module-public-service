@@ -20,18 +20,12 @@
 
 package io.nuls.api;
 
-import io.nuls.api.model.po.AgentInfo;
-import io.nuls.api.model.po.BlockHeaderInfo;
-import io.nuls.api.model.po.PageInfo;
-import io.nuls.api.model.po.PocRound;
+import io.nuls.api.model.po.*;
 import io.nuls.api.model.po.mini.MiniAccountInfo;
 import io.nuls.api.model.po.mini.MiniBlockHeaderInfo;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Niels
@@ -122,7 +116,7 @@ public class ApiContext {
 
     public static PageInfo<MiniAccountInfo> miniAccountPageInfo;
 
-    public static List<PocRound> roundList;
+    public static List<CurrentRound> roundList;
 
     public static void addAndRemoveLastBlockHeader(BlockHeaderInfo headerInfo) {
         MiniBlockHeaderInfo mini = new MiniBlockHeaderInfo(headerInfo);
@@ -132,8 +126,18 @@ public class ApiContext {
         blockList.add(0, mini);
     }
 
-    public static void addAndRemoveLastRound(PocRound round) {
-
+    public static void addAndRemoveLastRound(CurrentRound round) {
+        boolean has = false;
+        for (int i = 0; i < roundList.size(); i++) {
+            CurrentRound item = roundList.get(i);
+            if (item.getIndex() == round.getIndex()) {
+                roundList.remove(i);
+                roundList.add(i, round);
+                has = true;
+                break;
+            }
+        }
+        if (has) return;
         if (roundList.size() >= 5) {
             roundList.remove(roundList.size() - 1);
         }

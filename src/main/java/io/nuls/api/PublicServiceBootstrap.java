@@ -54,6 +54,7 @@ import io.nuls.core.rpc.modulebootstrap.RpcModuleState;
 import io.nuls.core.rpc.util.AddressPrefixDatas;
 import org.bouncycastle.util.encoders.Hex;
 import org.bson.Document;
+import org.checkerframework.checker.units.qual.C;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -256,9 +257,7 @@ public class PublicServiceBootstrap extends RpcModule {
         ApiContext.agentPageInfo = agentPageInfo;
 
         //缓存首页轮次信息
-        MongoRoundServiceImpl roundService = SpringLiteContext.getBean(MongoRoundServiceImpl.class);
-        List<PocRound> roundList = roundService.getRoundList(apiConfig.getChainId(), 1, 5);
-        ApiContext.roundList = roundList;
+        cacheRoundList(mongoDBService);
 
         //缓存nuls首页持币排名信息
         MongoAccountLedgerServiceImpl accountLedgerService = SpringLiteContext.getBean(MongoAccountLedgerServiceImpl.class);
@@ -278,6 +277,21 @@ public class PublicServiceBootstrap extends RpcModule {
         }
         ApiContext.blockList = list;
     }
+
+    private void cacheRoundList(MongoDBService mongoDBService) {
+        MongoRoundServiceImpl roundService = SpringLiteContext.getBean(MongoRoundServiceImpl.class);
+        List<PocRound> roundList = roundService.getRoundList(apiConfig.getChainId(), 1, 5);
+        List<CurrentRound> currentRoundList = new ArrayList<>();
+        for (PocRound round : roundList) {
+            CurrentRound currentRound = new CurrentRound();
+            currentRound.initByPocRound(round);
+            List<PocRoundItem> itemList = roundService.getRoundItemList(apiConfig.getChainId(), currentRound.getIndex());
+            currentRound.setItemList(itemList);
+            currentRoundList.add(currentRound);
+        }
+        ApiContext.roundList = currentRoundList;
+    }
+
 
     @Override
     public RpcModuleState onDependenciesLoss(Module dependenciesModule) {
