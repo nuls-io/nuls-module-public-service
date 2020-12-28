@@ -190,9 +190,15 @@ public class AccountInfo {
         accountInfo.balance = new BigInteger(this.balance.toString());
         accountInfo.totalBalance = new BigInteger(this.totalBalance.toString());
         accountInfo.totalReward = new BigInteger(this.totalReward.toString());
+        if (this.tokens == null) {
+            this.tokens = new ArrayList<>();
+        }
         accountInfo.tokens = new ArrayList<>(this.tokens);
+        if (this.token721s == null) {
+            this.token721s = new ArrayList<>();
+        }
         accountInfo.token721s = new ArrayList<>(this.token721s);
-        accountInfo.lastReward =new BigInteger(this.lastReward.toString());
+        accountInfo.lastReward = new BigInteger(this.lastReward.toString());
         return accountInfo;
     }
 
