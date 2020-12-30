@@ -1100,6 +1100,18 @@ public class ContractController {
         } catch (Exception e) {
             return RpcResult.paramError("[args] is invalid");
         }
+        Object[] multyAssetValues = null;
+        if (params.size() > 9) {
+            try {
+                List list1 = (List) params.get(9);
+                multyAssetValues = new Object[list1.size()];
+                for (int i = 0; i < list1.size(); i++) {
+                    multyAssetValues[i] = list1.get(i);
+                }
+            } catch (Exception e) {
+                return RpcResult.paramError("[multyAssetValues] is invalid");
+            }
+        }
         if (!CacheManager.isChainExist(chainId)) {
             return RpcResult.dataNotFound();
         }
@@ -1121,7 +1133,8 @@ public class ContractController {
                 contractAddress,
                 methodName,
                 methodDesc,
-                args
+                args,
+                multyAssetValues
         );
         rpcResult.setResult(mapResult.getData());
         return rpcResult;
@@ -1244,6 +1257,18 @@ public class ContractController {
         } catch (Exception e) {
             return RpcResult.paramError("[args] is invalid");
         }
+        Object[] multyAssetValues = null;
+        if (params.size() > 7) {
+            try {
+                List list1 = (List) params.get(7);
+                multyAssetValues = new Object[list1.size()];
+                for (int i = 0; i < list1.size(); i++) {
+                    multyAssetValues[i] = list1.get(i);
+                }
+            } catch (Exception e) {
+                return RpcResult.paramError("[multyAssetValues] is invalid");
+            }
+        }
         if (!CacheManager.isChainExist(chainId)) {
             return RpcResult.dataNotFound();
         }
@@ -1266,7 +1291,8 @@ public class ContractController {
                 contractAddress,
                 methodName,
                 methodDesc,
-                args
+                args,
+                multyAssetValues
         );
         rpcResult.setResult(mapResult.getData());
         return rpcResult;
@@ -1400,6 +1426,18 @@ public class ContractController {
         } catch (Exception e) {
             return RpcResult.paramError("[args] is invalid");
         }
+        Object[] multyAssetValues = null;
+        if (params.size() > 9) {
+            try {
+                List list1 = (List) params.get(9);
+                multyAssetValues = new Object[list1.size()];
+                for (int i = 0; i < list1.size(); i++) {
+                    multyAssetValues[i] = list1.get(i);
+                }
+            } catch (Exception e) {
+                return RpcResult.paramError("[multyAssetValues] is invalid");
+            }
+        }
         RpcResult contractMethodArgsTypesResult = this.getContractMethodArgsTypes(List.of(chainId, contractAddress, methodName, methodDesc));
         if (contractMethodArgsTypesResult.getError() != null) {
             return contractMethodArgsTypesResult;
@@ -1410,7 +1448,7 @@ public class ContractController {
         convertArgsToObjectArray(args, types);
 
         RpcResult rpcResult = new RpcResult();
-        Result<Map> mapResult = WalletRpcHandler.contractPreviewCall(chainId, sender, valueBigInteger, gasLimit, price, contractAddress, methodName, methodDesc, args);
+        Result<Map> mapResult = WalletRpcHandler.contractPreviewCall(chainId, sender, valueBigInteger, gasLimit, price, contractAddress, methodName, methodDesc, args, multyAssetValues);
         rpcResult.setResult(mapResult.getData());
         return rpcResult;
     }
