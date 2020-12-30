@@ -340,7 +340,7 @@ public class WalletRpcHandler {
     }
 
     public static Result<Map> validateContractCall(int chainId, Object sender, Object value, Object gasLimit, Object price,
-                                                   Object contractAddress, Object methodName, Object methodDesc, Object args) throws NulsException {
+                                                   Object contractAddress, Object methodName, Object methodDesc, Object args, Object[] multyAssetValues) throws NulsException {
         Map<String, Object> params = new HashMap<>();
         params.put(Constants.CHAIN_ID, chainId);
         params.put("sender", sender);
@@ -351,6 +351,7 @@ public class WalletRpcHandler {
         params.put("methodName", methodName);
         params.put("methodDesc", methodDesc);
         params.put("args", args);
+        params.put("multyAssetValues", multyAssetValues);
         Response response = RpcCall.requestAndResponse(ModuleE.SC.abbr, CommandConstant.VALIDATE_CALL, params);
         boolean bool = response.isSuccess();
         String msg = "";
@@ -405,7 +406,7 @@ public class WalletRpcHandler {
     }
 
     public static Result<Map> imputedContractCallGas(int chainId, Object sender, Object value,
-                                                     Object contractAddress, Object methodName, Object methodDesc, Object args) throws NulsException {
+                                                     Object contractAddress, Object methodName, Object methodDesc, Object args, Object[] multyAssetValues) throws NulsException {
         Map<String, Object> params = new HashMap<>();
         params.put(Constants.CHAIN_ID, chainId);
         params.put("sender", sender);
@@ -414,6 +415,7 @@ public class WalletRpcHandler {
         params.put("methodName", methodName);
         params.put("methodDesc", methodDesc);
         params.put("args", args);
+        params.put("multyAssetValues", multyAssetValues);
         Map map = (Map) RpcCall.request(ModuleE.SC.abbr, CommandConstant.IMPUTED_CALL_GAS, params);
         return Result.getSuccess(null).setData(map);
     }
@@ -713,7 +715,7 @@ public class WalletRpcHandler {
     }
 
 
-    public static Result contractPreviewCall(int chainId, String sender, BigInteger value, long gasLimit, long price, String contractAddress, String methodName, String methodDesc, Object[] args) {
+    public static Result contractPreviewCall(int chainId, String sender, BigInteger value, long gasLimit, long price, String contractAddress, String methodName, String methodDesc, Object[] args, Object[] multyAssetValues) {
 
         try {
             Map<String, Object> params = new HashMap<>();
@@ -726,6 +728,7 @@ public class WalletRpcHandler {
             params.put("methodName", methodName);
             params.put("methodDesc", methodDesc);
             params.put("args", args);
+            params.put("multyAssetValues", multyAssetValues);
             Map map = (Map) RpcCall.request(ModuleE.SC.abbr, CommandConstant.PREVIEW_CALL, params);
             return Result.getSuccess(null).setData(map);
         } catch (NulsException e) {
