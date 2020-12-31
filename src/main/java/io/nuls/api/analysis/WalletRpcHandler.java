@@ -340,7 +340,7 @@ public class WalletRpcHandler {
     }
 
     public static Result<Map> validateContractCall(int chainId, Object sender, Object value, Object gasLimit, Object price,
-                                                   Object contractAddress, Object methodName, Object methodDesc, Object args, Object[] multyAssetValues) throws NulsException {
+                                                   Object contractAddress, Object methodName, Object methodDesc, Object args, Object multyAssetValues) throws NulsException {
         Map<String, Object> params = new HashMap<>();
         params.put(Constants.CHAIN_ID, chainId);
         params.put("sender", sender);
