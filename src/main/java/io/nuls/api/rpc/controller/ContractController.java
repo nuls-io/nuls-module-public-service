@@ -2,7 +2,9 @@ package io.nuls.api.rpc.controller;
 
 import io.nuls.api.analysis.WalletRpcHandler;
 import io.nuls.api.cache.ApiCache;
+import io.nuls.api.constant.ApiConstant;
 import io.nuls.api.db.ContractService;
+import io.nuls.api.db.Token721Service;
 import io.nuls.api.db.TokenService;
 import io.nuls.api.manager.CacheManager;
 import io.nuls.api.model.po.*;
@@ -37,6 +39,8 @@ public class ContractController {
     private ContractService contractService;
     @Autowired
     private TokenService tokenService;
+    @Autowired
+    private Token721Service token721Service;
 
     @RpcMethod("getContract")
     public RpcResult getContract(List<Object> params) {
@@ -66,14 +70,16 @@ public class ContractController {
         if (contractInfo == null) {
             rpcResult.setError(new RpcResultError(RpcErrorCode.DATA_NOT_EXISTS));
         } else {
-            Integer assetIdOfNRC20 = WalletRpcHandler.getAssetIdOfNRC20(contractAddress);
-            if (assetIdOfNRC20 != null) {
-                boolean crossAssets = WalletRpcHandler.isCrossAssets(chainId, assetIdOfNRC20);
-                contractInfo.setCrossAsset(crossAssets);
-                Result<BigInteger> result = WalletRpcHandler.tokenTotalSupply(chainId, contractAddress);
-                if (result.isSuccess()) {
-                    BigInteger totalSupply = result.getData();
-                    contractInfo.setTotalSupply(totalSupply.toString());
+            if (ApiConstant.TOKEN_TYPE_NRC20 == contractInfo.getTokenType()) {
+                Integer assetIdOfNRC20 = WalletRpcHandler.getAssetIdOfNRC20(contractAddress);
+                if (assetIdOfNRC20 != null && assetIdOfNRC20.intValue() != 0) {
+                    boolean crossAssets = WalletRpcHandler.isCrossAssets(chainId, assetIdOfNRC20);
+                    contractInfo.setCrossAsset(crossAssets);
+                    Result<BigInteger> result = WalletRpcHandler.tokenTotalSupply(chainId, contractAddress);
+                    if (result.isSuccess()) {
+                        BigInteger totalSupply = result.getData();
+                        contractInfo.setTotalSupply(totalSupply.toString());
+                    }
                 }
             }
             ApiCache apiCache = CacheManager.getCache(chainId);
@@ -127,6 +133,7 @@ public class ContractController {
         }
         return RpcResult.success(CacheManager.getCache(chainId).getNrc20InfoList());
     }
+
 
     @RpcMethod("getAccountTokens")
     public RpcResult getAccountTokens(List<Object> params) {
@@ -330,6 +337,310 @@ public class ContractController {
             }
             RpcResult result = new RpcResult();
             result.setResult(pageInfo);
+            return result;
+        } catch (Exception e) {
+            LoggerUtil.commonLog.error(e);
+            return RpcResult.failed(RpcErrorCode.SYS_UNKNOWN_EXCEPTION);
+        }
+    }
+
+    @RpcMethod("getNrc721List")
+    public RpcResult getNrc721List(List<Object> params) {
+        int chainId;
+        try {
+            chainId = (int) params.get(0);
+        } catch (Exception e) {
+            return RpcResult.paramError("[chainId] is invalid");
+        }
+        if (!CacheManager.isChainExist(chainId)) {
+            return RpcResult.dataNotFound();
+        }
+        params.add(ApiConstant.TOKEN_TYPE_NRC721);
+        params.add(false);
+        return this.getContractList(params);
+    }
+
+    @RpcMethod("getAccountToken721s")
+    public RpcResult getAccountToken721s(List<Object> params) {
+        VerifyUtils.verifyParams(params, 4);
+        int chainId, pageNumber, pageSize;
+        String address;
+        try {
+            chainId = (int) params.get(0);
+        } catch (Exception e) {
+            return RpcResult.paramError("[chainId] is invalid");
+        }
+        try {
+            pageNumber = (int) params.get(1);
+        } catch (Exception e) {
+            return RpcResult.paramError("[pageIndex] is invalid");
+        }
+        try {
+            pageSize = (int) params.get(2);
+        } catch (Exception e) {
+            return RpcResult.paramError("[pageSize] is invalid");
+        }
+        try {
+            address = (String) params.get(3);
+        } catch (Exception e) {
+            return RpcResult.paramError("[address] is invalid");
+        }
+
+        if (!AddressTool.validAddress(chainId, address)) {
+            return RpcResult.paramError("[address] is invalid");
+        }
+        if (pageNumber <= 0) {
+            pageNumber = 1;
+        }
+        if (pageSize <= 0 || pageSize > 100) {
+            pageSize = 10;
+        }
+
+        PageInfo<AccountToken721Info> pageInfo;
+        if (!CacheManager.isChainExist(chainId)) {
+            pageInfo = new PageInfo<>(pageNumber, pageSize);
+        } else {
+            pageInfo = token721Service.getAccountTokens(chainId, address, pageNumber, pageSize);
+        }
+        RpcResult result = new RpcResult();
+        result.setResult(pageInfo);
+        return result;
+    }
+
+    @RpcMethod("getAccountToken721")
+    public RpcResult getAccountToken721(List<Object> params) {
+        RpcResult result = new RpcResult();
+        VerifyUtils.verifyParams(params, 3);
+        int chainId;
+        String address, contract;
+        try {
+            chainId = (int) params.get(0);
+        } catch (Exception e) {
+            return RpcResult.paramError("[chainId] is invalid");
+        }
+        try {
+            address = (String) params.get(1);
+        } catch (Exception e) {
+            return RpcResult.paramError("[address] is invalid");
+        }
+        try {
+            contract = (String) params.get(2);
+        } catch (Exception e) {
+            return RpcResult.paramError("[contract] is invalid");
+        }
+        if (!AddressTool.validAddress(chainId, address)) {
+            return RpcResult.paramError("[address] is invalid");
+        }
+        if (!AddressTool.validContractAddress(AddressTool.getAddress(contract), chainId)) {
+            return RpcResult.paramError("[contract] is invalid");
+        }
+        AccountToken721Info tokenInfo = token721Service.getAccountTokenInfo(chainId, address + contract);
+        if (tokenInfo == null) {
+            result.setError(new RpcResultError(RpcErrorCode.DATA_NOT_EXISTS));
+            return result;
+        }
+        result.setResult(tokenInfo);
+        return result;
+    }
+
+    @RpcMethod("getContractToken721s")
+    public RpcResult getContractToken721s(List<Object> params) {
+        VerifyUtils.verifyParams(params, 4);
+        int chainId, pageNumber, pageSize;
+        String contractAddress;
+        try {
+            chainId = (int) params.get(0);
+        } catch (Exception e) {
+            return RpcResult.paramError("[chainId] is invalid");
+        }
+        try {
+            pageNumber = (int) params.get(1);
+        } catch (Exception e) {
+            return RpcResult.paramError("[pageNumber] is invalid");
+        }
+        try {
+            pageSize = (int) params.get(2);
+        } catch (Exception e) {
+            return RpcResult.paramError("[pageSize] is invalid");
+        }
+        try {
+            contractAddress = (String) params.get(3);
+        } catch (Exception e) {
+            return RpcResult.paramError("[contractAddress] is invalid");
+        }
+        if (!AddressTool.validAddress(chainId, contractAddress)) {
+            return RpcResult.paramError("[contractAddress] is invalid");
+        }
+        if (pageNumber <= 0) {
+            pageNumber = 1;
+        }
+        if (pageSize <= 0 || pageSize > 100) {
+            pageSize = 10;
+        }
+
+        try {
+            PageInfo<AccountToken721Info> pageInfo;
+            if (!CacheManager.isChainExist(chainId)) {
+                pageInfo = new PageInfo<>(pageNumber, pageSize);
+            } else {
+                pageInfo = token721Service.getContractTokens(chainId, contractAddress, pageNumber, pageSize);
+            }
+            RpcResult result = new RpcResult();
+            result.setResult(pageInfo);
+            return result;
+        } catch (Exception e) {
+            LoggerUtil.commonLog.error(e);
+            return RpcResult.failed(RpcErrorCode.SYS_UNKNOWN_EXCEPTION);
+        }
+    }
+
+    @RpcMethod("getToken721Transfers")
+    public RpcResult getToken721Transfers(List<Object> params) {
+        VerifyUtils.verifyParams(params, 5);
+        int chainId, pageNumber, pageSize;
+        String address, contractAddress;
+        try {
+            chainId = (int) params.get(0);
+        } catch (Exception e) {
+            return RpcResult.paramError("[chainId] is invalid");
+        }
+        try {
+            pageNumber = (int) params.get(1);
+        } catch (Exception e) {
+            return RpcResult.paramError("[pageNumber] is invalid");
+        }
+        try {
+            pageSize = (int) params.get(2);
+        } catch (Exception e) {
+            return RpcResult.paramError("[pageSize] is invalid");
+        }
+        try {
+            address = (String) params.get(3);
+        } catch (Exception e) {
+            return RpcResult.paramError("[address] is invalid");
+        }
+        try {
+            contractAddress = (String) params.get(4);
+        } catch (Exception e) {
+            return RpcResult.paramError("[contractAddress] is invalid");
+        }
+
+        if (!StringUtils.isBlank(address) && !AddressTool.validAddress(chainId, address)) {
+            return RpcResult.paramError("[address] is invalid");
+        }
+        if (!StringUtils.isBlank(contractAddress) && !AddressTool.validAddress(chainId, contractAddress)) {
+            return RpcResult.paramError("[contractAddress] is invalid");
+        }
+
+        if (pageNumber <= 0) {
+            pageNumber = 1;
+        }
+        if (pageSize <= 0 || pageSize > 100) {
+            pageSize = 10;
+        }
+
+        try {
+            PageInfo<Token721Transfer> pageInfo;
+            if (!CacheManager.isChainExist(chainId)) {
+                pageInfo = new PageInfo<>(pageNumber, pageSize);
+            } else {
+                pageInfo = token721Service.getTokenTransfers(chainId, address, contractAddress, pageNumber, pageSize);
+            }
+            RpcResult result = new RpcResult();
+            result.setResult(pageInfo);
+            return result;
+        } catch (Exception e) {
+            LoggerUtil.commonLog.error(e);
+            return RpcResult.failed(RpcErrorCode.SYS_UNKNOWN_EXCEPTION);
+        }
+    }
+
+    @RpcMethod("getToken721Ids")
+    public RpcResult getToken721Ids(List<Object> params) {
+        VerifyUtils.verifyParams(params, 4);
+        int chainId, pageNumber, pageSize;
+        String contractAddress;
+        try {
+            chainId = (int) params.get(0);
+        } catch (Exception e) {
+            return RpcResult.paramError("[chainId] is invalid");
+        }
+        try {
+            pageNumber = (int) params.get(1);
+        } catch (Exception e) {
+            return RpcResult.paramError("[pageNumber] is invalid");
+        }
+        try {
+            pageSize = (int) params.get(2);
+        } catch (Exception e) {
+            return RpcResult.paramError("[pageSize] is invalid");
+        }
+        try {
+            contractAddress = (String) params.get(3);
+        } catch (Exception e) {
+            return RpcResult.paramError("[contractAddress] is invalid");
+        }
+        if (!AddressTool.validAddress(chainId, contractAddress)) {
+            return RpcResult.paramError("[contractAddress] is invalid");
+        }
+        if (pageNumber <= 0) {
+            pageNumber = 1;
+        }
+        if (pageSize <= 0 || pageSize > 100) {
+            pageSize = 10;
+        }
+
+        try {
+            PageInfo<Nrc721TokenIdInfo> pageInfo;
+            if (!CacheManager.isChainExist(chainId)) {
+                pageInfo = new PageInfo<>(pageNumber, pageSize);
+            } else {
+                pageInfo = token721Service.getContractTokenIds(chainId, contractAddress, pageNumber, pageSize);
+            }
+            RpcResult result = new RpcResult();
+            result.setResult(pageInfo);
+            return result;
+        } catch (Exception e) {
+            LoggerUtil.commonLog.error(e);
+            return RpcResult.failed(RpcErrorCode.SYS_UNKNOWN_EXCEPTION);
+        }
+    }
+
+    @RpcMethod("getToken721Id")
+    public RpcResult getToken721Id(List<Object> params) {
+        VerifyUtils.verifyParams(params, 3);
+        int chainId;
+        String contractAddress, tokenId;
+        try {
+            chainId = (int) params.get(0);
+        } catch (Exception e) {
+            return RpcResult.paramError("[chainId] is invalid");
+        }
+        try {
+            contractAddress = (String) params.get(1);
+        } catch (Exception e) {
+            return RpcResult.paramError("[contractAddress] is invalid");
+        }
+        try {
+            tokenId = String.valueOf(params.get(2));
+        } catch (Exception e) {
+            return RpcResult.paramError("[tokenId] is invalid");
+        }
+        if (!AddressTool.validAddress(chainId, contractAddress)) {
+            return RpcResult.paramError("[contractAddress] is invalid");
+        }
+        if (StringUtils.isBlank(tokenId)) {
+            return RpcResult.paramError("[tokenId] is invalid");
+        }
+
+        try {
+            RpcResult result = new RpcResult();
+            Nrc721TokenIdInfo tokenIdInfo = token721Service.getContractTokenId(chainId, contractAddress, tokenId);
+            if (tokenIdInfo == null) {
+                result.setError(new RpcResultError(RpcErrorCode.DATA_NOT_EXISTS));
+                return result;
+            }
+            result.setResult(tokenIdInfo);
             return result;
         } catch (Exception e) {
             LoggerUtil.commonLog.error(e);
@@ -789,6 +1100,18 @@ public class ContractController {
         } catch (Exception e) {
             return RpcResult.paramError("[args] is invalid");
         }
+        Object[] multyAssetValues = null;
+        if (params.size() > 9) {
+            try {
+                List list1 = (List) params.get(9);
+                multyAssetValues = new Object[list1.size()];
+                for (int i = 0; i < list1.size(); i++) {
+                    multyAssetValues[i] = list1.get(i);
+                }
+            } catch (Exception e) {
+                return RpcResult.paramError("[multyAssetValues] is invalid");
+            }
+        }
         if (!CacheManager.isChainExist(chainId)) {
             return RpcResult.dataNotFound();
         }
@@ -810,7 +1133,8 @@ public class ContractController {
                 contractAddress,
                 methodName,
                 methodDesc,
-                args
+                args,
+                multyAssetValues
         );
         rpcResult.setResult(mapResult.getData());
         return rpcResult;
@@ -933,6 +1257,18 @@ public class ContractController {
         } catch (Exception e) {
             return RpcResult.paramError("[args] is invalid");
         }
+        Object[] multyAssetValues = null;
+        if (params.size() > 7) {
+            try {
+                List list1 = (List) params.get(7);
+                multyAssetValues = new Object[list1.size()];
+                for (int i = 0; i < list1.size(); i++) {
+                    multyAssetValues[i] = list1.get(i);
+                }
+            } catch (Exception e) {
+                return RpcResult.paramError("[multyAssetValues] is invalid");
+            }
+        }
         if (!CacheManager.isChainExist(chainId)) {
             return RpcResult.dataNotFound();
         }
@@ -955,7 +1291,8 @@ public class ContractController {
                 contractAddress,
                 methodName,
                 methodDesc,
-                args
+                args,
+                multyAssetValues
         );
         rpcResult.setResult(mapResult.getData());
         return rpcResult;
@@ -1089,6 +1426,18 @@ public class ContractController {
         } catch (Exception e) {
             return RpcResult.paramError("[args] is invalid");
         }
+        Object[] multyAssetValues = null;
+        if (params.size() > 9) {
+            try {
+                List list1 = (List) params.get(9);
+                multyAssetValues = new Object[list1.size()];
+                for (int i = 0; i < list1.size(); i++) {
+                    multyAssetValues[i] = list1.get(i);
+                }
+            } catch (Exception e) {
+                return RpcResult.paramError("[multyAssetValues] is invalid");
+            }
+        }
         RpcResult contractMethodArgsTypesResult = this.getContractMethodArgsTypes(List.of(chainId, contractAddress, methodName, methodDesc));
         if (contractMethodArgsTypesResult.getError() != null) {
             return contractMethodArgsTypesResult;
@@ -1099,7 +1448,7 @@ public class ContractController {
         convertArgsToObjectArray(args, types);
 
         RpcResult rpcResult = new RpcResult();
-        Result<Map> mapResult = WalletRpcHandler.contractPreviewCall(chainId, sender, valueBigInteger, gasLimit, price, contractAddress, methodName, methodDesc, args);
+        Result<Map> mapResult = WalletRpcHandler.contractPreviewCall(chainId, sender, valueBigInteger, gasLimit, price, contractAddress, methodName, methodDesc, args, multyAssetValues);
         rpcResult.setResult(mapResult.getData());
         return rpcResult;
     }

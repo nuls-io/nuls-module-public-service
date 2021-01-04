@@ -527,6 +527,16 @@ public class AnalysisHandler {
         contractInfo.setNrc20((Boolean) map.get("nrc20"));
         contractInfo.setTokenType((Integer) map.get("tokenType"));
         contractInfo.setDirectPayable((Boolean) map.get("directPayable"));
+        boolean isNrc721 = contractInfo.getTokenType() == TOKEN_TYPE_NRC721;
+        if (isNrc721) {
+            Object tokenName = map.get("nrc20TokenName");
+            tokenName = tokenName == null ? EMPTY_STRING : tokenName;
+            Object tokenSymbol = map.get("nrc20TokenSymbol");
+            tokenSymbol = tokenSymbol == null ? EMPTY_STRING : tokenSymbol;
+            contractInfo.setTokenName(tokenName.toString());
+            contractInfo.setSymbol(tokenSymbol.toString());
+            contractInfo.setOwners(new ArrayList<>());
+        }
         if (contractInfo.isNrc20()) {
             contractInfo.setTokenName(map.get("nrc20TokenName").toString());
             contractInfo.setSymbol(map.get("nrc20TokenSymbol").toString());
@@ -791,6 +801,21 @@ public class AnalysisHandler {
             tokenTransferList.add(tokenTransfer);
         }
         resultInfo.setTokenTransfers(tokenTransferList);
+
+        // nrc721
+        transfers = (List<Map<String, Object>>) resultMap.get("token721Transfers");
+        List<Token721Transfer> token721TransferList = new ArrayList<>();
+        for (Map map1 : transfers) {
+            Token721Transfer token721Transfer = new Token721Transfer();
+            token721Transfer.setContractAddress((String) map1.get("contractAddress"));
+            token721Transfer.setFromAddress((String) map1.get("from"));
+            token721Transfer.setToAddress((String) map1.get("to"));
+            token721Transfer.setTokenId((String) map1.get("tokenId"));
+            token721Transfer.setName((String) map1.get("name"));
+            token721Transfer.setSymbol((String) map1.get("symbol"));
+            token721TransferList.add(token721Transfer);
+        }
+        resultInfo.setToken721Transfers(token721TransferList);
 
         return resultInfo;
     }

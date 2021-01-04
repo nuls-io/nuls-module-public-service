@@ -249,6 +249,16 @@ public class WalletRpcHandler {
         contractInfo.setNrc20((Boolean) map.get("nrc20"));
         contractInfo.setTokenType((Integer) map.get("tokenType"));
         contractInfo.setDirectPayable((Boolean) map.get("directPayable"));
+        boolean isNrc721 = contractInfo.getTokenType() == TOKEN_TYPE_NRC721;
+        if (isNrc721) {
+            Object tokenName = map.get("nrc20TokenName");
+            tokenName = tokenName == null ? EMPTY_STRING : tokenName;
+            Object tokenSymbol = map.get("nrc20TokenSymbol");
+            tokenSymbol = tokenSymbol == null ? EMPTY_STRING : tokenSymbol;
+            contractInfo.setTokenName(tokenName.toString());
+            contractInfo.setSymbol(tokenSymbol.toString());
+            contractInfo.setOwners(new ArrayList<>());
+        }
         if (contractInfo.isNrc20()) {
             contractInfo.setTokenName(map.get("nrc20TokenName").toString());
             contractInfo.setSymbol(map.get("nrc20TokenSymbol").toString());
@@ -330,7 +340,7 @@ public class WalletRpcHandler {
     }
 
     public static Result<Map> validateContractCall(int chainId, Object sender, Object value, Object gasLimit, Object price,
-                                                   Object contractAddress, Object methodName, Object methodDesc, Object args) throws NulsException {
+                                                   Object contractAddress, Object methodName, Object methodDesc, Object args, Object multyAssetValues) throws NulsException {
         Map<String, Object> params = new HashMap<>();
         params.put(Constants.CHAIN_ID, chainId);
         params.put("sender", sender);
@@ -341,6 +351,7 @@ public class WalletRpcHandler {
         params.put("methodName", methodName);
         params.put("methodDesc", methodDesc);
         params.put("args", args);
+        params.put("multyAssetValues", multyAssetValues);
         Response response = RpcCall.requestAndResponse(ModuleE.SC.abbr, CommandConstant.VALIDATE_CALL, params);
         boolean bool = response.isSuccess();
         String msg = "";
@@ -395,7 +406,7 @@ public class WalletRpcHandler {
     }
 
     public static Result<Map> imputedContractCallGas(int chainId, Object sender, Object value,
-                                                     Object contractAddress, Object methodName, Object methodDesc, Object args) throws NulsException {
+                                                     Object contractAddress, Object methodName, Object methodDesc, Object args, Object[] multyAssetValues) throws NulsException {
         Map<String, Object> params = new HashMap<>();
         params.put(Constants.CHAIN_ID, chainId);
         params.put("sender", sender);
@@ -404,6 +415,7 @@ public class WalletRpcHandler {
         params.put("methodName", methodName);
         params.put("methodDesc", methodDesc);
         params.put("args", args);
+        params.put("multyAssetValues", multyAssetValues);
         Map map = (Map) RpcCall.request(ModuleE.SC.abbr, CommandConstant.IMPUTED_CALL_GAS, params);
         return Result.getSuccess(null).setData(map);
     }
@@ -452,6 +464,60 @@ public class WalletRpcHandler {
         } catch (NulsException e) {
             Log.error(e.format());
             return Result.getSuccess(null).setData(BigInteger.ZERO);
+        }
+    }
+
+    public static String tokenName(int chainid, Object contractAddress) {
+        try {
+            Result<Map> result = invokeView(chainid, contractAddress, "name", null, null);
+            Map map = result.getData();
+            if (map == null) {
+                return EMPTY_STRING;
+            }
+            Object tokenName = map.get("result");
+            if (tokenName == null) {
+                return EMPTY_STRING;
+            }
+            return tokenName.toString();
+        } catch (NulsException e) {
+            Log.error(e.format());
+            return EMPTY_STRING;
+        }
+    }
+
+    public static String tokenSymbol(int chainid, Object contractAddress) {
+        try {
+            Result<Map> result = invokeView(chainid, contractAddress, "symbol", null, null);
+            Map map = result.getData();
+            if (map == null) {
+                return EMPTY_STRING;
+            }
+            Object tokenSymbol = map.get("result");
+            if (tokenSymbol == null) {
+                return EMPTY_STRING;
+            }
+            return tokenSymbol.toString();
+        } catch (NulsException e) {
+            Log.error(e.format());
+            return EMPTY_STRING;
+        }
+    }
+
+    public static String token721URI(int chainid, Object contractAddress, Object tokenId) {
+        try {
+            Result<Map> result = invokeView(chainid, contractAddress, "tokenURI", null, new Object[]{tokenId});
+            Map map = result.getData();
+            if (map == null) {
+                return EMPTY_STRING;
+            }
+            Object tokenURI = map.get("result");
+            if (tokenURI == null) {
+                return EMPTY_STRING;
+            }
+            return tokenURI.toString();
+        } catch (NulsException e) {
+            Log.error(e.format());
+            return EMPTY_STRING;
         }
     }
 
@@ -649,7 +715,7 @@ public class WalletRpcHandler {
     }
 
 
-    public static Result contractPreviewCall(int chainId, String sender, BigInteger value, long gasLimit, long price, String contractAddress, String methodName, String methodDesc, Object[] args) {
+    public static Result contractPreviewCall(int chainId, String sender, BigInteger value, long gasLimit, long price, String contractAddress, String methodName, String methodDesc, Object[] args, Object[] multyAssetValues) {
 
         try {
             Map<String, Object> params = new HashMap<>();
@@ -662,6 +728,7 @@ public class WalletRpcHandler {
             params.put("methodName", methodName);
             params.put("methodDesc", methodDesc);
             params.put("args", args);
+            params.put("multyAssetValues", multyAssetValues);
             Map map = (Map) RpcCall.request(ModuleE.SC.abbr, CommandConstant.PREVIEW_CALL, params);
             return Result.getSuccess(null).setData(map);
         } catch (NulsException e) {

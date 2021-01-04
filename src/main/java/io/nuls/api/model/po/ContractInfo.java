@@ -68,6 +68,9 @@ public class ContractInfo extends TxDataInfo {
     @JsonIgnore
     private boolean isNew;
 
+    public ContractInfo() {
+        this.totalSupply = "0";
+    }
 
     public Document toDocument() {
         Document document = DocumentTransferTool.toDocument(this, "contractAddress");

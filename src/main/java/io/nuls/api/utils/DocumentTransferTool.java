@@ -7,6 +7,7 @@ import org.bson.Document;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class DocumentTransferTool {
@@ -89,6 +90,8 @@ public class DocumentTransferTool {
                 }
                 if (field.getType().getName().equals("java.math.BigInteger")) {
                     field.set(instance, new BigInteger(document.get(field.getName()).toString()));
+                } else if (field.getType().getName().equals("java.util.Set")) {
+                    field.set(instance, new HashSet((List) document.get(field.getName())));
                 } else {
                     field.set(instance, document.get(field.getName()));
                 }
@@ -119,17 +122,14 @@ public class DocumentTransferTool {
                     continue;
                 } else if (field.getType().getName().equals("java.math.BigInteger")) {
                     field.set(instance, new BigInteger(document.get(field.getName()).toString()));
+                } else if (field.getType().getName().equals("java.util.Set")) {
+                    field.set(instance, new HashSet((List) document.get(field.getName())));
                 } else {
                     field.set(instance, document.get(field.getName()));
                 }
             }
             return instance;
         } catch (Exception e) {
-            LoggerUtil.commonLog.error("address:" + document.get("address").toString());
-            LoggerUtil.commonLog.error("balance:" + document.get("balance").toString());
-            LoggerUtil.commonLog.error("lockedBalance" +  document.get("lockedBalance").toString());
-            LoggerUtil.commonLog.error("tokenSymbol" +  document.get("tokenSymbol").toString());
-
             LoggerUtil.commonLog.error(e);
             throw new NulsRuntimeException(ApiErrorCode.DATA_PARSE_ERROR, "Document to Model fail");
         }

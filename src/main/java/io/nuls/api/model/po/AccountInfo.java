@@ -38,6 +38,8 @@ public class AccountInfo {
 
     private List<String> tokens;
 
+    private List<String> token721s;
+
     //是否是根据最新区块的交易新创建的账户，只为业务使用，不存储该字段
     @JsonIgnore
     private boolean isNew;
@@ -50,6 +52,7 @@ public class AccountInfo {
         Address address1 = new Address(address);
         this.type = address1.getAddressType();
         this.tokens = new ArrayList<>();
+        this.token721s = new ArrayList<>();
         this.isNew = true;
         this.totalOut = BigInteger.ZERO;
         this.totalIn = BigInteger.ZERO;
@@ -149,6 +152,14 @@ public class AccountInfo {
         this.tokens = tokens;
     }
 
+    public List<String> getToken721s() {
+        return token721s;
+    }
+
+    public void setToken721s(List<String> token721s) {
+        this.token721s = token721s;
+    }
+
     @JsonIgnore
     public boolean isNew() {
         return isNew;
@@ -179,8 +190,15 @@ public class AccountInfo {
         accountInfo.balance = new BigInteger(this.balance.toString());
         accountInfo.totalBalance = new BigInteger(this.totalBalance.toString());
         accountInfo.totalReward = new BigInteger(this.totalReward.toString());
+        if (this.tokens == null) {
+            this.tokens = new ArrayList<>();
+        }
         accountInfo.tokens = new ArrayList<>(this.tokens);
-        accountInfo.lastReward =new BigInteger(this.lastReward.toString());
+        if (this.token721s == null) {
+            this.token721s = new ArrayList<>();
+        }
+        accountInfo.token721s = new ArrayList<>(this.token721s);
+        accountInfo.lastReward = new BigInteger(this.lastReward.toString());
         return accountInfo;
     }
 

@@ -110,13 +110,13 @@ public class MongoTokenServiceImpl implements TokenService {
     }
 
     public PageInfo<TokenTransfer> getTokenTransfers(int chainId, String address, String contractAddress, int pageIndex, int pageSize) {
-        Bson filter;
+        Bson filter = null;
         if (StringUtils.isNotBlank(address) && StringUtils.isNotBlank(contractAddress)) {
             Bson addressFilter = Filters.or(Filters.eq("fromAddress", address), Filters.eq("toAddress", address));
             filter = Filters.and(Filters.eq("contractAddress", contractAddress), addressFilter);
         } else if (StringUtils.isNotBlank(contractAddress)) {
             filter = Filters.eq("contractAddress", contractAddress);
-        } else {
+        } else if (StringUtils.isNotBlank(address)) {
             filter = Filters.or(Filters.eq("fromAddress", address), Filters.eq("toAddress", address));
         }
         Bson sort = Sorts.descending("time");
