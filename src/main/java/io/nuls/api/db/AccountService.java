@@ -30,5 +30,5 @@ public interface AccountService {
 
     BigInteger getAccountTotalBalance(int chainId, String address);
 
-    void testBalance(int chainId);
+    void updateAllAccountLastReward(int chainId);
 }

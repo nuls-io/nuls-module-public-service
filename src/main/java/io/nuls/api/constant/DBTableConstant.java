@@ -65,6 +65,8 @@ public interface DBTableConstant {
     //智能合约token721转账记录表
     String TOKEN721_TRANSFER_TABLE = "token721_transfer_table_";
 
+    String LAST_DAY_REWARD_TABLE = "token721_transfer_table_";
+
     //---------------------------------字段(field)------------------------------
     //new_info表，最新统计的时间点
     String LAST_STATISTICAL_TIME = "last_statistical_time";
@@ -72,6 +74,8 @@ public interface DBTableConstant {
     String TX_COUNT = "txCount";
     String ANNUALIZE_REWARD = "annualizedReward";
     String CONSENSUS_LOCKED = "consensusLocked";
+
+    String LastDayRewardKey = "lastDayReward";
 
     //交易关系表分片数量
     int TX_RELATION_SHARDING_COUNT = 128;

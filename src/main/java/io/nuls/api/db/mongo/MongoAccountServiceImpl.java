@@ -317,7 +317,45 @@ public class MongoAccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void testBalance(int chainId) {
+    public void updateAllAccountLastReward(int chainId) {
+        BulkWriteOptions options = new BulkWriteOptions();
+        options.ordered(false);
+        List<WriteModel<Document>> modelList = new ArrayList<>();
 
+        boolean query = true;
+        int i = 1;
+        while (query) {
+            List<Document> documentList = mongoDBService.pageQuery(ACCOUNT_TABLE + chainId, i, 1000);
+            for (Document document : documentList) {
+                AccountInfo accountInfo = DocumentTransferTool.toInfo(document, "address", AccountInfo.class);
+                accountInfo.setLastDayReward(accountInfo.getTodayReward());
+                accountInfo.setTotalReward(BigInteger.ZERO);
+                updateCacheAccount(chainId, accountInfo);
+
+                document = DocumentTransferTool.toDocument(accountInfo, "address");
+                document.put("totalBalance", BigIntegerUtils.bigIntegerToString(accountInfo.getTotalBalance(), 32));
+                modelList.add(new ReplaceOneModel<>(Filters.eq("_id", accountInfo.getAddress()), document));
+            }
+
+            mongoDBService.bulkWrite(ACCOUNT_TABLE + chainId, modelList, options);
+            modelList.clear();
+
+
+            if (documentList.size() < 1000) {
+                query = false;
+            }
+            i++;
+        }
+    }
+
+    private void updateCacheAccount(int chainId, AccountInfo accountInfo) {
+        ApiCache apiCache = CacheManager.getCache(chainId);
+        if (apiCache == null) {
+            return;
+        }
+        AccountInfo cacheAccount = apiCache.getAccountInfo(accountInfo.getAddress());
+        if (cacheAccount != null) {
+            apiCache.addAccountInfo(accountInfo);
+        }
     }
 }

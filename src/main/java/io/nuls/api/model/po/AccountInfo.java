@@ -34,6 +34,10 @@ public class AccountInfo {
 
     private BigInteger lastReward;
 
+    private BigInteger lastDayReward = BigInteger.ZERO;
+
+    private BigInteger todayReward = BigInteger.ZERO;
+
     private String symbol;
 
     private List<String> tokens;
@@ -216,5 +220,21 @@ public class AccountInfo {
 
     public void setLastReward(BigInteger lastReward) {
         this.lastReward = lastReward;
+    }
+
+    public BigInteger getLastDayReward() {
+        return lastDayReward;
+    }
+
+    public void setLastDayReward(BigInteger lastDayReward) {
+        this.lastDayReward = lastDayReward;
+    }
+
+    public BigInteger getTodayReward() {
+        return todayReward;
+    }
+
+    public void setTodayReward(BigInteger todayReward) {
+        this.todayReward = todayReward;
     }
 }

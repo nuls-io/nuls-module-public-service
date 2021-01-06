@@ -261,6 +261,7 @@ public class SyncService {
                 AccountInfo accountInfo = queryAccountInfo(chainId, output.getAddress());
                 accountInfo.setTotalReward(accountInfo.getTotalReward().add(output.getAmount()));
                 accountInfo.setLastReward(output.getAmount());
+                accountInfo.setTodayReward(accountInfo.getTotalReward().add(output.getAmount()));
             }
 
             if (ApiContext.syncCoinBase) {
