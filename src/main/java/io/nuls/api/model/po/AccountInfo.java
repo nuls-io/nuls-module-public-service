@@ -203,6 +203,8 @@ public class AccountInfo {
         }
         accountInfo.token721s = new ArrayList<>(this.token721s);
         accountInfo.lastReward = new BigInteger(this.lastReward.toString());
+        accountInfo.setTodayReward(this.todayReward);
+        accountInfo.setLastDayReward(this.lastDayReward);
         return accountInfo;
     }
 
