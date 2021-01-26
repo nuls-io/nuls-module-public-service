@@ -194,6 +194,9 @@ public class AccountInfo {
         accountInfo.balance = new BigInteger(this.balance.toString());
         accountInfo.totalBalance = new BigInteger(this.totalBalance.toString());
         accountInfo.totalReward = new BigInteger(this.totalReward.toString());
+        accountInfo.lastReward = new BigInteger(this.lastReward.toString());
+        accountInfo.todayReward = new BigInteger(this.todayReward.toString());
+        accountInfo.lastDayReward = new BigInteger(this.lastDayReward.toString());
         if (this.tokens == null) {
             this.tokens = new ArrayList<>();
         }
@@ -202,9 +205,6 @@ public class AccountInfo {
             this.token721s = new ArrayList<>();
         }
         accountInfo.token721s = new ArrayList<>(this.token721s);
-        accountInfo.lastReward = new BigInteger(this.lastReward.toString());
-        accountInfo.setTodayReward(this.todayReward);
-        accountInfo.setLastDayReward(this.lastDayReward);
         return accountInfo;
     }
 

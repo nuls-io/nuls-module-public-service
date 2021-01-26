@@ -329,7 +329,7 @@ public class MongoAccountServiceImpl implements AccountService {
             for (Document document : documentList) {
                 AccountInfo accountInfo = DocumentTransferTool.toInfo(document, "address", AccountInfo.class);
                 accountInfo.setLastDayReward(accountInfo.getTodayReward());
-                accountInfo.setTotalReward(BigInteger.ZERO);
+                accountInfo.setTodayReward(BigInteger.ZERO);
                 updateCacheAccount(chainId, accountInfo);
 
                 document = DocumentTransferTool.toDocument(accountInfo, "address");
@@ -339,7 +339,6 @@ public class MongoAccountServiceImpl implements AccountService {
 
             mongoDBService.bulkWrite(ACCOUNT_TABLE + chainId, modelList, options);
             modelList.clear();
-
 
             if (documentList.size() < 1000) {
                 query = false;
