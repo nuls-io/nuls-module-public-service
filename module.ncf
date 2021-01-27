@@ -58,4 +58,5 @@ businessAddress=NULSd6HgdemcQDAaiEJWq9ESMhtUHXRsNJ4KM
 teamAddress=NULSd6HgbfkSuRGKSLJJzAPAihgDQtaUhuE4L
 communityAddress=NULSd6HgjDZmLMbZSmH9tqb6smdzZHCxsCRD3
 dependent=smart-contract,cross-chain,chain-manager,protocol-update
-
+syncCoinBase=false
+syncAddress=

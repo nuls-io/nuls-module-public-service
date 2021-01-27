@@ -264,18 +264,11 @@ public class SyncService {
                 accountInfo.setTodayReward(accountInfo.getTotalReward().add(output.getAmount()));
             }
 
-            if (ApiContext.syncCoinBase) {
-                if (!ApiContext.syncAddress.isEmpty()) {
-                    if (ApiContext.syncAddress.contains(output.getAddress())) {
-                        AccountLedgerInfo ledgerInfo = queryLedgerInfo(chainId, output.getAddress(), output.getChainId(), output.getAssetsId());
-                        ledgerInfo.setTotalBalance(ledgerInfo.getTotalBalance().add(output.getAmount()));
-                        txRelationInfoSet.add(new TxRelationInfo(output, tx, ledgerInfo.getTotalBalance()));
-                    }
-                } else {
-                    AccountLedgerInfo ledgerInfo = queryLedgerInfo(chainId, output.getAddress(), output.getChainId(), output.getAssetsId());
-                    ledgerInfo.setTotalBalance(ledgerInfo.getTotalBalance().add(output.getAmount()));
-                    txRelationInfoSet.add(new TxRelationInfo(output, tx, ledgerInfo.getTotalBalance()));
-                }
+            AccountLedgerInfo ledgerInfo = queryLedgerInfo(chainId, output.getAddress(), output.getChainId(), output.getAssetsId());
+            ledgerInfo.setTotalBalance(ledgerInfo.getTotalBalance().add(output.getAmount()));
+
+            if (ApiContext.syncCoinBase && !ApiContext.syncAddress.isEmpty() && ApiContext.syncAddress.contains(output.getAddress())) {
+                txRelationInfoSet.add(new TxRelationInfo(output, tx, ledgerInfo.getTotalBalance()));
             }
         }
         for (String address : addressSet) {
