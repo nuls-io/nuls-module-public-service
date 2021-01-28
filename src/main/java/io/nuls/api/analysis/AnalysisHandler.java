@@ -520,7 +520,6 @@ public class AnalysisHandler {
         params.put(Constants.CHAIN_ID, chainId);
         params.put("contractAddress", contractInfo.getContractAddress());
         params.put("hash", contractInfo.getCreateTxHash());
-        LoggerUtil.commonLog.info("------ContractAddress:" + contractInfo.getContractAddress());
         Map map = (Map) RpcCall.request(ModuleE.SC.abbr, CommandConstant.CONTRACT_INFO, params);
 
         contractInfo.setCreater(map.get("creater").toString());

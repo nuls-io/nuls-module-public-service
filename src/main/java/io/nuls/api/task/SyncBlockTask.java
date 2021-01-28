@@ -16,6 +16,8 @@ public class SyncBlockTask implements Runnable {
 
     private int chainId;
 
+    private boolean running;
+
     private SyncService syncService;
 
     private RollbackService rollbackService;
@@ -30,6 +32,19 @@ public class SyncBlockTask implements Runnable {
 
     @Override
     public void run() {
+        if (running) {
+            return;
+        }
+        try {
+            running = true;
+            process();
+        } finally {
+            running = false;
+        }
+    }
+
+
+    private void process() {
         if (syncErrorCount >= 10) {
             LoggerUtil.commonLog.info("------- syncErrorCount > 10,  sync block stop --------");
             return;
@@ -52,14 +67,14 @@ public class SyncBlockTask implements Runnable {
             return;
         }
 
-        boolean running = true;
-        while (running) {
+        boolean syncable = true;
+        while (syncable) {
             try {
-                running = syncBlock();
+                syncable = syncBlock();
             } catch (Exception e) {
                 Log.error(e.getMessage(), e);
                 syncErrorCount++;
-                running = false;
+                syncable = false;
             }
         }
     }

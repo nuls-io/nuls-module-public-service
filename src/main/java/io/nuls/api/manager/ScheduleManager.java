@@ -40,7 +40,7 @@ public class ScheduleManager {
         executorService.scheduleAtFixedRate(new UnConfirmTxTask(ApiContext.defaultChainId), 1, 2, TimeUnit.MINUTES);
         executorService.scheduleAtFixedRate(new StatisticalRewardTask(ApiContext.defaultChainId), 1, 60, TimeUnit.MINUTES);
         executorService.scheduleAtFixedRate(new GetGlobalInfoTask(ApiContext.defaultChainId), 5, 10, TimeUnit.SECONDS);
-        executorService.scheduleAtFixedRate(new LastDayRewardStatTask(ApiContext.defaultChainId), 0, 15, TimeUnit.MINUTES);
+        executorService.scheduleAtFixedRate(new LastDayRewardStatTask(ApiContext.defaultChainId), 0, 5, TimeUnit.MINUTES);
 
         MongoAgentServiceImpl mongoAgentService = SpringLiteContext.getBean(MongoAgentServiceImpl.class);
         MongoAccountLedgerServiceImpl accountLedgerService = SpringLiteContext.getBean(MongoAccountLedgerServiceImpl.class);

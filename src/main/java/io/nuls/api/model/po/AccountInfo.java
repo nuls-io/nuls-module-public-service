@@ -181,32 +181,6 @@ public class AccountInfo {
         this.totalReward = totalReward;
     }
 
-    public AccountInfo copy() {
-        AccountInfo accountInfo = new AccountInfo();
-        accountInfo.address = this.address;
-        accountInfo.alias = this.alias;
-        accountInfo.type = this.type;
-        accountInfo.txCount = this.txCount;
-        accountInfo.totalOut = new BigInteger(this.totalOut.toString());
-        accountInfo.totalIn = new BigInteger(this.totalIn.toString());
-        accountInfo.consensusLock = new BigInteger(this.consensusLock.toString());
-        accountInfo.timeLock = new BigInteger(this.timeLock.toString());
-        accountInfo.balance = new BigInteger(this.balance.toString());
-        accountInfo.totalBalance = new BigInteger(this.totalBalance.toString());
-        accountInfo.totalReward = new BigInteger(this.totalReward.toString());
-        accountInfo.lastReward = new BigInteger(this.lastReward.toString());
-        accountInfo.todayReward = new BigInteger(this.todayReward.toString());
-        accountInfo.lastDayReward = new BigInteger(this.lastDayReward.toString());
-        if (this.tokens == null) {
-            this.tokens = new ArrayList<>();
-        }
-        accountInfo.tokens = new ArrayList<>(this.tokens);
-        if (this.token721s == null) {
-            this.token721s = new ArrayList<>();
-        }
-        accountInfo.token721s = new ArrayList<>(this.token721s);
-        return accountInfo;
-    }
 
     public String getSymbol() {
         return symbol;
@@ -239,4 +213,32 @@ public class AccountInfo {
     public void setTodayReward(BigInteger todayReward) {
         this.todayReward = todayReward;
     }
+
+    public AccountInfo copy() {
+        AccountInfo accountInfo = new AccountInfo();
+        accountInfo.address = this.address;
+        accountInfo.alias = this.alias;
+        accountInfo.type = this.type;
+        accountInfo.txCount = this.txCount;
+        accountInfo.totalOut = new BigInteger(this.totalOut.toString());
+        accountInfo.totalIn = new BigInteger(this.totalIn.toString());
+        accountInfo.consensusLock = new BigInteger(this.consensusLock.toString());
+        accountInfo.timeLock = new BigInteger(this.timeLock.toString());
+        accountInfo.balance = new BigInteger(this.balance.toString());
+        accountInfo.totalBalance = new BigInteger(this.totalBalance.toString());
+        accountInfo.totalReward = new BigInteger(this.totalReward.toString());
+        accountInfo.lastReward = new BigInteger(this.lastReward.toString());
+        accountInfo.todayReward = new BigInteger(this.todayReward.toString());
+        accountInfo.lastDayReward = new BigInteger(this.lastDayReward.toString());
+        if (this.tokens == null) {
+            this.tokens = new ArrayList<>();
+        }
+        accountInfo.tokens = new ArrayList<>(this.tokens);
+        if (this.token721s == null) {
+            this.token721s = new ArrayList<>();
+        }
+        accountInfo.token721s = new ArrayList<>(this.token721s);
+        return accountInfo;
+    }
+
 }

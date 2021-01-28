@@ -6,6 +6,7 @@ import io.nuls.api.analysis.WalletRpcHandler;
 import io.nuls.api.cache.ApiCache;
 import io.nuls.api.constant.ApiConstant;
 import io.nuls.api.constant.ApiErrorCode;
+import io.nuls.api.constant.DBTableConstant;
 import io.nuls.api.db.*;
 import io.nuls.api.db.mongo.MongoAccountServiceImpl;
 import io.nuls.api.manager.CacheManager;
@@ -17,8 +18,10 @@ import io.nuls.core.constant.TxType;
 import io.nuls.core.core.annotation.Autowired;
 import io.nuls.core.core.annotation.Component;
 import io.nuls.core.exception.NulsRuntimeException;
+import io.nuls.core.model.DateUtils;
 import io.nuls.core.model.StringUtils;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -53,6 +56,8 @@ public class SyncService {
     private TokenService tokenService;
     @Autowired
     private Token721Service token721Service;
+    @Autowired
+    private LastDayRewardStatService lastDayRewardStatService;
 
     //记录每个区块打包交易涉及到的账户的余额变动
     private Map<String, AccountInfo> accountInfoMap = new HashMap<>();
@@ -114,10 +119,13 @@ public class SyncService {
         //保存数据
         save(chainId, blockInfo);
 
+        processLastDayReward(chainId, blockInfo.getHeader());
+
         ApiCache apiCache = CacheManager.getCache(chainId);
         apiCache.setBestHeader(blockInfo.getHeader());
         ApiContext.addAndRemoveLastBlockHeader(blockInfo.getHeader());
         time2 = System.currentTimeMillis();
+
         LoggerUtil.commonLog.info("-----height finish:" + blockInfo.getHeader().getHeight() + "-----txCount:" + blockInfo.getHeader().getTxCount() + "-----use:" + (time2 - time1) + "-----");
         return true;
     }
@@ -183,6 +191,26 @@ public class SyncService {
         agentInfo.setTotalReward(agentInfo.getTotalReward().add(agentReward).add(otherReward));
         agentInfo.setAgentReward(agentInfo.getAgentReward().add(agentReward));
         agentInfo.setCommissionReward(agentInfo.getCommissionReward().add(otherReward));
+    }
+
+
+    private void processLastDayReward(int chainId, BlockHeaderInfo headerInfo) {
+        LastDayRewardStatInfo statInfo = lastDayRewardStatService.getInfo(chainId);
+        if (statInfo == null) {
+            statInfo = new LastDayRewardStatInfo();
+            statInfo.setLastDayRewardKey(DBTableConstant.LastDayRewardKey);
+            lastDayRewardStatService.save(chainId, statInfo);
+        }
+        //判断当前块时间和上次统计块时间日期相差了一天
+        if (headerInfo.getCreateTime() - statInfo.getLastStatTime() < DateUtils.DATE_TIME / 1000) {
+            return;
+        }
+        //已超过一天，将所有账户的昨日收益转变为今日收益，今日收益清空后，重新获取
+        accountService.updateAllAccountLastReward(chainId);
+
+        statInfo.setLastStatHeight(headerInfo.getHeight());
+        statInfo.setLastStatTime(headerInfo.getCreateTime());
+        lastDayRewardStatService.update(chainId, statInfo);
     }
 
     /**
@@ -264,10 +292,8 @@ public class SyncService {
                 accountInfo.setTodayReward(accountInfo.getTotalReward().add(output.getAmount()));
             }
 
-            AccountLedgerInfo ledgerInfo = queryLedgerInfo(chainId, output.getAddress(), output.getChainId(), output.getAssetsId());
-            ledgerInfo.setTotalBalance(ledgerInfo.getTotalBalance().add(output.getAmount()));
-
             if (ApiContext.syncCoinBase && !ApiContext.syncAddress.isEmpty() && ApiContext.syncAddress.contains(output.getAddress())) {
+                AccountLedgerInfo ledgerInfo = queryLedgerInfo(chainId, output.getAddress(), output.getChainId(), output.getAssetsId());
                 txRelationInfoSet.add(new TxRelationInfo(output, tx, ledgerInfo.getTotalBalance()));
             }
         }
@@ -282,11 +308,10 @@ public class SyncService {
             return;
         }
         for (CoinToInfo output : tx.getCoinTos()) {
+            calcBalance(chainId, output);
             AccountInfo accountInfo = queryAccountInfo(chainId, output.getAddress());
-            accountInfo.setTotalBalance(accountInfo.getTotalBalance().add(output.getAmount()));
             accountInfo.setTxCount(accountInfo.getTxCount() + 1);
             AccountLedgerInfo ledgerInfo = queryLedgerInfo(chainId, output.getAddress(), output.getChainId(), output.getAssetsId());
-            ledgerInfo.setTotalBalance(ledgerInfo.getTotalBalance().add(output.getAmount()));
             txRelationInfoSet.add(new TxRelationInfo(output, tx, ledgerInfo.getTotalBalance()));
         }
     }
@@ -625,7 +650,6 @@ public class SyncService {
         AccountInfo accountInfo;
         AccountLedgerInfo ledgerInfo;
         CoinToInfo output = null;
-        BigInteger amount = BigInteger.ZERO;
         addressSet.clear();
         for (int i = 0; i < tx.getCoinTos().size(); i++) {
             output = tx.getCoinTos().get(i);
@@ -1039,10 +1063,16 @@ public class SyncService {
             AccountInfo accountInfo = queryAccountInfo(chainId, output.getAddress());
             accountInfo.setTotalIn(accountInfo.getTotalIn().add(output.getAmount()));
             accountInfo.setTotalBalance(accountInfo.getTotalBalance().add(output.getAmount()));
+            if (accountInfo.getAddress().equals("NULSd6Hgaza4vj6FnQuQzCPHV1ouFsjtGA9W5")) {
+                LoggerUtil.commonLog.info("---NULSd6Hgaza4vj6FnQuQzCPHV1ouFsjtGA9W5 add accountInfo.totalBalance:" + accountInfo.getTotalBalance().toString());
+            }
         }
 
         AccountLedgerInfo ledgerInfo = queryLedgerInfo(chainId, output.getAddress(), output.getChainId(), output.getAssetsId());
         ledgerInfo.setTotalBalance(ledgerInfo.getTotalBalance().add(output.getAmount()));
+        if (ledgerInfo.getAddress().equals("NULSd6Hgaza4vj6FnQuQzCPHV1ouFsjtGA9W5")) {
+            LoggerUtil.commonLog.info("---NULSd6Hgaza4vj6FnQuQzCPHV1ouFsjtGA9W5 add ledgerInfo.totalBalance:" + ledgerInfo.getTotalBalance().toString());
+        }
         return ledgerInfo;
     }
 
@@ -1052,12 +1082,20 @@ public class SyncService {
             AccountInfo accountInfo = queryAccountInfo(chainId, input.getAddress());
             accountInfo.setTotalOut(accountInfo.getTotalOut().add(input.getAmount()));
             accountInfo.setTotalBalance(accountInfo.getTotalBalance().subtract(input.getAmount()));
+
+            if (accountInfo.getAddress().equals("NULSd6Hgaza4vj6FnQuQzCPHV1ouFsjtGA9W5")) {
+                LoggerUtil.commonLog.info("---NULSd6Hgaza4vj6FnQuQzCPHV1ouFsjtGA9W5 subtract accountInfo.totalBalance:" + accountInfo.getTotalBalance().toString());
+            }
             if (accountInfo.getTotalBalance().compareTo(BigInteger.ZERO) < 0) {
                 throw new NulsRuntimeException(ApiErrorCode.DATA_ERROR, "account[" + accountInfo.getAddress() + "] totalBalance < 0");
             }
         }
         AccountLedgerInfo ledgerInfo = queryLedgerInfo(chainId, input.getAddress(), input.getChainId(), input.getAssetsId());
         ledgerInfo.setTotalBalance(ledgerInfo.getTotalBalance().subtract(input.getAmount()));
+
+        if (ledgerInfo.getAddress().equals("NULSd6Hgaza4vj6FnQuQzCPHV1ouFsjtGA9W5")) {
+            LoggerUtil.commonLog.info("---NULSd6Hgaza4vj6FnQuQzCPHV1ouFsjtGA9W5 subtract ledgerInfo.totalBalance:" + ledgerInfo.getTotalBalance().toString());
+        }
         if (ledgerInfo.getTotalBalance().compareTo(BigInteger.ZERO) < 0) {
             throw new NulsRuntimeException(ApiErrorCode.DATA_ERROR, "accountLedger[" + DBUtil.getAccountAssetKey(ledgerInfo.getAddress(), ledgerInfo.getChainId(), ledgerInfo.getAssetId()) + "] totalBalance < 0");
         }
@@ -1068,12 +1106,20 @@ public class SyncService {
         if (chainId == assetChainId) {
             accountInfo.setTotalOut(accountInfo.getTotalOut().add(fee));
             accountInfo.setTotalBalance(accountInfo.getTotalBalance().subtract(fee));
+
+            if (accountInfo.getAddress().equals("NULSd6Hgaza4vj6FnQuQzCPHV1ouFsjtGA9W5")) {
+                LoggerUtil.commonLog.info("---NULSd6Hgaza4vj6FnQuQzCPHV1ouFsjtGA9W5 subtract accountInfo.totalBalance:" + accountInfo.getTotalBalance().toString());
+            }
             if (accountInfo.getTotalBalance().compareTo(BigInteger.ZERO) < 0) {
                 throw new NulsRuntimeException(ApiErrorCode.DATA_ERROR, "account[" + accountInfo.getAddress() + "] totalBalance < 0");
             }
         }
         AccountLedgerInfo ledgerInfo = queryLedgerInfo(chainId, accountInfo.getAddress(), assetChainId, assetId);
         ledgerInfo.setTotalBalance(ledgerInfo.getTotalBalance().subtract(fee));
+
+        if (ledgerInfo.getAddress().equals("NULSd6Hgaza4vj6FnQuQzCPHV1ouFsjtGA9W5")) {
+            LoggerUtil.commonLog.info("---NULSd6Hgaza4vj6FnQuQzCPHV1ouFsjtGA9W5 subtract ledgerInfo.totalBalance:" + ledgerInfo.getTotalBalance().toString());
+        }
         if (ledgerInfo.getTotalBalance().compareTo(BigInteger.ZERO) < 0) {
             throw new NulsRuntimeException(ApiErrorCode.DATA_ERROR, "accountLedger[" + DBUtil.getAccountAssetKey(ledgerInfo.getAddress(), ledgerInfo.getChainId(), ledgerInfo.getAssetId()) + "] totalBalance < 0");
         }
