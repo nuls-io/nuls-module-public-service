@@ -124,9 +124,10 @@ public class SyncService {
         ApiContext.addAndRemoveLastBlockHeader(blockInfo.getHeader());
         time2 = System.currentTimeMillis();
 
-        if (blockInfo.getHeader().getHeight() % 10000 == 0) {
-            LoggerUtil.commonLog.info("-----height finish:" + blockInfo.getHeader().getHeight() + "-----txCount:" + blockInfo.getHeader().getTxCount() + "-----use:" + (time2 - time1) + "-----");
-        }
+//        if (blockInfo.getHeader().getHeight() % 10000 == 0) {
+//
+//        }
+        LoggerUtil.commonLog.info("-----height finish:" + blockInfo.getHeader().getHeight() + "-----txCount:" + blockInfo.getHeader().getTxCount() + "-----use:" + (time2 - time1) + "-----");
         return true;
     }
 

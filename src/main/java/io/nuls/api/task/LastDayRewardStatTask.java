@@ -53,8 +53,6 @@ public class LastDayRewardStatTask implements Runnable {
             statInfo.setLastStatHeight(headerInfo.getHeight());
             statInfo.setLastStatTime(headerInfo.getCreateTime());
             lastDayRewardStatService.update(chainId, statInfo);
-
-            System.out.println("--------------end ---------------------");
         } catch (Exception e) {
             Log.error("------统计昨日收益异常-----", e);
         } finally {
