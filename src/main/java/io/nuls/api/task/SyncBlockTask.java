@@ -94,12 +94,15 @@ public class SyncBlockTask implements Runnable {
      * @return boolean 是否还继续同步
      */
     private boolean syncBlock() {
-        BlockHeaderInfo localBestBlockHeader = syncService.getBestBlockHeader(chainId);
+        ApiContext.locker.lock();
         try {
+            BlockHeaderInfo localBestBlockHeader = syncService.getBestBlockHeader(chainId);
             return process(localBestBlockHeader);
         } catch (Exception e) {
             LoggerUtil.commonLog.error(e);
             return false;
+        } finally {
+            ApiContext.locker.unlock();
         }
     }
 

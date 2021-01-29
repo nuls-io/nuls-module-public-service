@@ -16,22 +16,7 @@ import java.util.concurrent.TimeUnit;
 public class ScheduleManager {
 
     public void start() {
-//        int corePoolSize = ChainManager.getConfigBeanMap().size();
-//        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(corePoolSize);
-//        for (ConfigBean bean : ChainManager.getConfigBeanMap().values()) {
-//            executorService.scheduleAtFixedRate(new SyncBlockTask(bean.getChainId()), 1, 10, TimeUnit.SECONDS);
-//        }
-
-//        int corePoolSize = CacheManager.getApiCaches().size();
-//        ScheduledExecutorService executorService = Executors.newScheduledThreadPool( corePoolSize * 4);
-//        for (ApiCache apiCache : CacheManager.getApiCaches().values()) {
-//            executorService.scheduleAtFixedRate(new SyncBlockTask(apiCache.getChainInfo().getChainId()), 1, 10, TimeUnit.SECONDS);
-//            executorService.scheduleAtFixedRate(new StatisticalNulsTask(apiCache.getChainInfo().getChainId()), 1, 20, TimeUnit.MINUTES);
-//            executorService.scheduleAtFixedRate(new StatisticalTask(apiCache.getChainInfo().getChainId()), 1, 60, TimeUnit.MINUTES);
-//            executorService.scheduleAtFixedRate(new UnConfirmTxTask(apiCache.getChainInfo().getChainId()), 1, 10, TimeUnit.MINUTES);
-//        }
-
-        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(7);
+        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(9);
         executorService.scheduleAtFixedRate(new DeleteTxsTask(ApiContext.defaultChainId), 2, 60, TimeUnit.SECONDS);
         executorService.scheduleAtFixedRate(new QueryChainInfoTask(ApiContext.defaultChainId), 2, 60, TimeUnit.SECONDS);
         executorService.scheduleAtFixedRate(new SyncBlockTask(ApiContext.defaultChainId), 5, 10, TimeUnit.SECONDS);
@@ -40,7 +25,7 @@ public class ScheduleManager {
         executorService.scheduleAtFixedRate(new UnConfirmTxTask(ApiContext.defaultChainId), 1, 2, TimeUnit.MINUTES);
         executorService.scheduleAtFixedRate(new StatisticalRewardTask(ApiContext.defaultChainId), 1, 60, TimeUnit.MINUTES);
         executorService.scheduleAtFixedRate(new GetGlobalInfoTask(ApiContext.defaultChainId), 5, 10, TimeUnit.SECONDS);
-        executorService.scheduleAtFixedRate(new LastDayRewardStatTask(ApiContext.defaultChainId), 0, 5, TimeUnit.MINUTES);
+        executorService.scheduleAtFixedRate(new LastDayRewardStatTask(ApiContext.defaultChainId), 0, 1, TimeUnit.HOURS);
 
         MongoAgentServiceImpl mongoAgentService = SpringLiteContext.getBean(MongoAgentServiceImpl.class);
         MongoAccountLedgerServiceImpl accountLedgerService = SpringLiteContext.getBean(MongoAccountLedgerServiceImpl.class);

@@ -26,11 +26,15 @@ import io.nuls.api.model.po.mini.MiniBlockHeaderInfo;
 
 import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Niels
  */
 public class ApiContext {
+
+    public static Lock locker = new ReentrantLock();
 
     public static int mainChainId;
 
