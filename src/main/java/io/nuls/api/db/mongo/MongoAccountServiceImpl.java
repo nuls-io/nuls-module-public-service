@@ -60,9 +60,14 @@ public class MongoAccountServiceImpl implements AccountService {
                 return null;
             }
             accountInfo = DocumentTransferTool.toInfo(document, "address", AccountInfo.class);
+
             while (addressList.size() >= cacheSize) {
-                address = addressList.remove(0);
-                apiCache.getAccountMap().remove(address);
+                if (addressList.get(0) == null) {
+                    addressList.remove(0);
+                } else {
+                    address = addressList.remove(0);
+                    apiCache.getAccountMap().remove(address);
+                }
             }
             apiCache.addAccountInfo(accountInfo);
             addressList.add(accountInfo.getAddress());
@@ -83,8 +88,12 @@ public class MongoAccountServiceImpl implements AccountService {
             }
             accountInfo = DocumentTransferTool.toInfo(document, "address", AccountInfo.class);
             while (addressList.size() >= cacheSize) {
-                address = addressList.remove(0);
-                apiCache.getAccountMap().remove(address);
+                if (addressList.get(0) == null) {
+                    addressList.remove(0);
+                } else {
+                    address = addressList.remove(0);
+                    apiCache.getAccountMap().remove(address);
+                }
             }
             apiCache.addAccountInfo(accountInfo);
             addressList.add(accountInfo.getAddress());
