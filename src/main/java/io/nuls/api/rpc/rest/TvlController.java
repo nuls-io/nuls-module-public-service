@@ -26,7 +26,8 @@ public class TvlController implements Runnable {
         new Thread(runner).start();
     }
 
-    public static void doGet(Request request, Response response) {
+    public static void doGet( Response response) {
+        Log.info("TvlController.doGet");
         ApiCache apiCache = CacheManager.getCache(1);
         BigInteger consensusAmount = apiCache.getCoinContextInfo().getConsensusTotal();
 
