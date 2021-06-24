@@ -34,9 +34,15 @@ public class AccountInfo {
 
     private BigInteger lastReward;
 
+    private BigInteger lastDayReward = BigInteger.ZERO;
+
+    private BigInteger todayReward = BigInteger.ZERO;
+
     private String symbol;
 
     private List<String> tokens;
+
+    private List<String> token721s;
 
     //是否是根据最新区块的交易新创建的账户，只为业务使用，不存储该字段
     @JsonIgnore
@@ -50,6 +56,7 @@ public class AccountInfo {
         Address address1 = new Address(address);
         this.type = address1.getAddressType();
         this.tokens = new ArrayList<>();
+        this.token721s = new ArrayList<>();
         this.isNew = true;
         this.totalOut = BigInteger.ZERO;
         this.totalIn = BigInteger.ZERO;
@@ -149,6 +156,14 @@ public class AccountInfo {
         this.tokens = tokens;
     }
 
+    public List<String> getToken721s() {
+        return token721s;
+    }
+
+    public void setToken721s(List<String> token721s) {
+        this.token721s = token721s;
+    }
+
     @JsonIgnore
     public boolean isNew() {
         return isNew;
@@ -166,23 +181,6 @@ public class AccountInfo {
         this.totalReward = totalReward;
     }
 
-    public AccountInfo copy() {
-        AccountInfo accountInfo = new AccountInfo();
-        accountInfo.address = this.address;
-        accountInfo.alias = this.alias;
-        accountInfo.type = this.type;
-        accountInfo.txCount = this.txCount;
-        accountInfo.totalOut = new BigInteger(this.totalOut.toString());
-        accountInfo.totalIn = new BigInteger(this.totalIn.toString());
-        accountInfo.consensusLock = new BigInteger(this.consensusLock.toString());
-        accountInfo.timeLock = new BigInteger(this.timeLock.toString());
-        accountInfo.balance = new BigInteger(this.balance.toString());
-        accountInfo.totalBalance = new BigInteger(this.totalBalance.toString());
-        accountInfo.totalReward = new BigInteger(this.totalReward.toString());
-        accountInfo.tokens = new ArrayList<>(this.tokens);
-        accountInfo.lastReward =new BigInteger(this.lastReward.toString());
-        return accountInfo;
-    }
 
     public String getSymbol() {
         return symbol;
@@ -199,4 +197,48 @@ public class AccountInfo {
     public void setLastReward(BigInteger lastReward) {
         this.lastReward = lastReward;
     }
+
+    public BigInteger getLastDayReward() {
+        return lastDayReward;
+    }
+
+    public void setLastDayReward(BigInteger lastDayReward) {
+        this.lastDayReward = lastDayReward;
+    }
+
+    public BigInteger getTodayReward() {
+        return todayReward;
+    }
+
+    public void setTodayReward(BigInteger todayReward) {
+        this.todayReward = todayReward;
+    }
+
+    public AccountInfo copy() {
+        AccountInfo accountInfo = new AccountInfo();
+        accountInfo.address = this.address;
+        accountInfo.alias = this.alias;
+        accountInfo.type = this.type;
+        accountInfo.txCount = this.txCount;
+        accountInfo.totalOut = new BigInteger(this.totalOut.toString());
+        accountInfo.totalIn = new BigInteger(this.totalIn.toString());
+        accountInfo.consensusLock = new BigInteger(this.consensusLock.toString());
+        accountInfo.timeLock = new BigInteger(this.timeLock.toString());
+        accountInfo.balance = new BigInteger(this.balance.toString());
+        accountInfo.totalBalance = new BigInteger(this.totalBalance.toString());
+        accountInfo.totalReward = new BigInteger(this.totalReward.toString());
+        accountInfo.lastReward = new BigInteger(this.lastReward.toString());
+        accountInfo.todayReward = new BigInteger(this.todayReward.toString());
+        accountInfo.lastDayReward = new BigInteger(this.lastDayReward.toString());
+        if (this.tokens == null) {
+            this.tokens = new ArrayList<>();
+        }
+        accountInfo.tokens = new ArrayList<>(this.tokens);
+        if (this.token721s == null) {
+            this.token721s = new ArrayList<>();
+        }
+        accountInfo.token721s = new ArrayList<>(this.token721s);
+        return accountInfo;
+    }
+
 }

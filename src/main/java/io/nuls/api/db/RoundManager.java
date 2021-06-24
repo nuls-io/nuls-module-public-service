@@ -41,30 +41,27 @@ public class RoundManager {
     public void process(int chainId, BlockInfo blockInfo) {
         ApiCache apiCache = CacheManager.getCache(chainId);
         CurrentRound currentRound = apiCache.getCurrentRound();
-        try {
-            if (null == currentRound.getItemList()) {
-                PocRound round = null;
-                long roundIndex = blockInfo.getHeader().getRoundIndex();
-                while (round == null && blockInfo.getHeader().getHeight() > 1) {
-                    round = mongoRoundServiceImpl.getRound(chainId, roundIndex--);
-                }
-                if (round != null) {
-                    CurrentRound preRound = new CurrentRound();
-                    preRound.initByPocRound(round);
-                    List<PocRoundItem> list = mongoRoundServiceImpl.getRoundItemList(chainId, round.getIndex());
-                    preRound.setItemList(list);
-                    preRound.setStartBlockHeader(mongoBlockServiceImpl.getBlockHeader(chainId, round.getStartHeight()));
-                    preRound.setPackerOrder(round.getMemberCount());
-                    apiCache.setCurrentRound(preRound);
-                }
+
+        if (null == currentRound.getItemList()) {
+            PocRound round = null;
+            long roundIndex = blockInfo.getHeader().getRoundIndex();
+            while (round == null && blockInfo.getHeader().getHeight() > 1) {
+                round = mongoRoundServiceImpl.getRound(chainId, roundIndex--);
             }
-            if (blockInfo.getHeader().getRoundIndex() == apiCache.getCurrentRound().getIndex()) {
-                processCurrentRound(chainId, blockInfo);
-            } else {
-                processNextRound(chainId, blockInfo);
+            if (round != null) {
+                CurrentRound preRound = new CurrentRound();
+                preRound.initByPocRound(round);
+                List<PocRoundItem> list = mongoRoundServiceImpl.getRoundItemList(chainId, round.getIndex());
+                preRound.setItemList(list);
+                preRound.setStartBlockHeader(mongoBlockServiceImpl.getBlockHeader(chainId, round.getStartHeight()));
+                preRound.setPackerOrder(round.getMemberCount());
+                apiCache.setCurrentRound(preRound);
             }
-        } catch (Exception e) {
-            LoggerUtil.commonLog.error(e);
+        }
+        if (blockInfo.getHeader().getRoundIndex() == apiCache.getCurrentRound().getIndex()) {
+            processCurrentRound(chainId, blockInfo);
+        } else {
+            processNextRound(chainId, blockInfo);
         }
     }
 
@@ -90,6 +87,7 @@ public class RoundManager {
         apiCache.setCurrentRound(currentRound);
         mongoRoundServiceImpl.updateRoundItem(chainId, item);
         this.mongoRoundServiceImpl.updateRound(chainId, currentRound.toPocRound());
+        ApiContext.addAndRemoveLastRound(currentRound);
     }
 
 
@@ -232,8 +230,9 @@ public class RoundManager {
         apiCache.setCurrentRound(round);
 //        Log.warn("++++++++{}({})+++++++" + round.toString(), blockInfo.getBlockHeader().getHeight(), startHeight);
         mongoRoundServiceImpl.saveRoundItemList(chainId, round.getItemList());
-        mongoRoundServiceImpl.saveRound(chainId, round.toPocRound());
-
+        PocRound pocRound = round.toPocRound();
+        mongoRoundServiceImpl.saveRound(chainId, pocRound);
+        ApiContext.addAndRemoveLastRound(currentRound);
     }
 
 
@@ -244,7 +243,7 @@ public class RoundManager {
             PocRound round = null;
             long roundIndex = blockInfo.getHeader().getRoundIndex();
             while (round == null && blockInfo.getHeader().getHeight() > 0) {
-                if(roundIndex < 0) {
+                if (roundIndex < 0) {
                     return;
                 }
                 round = mongoRoundServiceImpl.getRound(chainId, roundIndex--);
@@ -274,12 +273,12 @@ public class RoundManager {
         mongoRoundServiceImpl.removeRound(chainId, currentRound.getIndex());
         PocRound round = null;
         long roundIndex = currentRound.getIndex() - 1;
-        if(currentRound.getStartHeight() == 1) {
+        if (currentRound.getStartHeight() == 1) {
             roundIndex = 1;
         }
 
         while (round == null) {
-            if(roundIndex < 0) {
+            if (roundIndex < 0) {
                 return;
             }
             round = mongoRoundServiceImpl.getRound(chainId, roundIndex--);

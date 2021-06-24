@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 import static io.nuls.api.constant.DBTableConstant.TX_COUNT;
+import static io.nuls.api.utils.AssetTool.extractMultyAssetInfoFromCallTransaction;
 import static io.nuls.core.constant.TxType.*;
 
 @Controller
@@ -308,9 +309,6 @@ public class TransactionController {
                 return RpcResult.dataNotFound();
             }
             int type = this.extractTxTypeFromTx(txHex);
-            if(type == CROSS_CHAIN){
-                return RpcResult.failed(CommonCodeConstanst.PARAMETER_ERROR,"Cross-chain tx pause support");
-            }
             Result result = Result.getSuccess(null);
             CallContractData call = null;
             String contract = null, txHash = null;
@@ -350,7 +348,8 @@ public class TransactionController {
                             contract,
                             call.getMethodName(),
                             call.getMethodDesc(),
-                            call.getArgs());
+                            call.getArgs(),
+                            extractMultyAssetInfoFromCallTransaction(callTx.getCoinDataInstance()));
                     break;
                 case DELETE_CONTRACT:
                     Transaction deleteTx = new Transaction();
@@ -397,6 +396,8 @@ public class TransactionController {
             return RpcResult.failed(RpcErrorCode.TX_PARSE_ERROR);
         }
     }
+
+
 
     private RpcResult validateContractArgs(String[][] args) {
         if (args == null || args.length == 0) {

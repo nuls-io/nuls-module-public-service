@@ -5,7 +5,9 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.InsertOneModel;
 import com.mongodb.client.model.Sorts;
 import com.mongodb.client.model.WriteModel;
+import io.nuls.api.ApiContext;
 import io.nuls.api.cache.ApiCache;
+import io.nuls.api.constant.config.ApiConfig;
 import io.nuls.api.db.AgentService;
 import io.nuls.api.db.BlockService;
 import io.nuls.api.manager.CacheManager;
@@ -27,13 +29,14 @@ import static io.nuls.api.constant.DBTableConstant.BLOCK_HEX_TABLE;
 
 @Component
 public class MongoBlockServiceImpl implements BlockService {
-
+    @Autowired
+    private ApiConfig apiConfig;
     @Autowired
     private MongoDBService mongoDBService;
     @Autowired
     private MongoChainServiceImpl mongoChainServiceImpl;
     @Autowired
-    AgentService agentService;
+    private AgentService agentService;
 
     public BlockHeaderInfo getBestBlockHeader(int chainId) {
         ApiCache apiCache = CacheManager.getCache(chainId);
@@ -143,6 +146,16 @@ public class MongoBlockServiceImpl implements BlockService {
         if (!CacheManager.isChainExist(chainId)) {
             return new PageInfo<>(pageIndex, pageSize);
         }
+
+        long totalCount;
+        //默认浏览器首页查询 ，直接走缓存
+        if (chainId == apiConfig.getChainId() && pageIndex == 1 && pageSize == 15 &&
+                StringUtils.isBlank(packingAddress) && !filterEmptyBlocks) {
+            totalCount = mongoDBService.getEstimateCount(BLOCK_HEADER_TABLE + chainId);
+            PageInfo<MiniBlockHeaderInfo> pageInfo = new PageInfo<>(pageIndex, pageSize, totalCount, ApiContext.blockList);
+            return pageInfo;
+        }
+
         Bson filter = null;
         if (StringUtils.isNotBlank(packingAddress)) {
             filter = Filters.eq("packingAddress", packingAddress);
@@ -154,15 +167,14 @@ public class MongoBlockServiceImpl implements BlockService {
                 filter = Filters.and(filter, Filters.gt("txCount", 1));
             }
         }
-        long totalCount;
-        if(StringUtils.isNotBlank(packingAddress)){
-            AgentInfo agentInfo = agentService.getAgentByPackingAddress(chainId,packingAddress);
-            if(agentInfo == null){
+        if (StringUtils.isNotBlank(packingAddress)) {
+            AgentInfo agentInfo = agentService.getAgentByPackingAddress(chainId, packingAddress);
+            if (agentInfo == null) {
                 totalCount = 0;
-            }else {
+            } else {
                 totalCount = agentInfo.getTotalPackingCount();
             }
-        }else{
+        } else {
             totalCount = mongoDBService.getEstimateCount(BLOCK_HEADER_TABLE + chainId);
         }
         BasicDBObject fields = new BasicDBObject();

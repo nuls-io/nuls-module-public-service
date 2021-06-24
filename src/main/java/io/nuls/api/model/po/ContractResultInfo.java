@@ -40,6 +40,8 @@ public class ContractResultInfo {
 
     private List<TokenTransfer> tokenTransfers;
 
+    private List<Token721Transfer> token721Transfers;
+
     private String remark;
 
     private List<String> contractTxList;
@@ -60,8 +62,15 @@ public class ContractResultInfo {
             tokenTransferList.add(doc);
         }
 
+        List<Document> token721TransferList = new ArrayList<>();
+        for (Token721Transfer transfer721 : token721Transfers) {
+            Document doc = DocumentTransferTool.toDocument(transfer721);
+            token721TransferList.add(doc);
+        }
+
         document.put("nulsTransfers", nulsTransferList);
         document.put("tokenTransfers", tokenTransferList);
+        document.put("token721Transfers", token721TransferList);
         return document;
     }
 
@@ -80,12 +89,21 @@ public class ContractResultInfo {
             tokenTransferList.add(tokenTransfer);
         }
 
+        documentList = (List<Document>) document.get("token721Transfers");
+        List<Token721Transfer> token721TransferList = new ArrayList<>();
+        for (Document doc : documentList) {
+            Token721Transfer token721Transfer = DocumentTransferTool.toInfo(doc, Token721Transfer.class);
+            token721TransferList.add(token721Transfer);
+        }
+
         document.remove("nulsTransfers");
         document.remove("tokenTransfers");
+        document.remove("token721Transfers");
 
         ContractResultInfo resultInfo = DocumentTransferTool.toInfo(document, "txHash", ContractResultInfo.class);
         resultInfo.setNulsTransfers(nulsTransferList);
         resultInfo.setTokenTransfers(tokenTransferList);
+        resultInfo.setToken721Transfers(token721TransferList);
         return resultInfo;
     }
 
@@ -207,6 +225,14 @@ public class ContractResultInfo {
 
     public void setTokenTransfers(List<TokenTransfer> tokenTransfers) {
         this.tokenTransfers = tokenTransfers;
+    }
+
+    public List<Token721Transfer> getToken721Transfers() {
+        return token721Transfers;
+    }
+
+    public void setToken721Transfers(List<Token721Transfer> token721Transfers) {
+        this.token721Transfers = token721Transfers;
     }
 
     public String getRemark() {

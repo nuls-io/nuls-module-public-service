@@ -20,16 +20,21 @@
 
 package io.nuls.api;
 
+import io.nuls.api.model.po.*;
+import io.nuls.api.model.po.mini.MiniAccountInfo;
+import io.nuls.api.model.po.mini.MiniBlockHeaderInfo;
+
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Niels
  */
 public class ApiContext {
+
+    public static Lock locker = new ReentrantLock();
 
     public static int mainChainId;
 
@@ -69,6 +74,8 @@ public class ApiContext {
 
     public static int protocolVersion = 1;
 
+    public static int localProtocolVersion = 1;
+
     public static int maxAliveConnect;
 
     public static int maxWaitTime;
@@ -107,4 +114,37 @@ public class ApiContext {
     //销毁地址公钥
     public static byte[] blackHolePublicKey;
 
+    public static List<MiniBlockHeaderInfo> blockList;
+
+    public static PageInfo<AgentInfo> agentPageInfo;
+
+    public static PageInfo<MiniAccountInfo> miniAccountPageInfo;
+
+    public static List<CurrentRound> roundList;
+
+    public static void addAndRemoveLastBlockHeader(BlockHeaderInfo headerInfo) {
+        MiniBlockHeaderInfo mini = new MiniBlockHeaderInfo(headerInfo);
+        if (blockList.size() >= 15) {
+            blockList.remove(blockList.size() - 1);
+        }
+        blockList.add(0, mini);
+    }
+
+    public static void addAndRemoveLastRound(CurrentRound round) {
+        boolean has = false;
+        for (int i = 0; i < roundList.size(); i++) {
+            CurrentRound item = roundList.get(i);
+            if (item.getIndex() == round.getIndex()) {
+                roundList.remove(i);
+                roundList.add(i, round);
+                has = true;
+                break;
+            }
+        }
+        if (has) return;
+        if (roundList.size() >= 5) {
+            roundList.remove(roundList.size() - 1);
+        }
+        roundList.add(0, round);
+    }
 }

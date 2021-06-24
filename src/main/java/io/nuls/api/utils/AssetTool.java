@@ -5,13 +5,17 @@ import io.nuls.api.cache.ApiCache;
 import io.nuls.api.db.AgentService;
 import io.nuls.api.manager.CacheManager;
 import io.nuls.api.model.po.CoinContextInfo;
+import io.nuls.base.data.CoinData;
+import io.nuls.base.data.CoinTo;
 import io.nuls.core.core.ioc.SpringLiteContext;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class AssetTool {
@@ -96,5 +100,31 @@ public class AssetTool {
         BigDecimal decimal = new BigDecimal(value).movePointLeft(8).setScale(8, RoundingMode.HALF_DOWN);
         DecimalFormat format = new DecimalFormat("0.########");
         return format.format(decimal);
+    }
+
+    public static String[][] extractMultyAssetInfoFromCallTransaction(CoinData coinData) {
+        List<CoinTo> toList = coinData.getTo();
+        if (toList == null || toList.isEmpty()) {
+            return null;
+        }
+        List<String[]> list = null;
+        for (CoinTo to : toList) {
+            if (to.getAssetsChainId() == ApiContext.defaultChainId && to.getAssetsId() == ApiContext.defaultAssetId) {
+                continue;
+            }
+            if (list == null) {
+                list = new ArrayList<>();
+            }
+            list.add(new String[]{to.getAmount().toString(), String.valueOf(to.getAssetsChainId()), String.valueOf(to.getAssetsId())});
+        }
+        String[][] array = null;
+        if (list != null && !list.isEmpty()) {
+            array = new String[list.size()][];
+            int i = 0;
+            for (String[] asset : list) {
+                array[i++] = asset;
+            }
+        }
+        return array;
     }
 }

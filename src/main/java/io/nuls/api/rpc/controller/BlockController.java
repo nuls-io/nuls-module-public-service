@@ -22,6 +22,7 @@ package io.nuls.api.rpc.controller;
 
 import io.nuls.api.analysis.AnalysisHandler;
 import io.nuls.api.analysis.WalletRpcHandler;
+import io.nuls.api.constant.config.ApiConfig;
 import io.nuls.api.db.BlockService;
 import io.nuls.api.manager.CacheManager;
 import io.nuls.api.model.po.BlockHeaderInfo;
@@ -49,6 +50,8 @@ public class BlockController {
 
     @Autowired
     private BlockService blockService;
+    @Autowired
+    private ApiConfig apiConfig;
 
     @RpcMethod("getBestBlockHeader")
     public RpcResult getBestInfo(List<Object> params) {

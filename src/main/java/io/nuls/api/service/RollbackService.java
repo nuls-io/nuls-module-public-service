@@ -1,12 +1,15 @@
 package io.nuls.api.service;
 
+import io.nuls.api.ApiContext;
 import io.nuls.api.analysis.AnalysisHandler;
+import io.nuls.api.analysis.WalletRpcHandler;
 import io.nuls.api.constant.ApiConstant;
 import io.nuls.api.constant.ApiErrorCode;
 import io.nuls.api.db.*;
 import io.nuls.api.manager.CacheManager;
 import io.nuls.api.model.po.*;
 import io.nuls.api.utils.DBUtil;
+import io.nuls.api.utils.LoggerUtil;
 import io.nuls.base.basic.AddressTool;
 import io.nuls.core.constant.TxType;
 import io.nuls.core.core.annotation.Autowired;
@@ -42,6 +45,8 @@ public class RollbackService {
     @Autowired
     private TokenService tokenService;
     @Autowired
+    private Token721Service token721Service;
+    @Autowired
     private ChainService chainService;
     @Autowired
     private AccountLedgerService ledgerService;
@@ -64,17 +69,27 @@ public class RollbackService {
     private List<String> contractTxHashList = new ArrayList<>();
     //记录每个区块智能合约相关的账户token信息
     private Map<String, AccountTokenInfo> accountTokenMap = new HashMap<>();
-    //记录合约转账信息
+    //记录每个区块智能合约相关的账户token721信息
+    private Map<String, AccountToken721Info> accountToken721Map = new HashMap<>();
+    //记录合约nrc20转账信息
     private List<String> tokenTransferHashList = new ArrayList<>();
+    //记录合约nrc721转账信息
+    private List<String> token721TransferHashList = new ArrayList<>();
+    //记录合约nrc721造币信息
+    private List<Nrc721TokenIdInfo> token721IdList = new ArrayList<>();
     //记录链信息
     private List<ChainInfo> chainInfoList = new ArrayList<>();
     //记录每个区块交易和账户地址的关系
     private Set<TxRelationInfo> txRelationInfoSet = new HashSet<>();
+    //记录每个跨链交易和账户地址的关系
+    private Set<String> crossTxHashSet = new HashSet<>();
     //处理每个交易时，过滤交易中的重复地址
     Set<String> addressSet = new HashSet<>();
 
     public boolean rollbackBlock(int chainId, long blockHeight) {
         clear();
+
+        LoggerUtil.commonLog.info("-----rollbackBlock height :" + blockHeight);
         BlockHexInfo blockHexInfo = blockService.getBlockHexInfo(chainId, blockHeight);
         if (blockHexInfo == null) {
             blockService.deleteBlockHeader(chainId, blockHeight);
@@ -167,7 +182,7 @@ public class RollbackService {
     }
 
     private void processTxs(int chainId, List<TransactionInfo> txs) {
-        for (int i = 0; i < txs.size(); i++) {
+        for (int i = txs.size() - 1; i >=0 ; i--) {
             TransactionInfo tx = txs.get(i);
             if (tx.getType() == TxType.COIN_BASE) {
                 processCoinBaseTx(chainId, tx);
@@ -195,6 +210,9 @@ public class RollbackService {
                 processDeleteContract(chainId, tx);
             } else if (tx.getType() == TxType.CROSS_CHAIN) {
                 processCrossTransferTx(chainId, tx);
+                // add by pierre at 2019-12-23 特殊跨链转账交易，从平行链跨链转回主网的NRC20资产
+                processCrossTransferTxForNRC20TransferBack(chainId, tx);
+                // end code by pierre
             } else if (tx.getType() == TxType.REGISTER_CHAIN_AND_ASSET) {
                 processRegChainTx(chainId, tx);
             } else if (tx.getType() == TxType.DESTROY_CHAIN_AND_ASSET) {
@@ -205,6 +223,10 @@ public class RollbackService {
                 processCancelAssetTx(chainId, tx);
             } else if (tx.getType() == TxType.CONTRACT_RETURN_GAS) {
                 processReturnGasTx(chainId, tx);
+            } else if (tx.getType() == TxType.CONTRACT_TOKEN_CROSS_TRANSFER) {
+                processCrossTransferTxForNRC20TransferOut(chainId, tx);
+            } else if (tx.getType() == TxType.LEDGER_ASSET_REG_TRANSFER) {
+                processLedgerAssetRegTransferTx(chainId, tx);
             }
         }
     }
@@ -248,6 +270,47 @@ public class RollbackService {
         }
     }
 
+    private void processCrossTransferTxForNRC20TransferOut(int chainId, TransactionInfo tx) {
+        addressSet.clear();
+
+        if (tx.getCoinFroms() != null) {
+            for (CoinFromInfo input : tx.getCoinFroms()) {
+                //如果地址不是本链的地址，不参与计算与存储
+                if (chainId != AddressTool.getChainIdByAddress(input.getAddress())) {
+                    continue;
+                }
+                addressSet.add(input.getAddress());
+                if (input.getAssetsId() == ApiContext.defaultAssetId) {
+                    AccountLedgerInfo ledgerInfo = calcBalance(chainId, input);
+                    txRelationInfoSet.add(new TxRelationInfo(input, tx, ledgerInfo.getTotalBalance()));
+                } else {
+                    txRelationInfoSet.add(new TxRelationInfo(input, tx, BigInteger.ZERO));
+                }
+            }
+        }
+
+        if (tx.getCoinTos() != null) {
+            for (CoinToInfo output : tx.getCoinTos()) {
+                //如果地址不是本链的地址，不参与计算与存储
+                if (chainId != AddressTool.getChainIdByAddress(output.getAddress())) {
+                    continue;
+                }
+                addressSet.add(output.getAddress());
+                AccountLedgerInfo ledgerInfo = calcBalance(chainId, output);
+                txRelationInfoSet.add(new TxRelationInfo(output, tx, ledgerInfo.getTotalBalance()));
+            }
+        }
+
+        for (String address : addressSet) {
+            AccountInfo accountInfo = queryAccountInfo(chainId, address);
+            accountInfo.setTxCount(accountInfo.getTxCount() - 1);
+        }
+    }
+
+    private void processLedgerAssetRegTransferTx(int chainId, TransactionInfo tx) {
+        processTransferTx(chainId, tx);
+    }
+
     private void processTransferTx(int chainId, TransactionInfo tx) {
         addressSet.clear();
 
@@ -283,8 +346,29 @@ public class RollbackService {
                 addressSet.add(input.getAddress());
                 calcBalance(chainId, input);
                 txRelationInfoSet.add(new TxRelationInfo(input.getAddress(), tx.getHash()));
+                crossTxHashSet.add(tx.getHash());
+
+                AssetInfo assetInfo = CacheManager.getRegisteredAsset(input.getAssetKey());
+                if (assetInfo.getChainId() != ApiContext.defaultChainId) {
+                    //资产跨链转出后，修改资产在本链的总余额
+                    ChainInfo chainInfo = queryChainInfo(assetInfo.getChainId());
+                    if (chainInfo != null) {
+                        AssetInfo asset = chainInfo.getDefaultAsset();
+                        if (asset.getAssetId() == assetInfo.getAssetId()) {
+                            asset.setLocalTotalCoins(asset.getLocalTotalCoins().add(input.getAmount()));
+                        }
+                        for (AssetInfo ass : chainInfo.getAssets()) {
+                            if (ass.getAssetId() == assetInfo.getAssetId()) {
+                                ass.setLocalTotalCoins(ass.getLocalTotalCoins().add(input.getAmount()));
+                            }
+                        }
+                    }
+                }
             }
         }
+
+        boolean nrc20CrossTransferBack = tx.getTxData() != null && tx.getTxData() instanceof ContractCallInfo;
+
         if (tx.getCoinTos() != null) {
             for (CoinToInfo output : tx.getCoinTos()) {
                 //如果地址不是本链的地址，不参与计算与存储
@@ -292,13 +376,47 @@ public class RollbackService {
                     continue;
                 }
                 addressSet.add(output.getAddress());
-                calcBalance(chainId, output);
-                txRelationInfoSet.add(new TxRelationInfo(output.getAddress(), tx.getHash()));
+                if (nrc20CrossTransferBack && output.getAssetsId() != ApiContext.defaultAssetId) {
+                    txRelationInfoSet.add(new TxRelationInfo(output.getAddress(), tx.getHash()));
+                } else {
+                    calcBalance(chainId, output);
+                    txRelationInfoSet.add(new TxRelationInfo(output.getAddress(), tx.getHash()));
+
+                    AssetInfo assetInfo = CacheManager.getRegisteredAsset(output.getAssetKey());
+                    //资产跨链转入后，修改资产在本链的总余额
+                    if (assetInfo.getChainId() != ApiContext.defaultChainId) {
+                        ChainInfo chainInfo = queryChainInfo(assetInfo.getChainId());
+                        if (chainInfo != null) {
+                            AssetInfo asset = chainInfo.getDefaultAsset();
+                            if (asset.getAssetId() == assetInfo.getAssetId()) {
+                                asset.setLocalTotalCoins(asset.getLocalTotalCoins().subtract(output.getAmount()));
+                            }
+                            for (AssetInfo ass : chainInfo.getAssets()) {
+                                if (ass.getAssetId() == assetInfo.getAssetId()) {
+                                    ass.setLocalTotalCoins(ass.getLocalTotalCoins().subtract(output.getAmount()));
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
         for (String address : addressSet) {
             AccountInfo accountInfo = queryAccountInfo(chainId, address);
             accountInfo.setTxCount(accountInfo.getTxCount() - 1);
+        }
+    }
+
+    private void processCrossTransferTxForNRC20TransferBack(int chainId, TransactionInfo tx) {
+        if (tx.getTxData() != null && tx.getTxData() instanceof ContractCallInfo) {
+            contractTxHashList.add(tx.getHash());
+            ContractCallInfo callInfo = (ContractCallInfo) tx.getTxData();
+            ContractInfo contractInfo = queryContractInfo(chainId, callInfo.getContractAddress());
+            contractInfo.setTxCount(contractInfo.getTxCount() - 1);
+
+            if (callInfo.getResultInfo().isSuccess()) {
+                processTokenTransfers(chainId, callInfo.getResultInfo().getTokenTransfers(), callInfo.getResultInfo().getToken721Transfers(), tx);
+            }
         }
     }
 
@@ -512,7 +630,7 @@ public class RollbackService {
         contractTxHashList.add(tx.getHash());
         ContractResultInfo resultInfo = contractInfo.getResultInfo();
         if (resultInfo.isSuccess()) {
-            processTokenTransfers(chainId, resultInfo.getTokenTransfers(), tx);
+            processTokenTransfers(chainId, resultInfo.getTokenTransfers(), resultInfo.getToken721Transfers(), tx);
         }
     }
 
@@ -525,7 +643,7 @@ public class RollbackService {
         contractInfo.setTxCount(contractInfo.getTxCount() - 1);
 
         if (resultInfo.isSuccess()) {
-            processTokenTransfers(chainId, resultInfo.getTokenTransfers(), tx);
+            processTokenTransfers(chainId, resultInfo.getTokenTransfers(), resultInfo.getToken721Transfers(), tx);
         }
     }
 
@@ -625,7 +743,12 @@ public class RollbackService {
         chainInfoList.add(chainInfo);
     }
 
-    private void processTokenTransfers(int chainId, List<TokenTransfer> tokenTransfers, TransactionInfo tx) {
+    private void processTokenTransfers(int chainId, List<TokenTransfer> tokenTransfers, List<Token721Transfer> token721Transfers, TransactionInfo tx) {
+        processToken20Transfers(chainId, tokenTransfers, tx);
+        processToken721Transfers(chainId, token721Transfers, tx);
+    }
+
+    private void processToken20Transfers(int chainId, List<TokenTransfer> tokenTransfers, TransactionInfo tx) {
         if (tokenTransfers.isEmpty()) {
             return;
         }
@@ -645,6 +768,83 @@ public class RollbackService {
                 processAccountNrc20(chainId, contractInfo, tokenTransfer.getToAddress(), new BigInteger(tokenTransfer.getValue()), -1);
             }
         }
+    }
+
+    private void processToken721Transfers(int chainId, List<Token721Transfer> tokenTransfers, TransactionInfo tx) {
+        if (tokenTransfers.isEmpty()) {
+            return;
+        }
+        token721TransferHashList.add(tx.getHash());
+
+        Token721Transfer tokenTransfer;
+        ContractInfo contractInfo;
+        Nrc721TokenIdInfo tokenIdInfo;
+        for (int i = 0; i < tokenTransfers.size(); i++) {
+            tokenTransfer = tokenTransfers.get(i);
+            tokenTransfer.setTxHash(tx.getHash());
+            tokenTransfer.setHeight(tx.getHeight());
+            tokenTransfer.setTime(tx.getCreateTime());
+
+            contractInfo = queryContractInfo(chainId, tokenTransfer.getContractAddress());
+            contractInfo.setTransferCount(contractInfo.getTransferCount() - 1);
+
+            boolean isMint = false;
+            boolean isBurn = false;
+            if (tokenTransfer.getFromAddress() != null) {
+                processAccountNrc721(chainId, contractInfo, tokenTransfer.getFromAddress(), tokenTransfer.getTokenId(), 1);
+            } else {
+                isMint = true;
+            }
+            if (tokenTransfer.getToAddress() != null) {
+                processAccountNrc721(chainId, contractInfo, tokenTransfer.getToAddress(), tokenTransfer.getTokenId(), -1);
+            } else {
+                isBurn = true;
+            }
+            if (isMint) {
+                // 造币回滚
+                // 减少发行总量
+                contractInfo.setTotalSupply(new BigInteger(contractInfo.getTotalSupply()).subtract(BigInteger.ONE).toString());
+                // from为空时，视为NRC721的造币
+                tokenIdInfo = new Nrc721TokenIdInfo(tokenTransfer.getContractAddress(), null, null, tokenTransfer.getTokenId(), null, null, null);
+            } else if (isBurn) {
+                // 销毁回滚
+                // 增加发行总量
+                contractInfo.setTotalSupply(new BigInteger(contractInfo.getTotalSupply()).add(BigInteger.ONE).toString());
+                // from为空时，视为NRC721的造币
+                tokenIdInfo = new Nrc721TokenIdInfo(
+                        tokenTransfer.getContractAddress(),
+                        contractInfo.getTokenName(),
+                        contractInfo.getSymbol(),
+                        tokenTransfer.getTokenId(),
+                        WalletRpcHandler.token721URI(chainId, tokenTransfer.getContractAddress(), tokenTransfer.getTokenId()),
+                        tokenTransfer.getTime(),
+                        tokenTransfer.getToAddress()
+                );
+            } else {
+                // 转账回滚
+                tokenIdInfo = new Nrc721TokenIdInfo(tokenTransfer.getContractAddress(), null, null, tokenTransfer.getTokenId(), null, null, tokenTransfer.getFromAddress());
+            }
+            token721IdList.add(tokenIdInfo);
+        }
+    }
+
+    private AccountToken721Info processAccountNrc721(int chainId, ContractInfo contractInfo, String address, String tokenId, int type) {
+        AccountToken721Info tokenInfo = queryAccountToken721Info(chainId, address + contractInfo.getContractAddress());
+        if (tokenInfo == null) {
+            return null;
+        }
+
+        if (type == 1) {
+            tokenInfo.addToken(tokenId);
+        } else {
+            tokenInfo.removeToken(tokenId);
+        }
+
+        if (!accountToken721Map.containsKey(tokenInfo.getKey())) {
+            accountToken721Map.put(tokenInfo.getKey(), tokenInfo);
+        }
+
+        return tokenInfo;
     }
 
     private AccountTokenInfo processAccountNrc20(int chainId, ContractInfo contractInfo, String address, BigInteger value, int type) {
@@ -714,7 +914,20 @@ public class RollbackService {
         if (blockInfo.getHeader().getHeight() != syncInfo.getBestHeight()) {
             throw new NulsRuntimeException(ApiErrorCode.DATA_ERROR);
         }
+
         if (syncInfo.isFinish()) {
+            token721Service.rollbackTokenIds(chainId, token721IdList);
+            syncInfo.setStep(70);
+            chainService.updateStep(syncInfo);
+        }
+
+        if (syncInfo.getStep() == 70) {
+            token721Service.saveAccountTokens(chainId, accountToken721Map);
+            syncInfo.setStep(60);
+            chainService.updateStep(syncInfo);
+        }
+
+        if (syncInfo.getStep() == 60) {
             accountService.saveAccounts(chainId, accountInfoMap);
             syncInfo.setStep(50);
             chainService.updateStep(syncInfo);
@@ -745,6 +958,8 @@ public class RollbackService {
         }
         //回滚chain信息
         chainService.rollbackChainList(chainInfoList);
+        //回滾token721转账信息
+        token721Service.rollbackTokenTransfers(chainId, token721TransferHashList, blockInfo.getHeader().getHeight());
         //回滾token转账信息
         tokenService.rollbackTokenTransfers(chainId, tokenTransferHashList, blockInfo.getHeader().getHeight());
         //回滾智能合約交易
@@ -754,6 +969,7 @@ public class RollbackService {
         punishService.rollbackPunishLog(chainId, punishTxHashList, blockInfo.getHeader().getHeight());
         aliasService.rollbackAliasList(chainId, aliasInfoList);
         transactionService.rollbackTxRelationList(chainId, txRelationInfoSet);
+        transactionService.rollbackCrossTxRelationList(chainId, crossTxHashSet);
         transactionService.rollbackTx(chainId, blockInfo.getHeader().getTxHashList());
         blockService.deleteBlockHeader(chainId, blockInfo.getHeader().getHeight());
 
@@ -848,6 +1064,27 @@ public class RollbackService {
         return accountTokenInfo;
     }
 
+    private AccountToken721Info queryAccountToken721Info(int chainId, String key) {
+        AccountToken721Info accountToken721Info = accountToken721Map.get(key);
+        if (accountToken721Info == null) {
+            accountToken721Info = token721Service.getAccountTokenInfo(chainId, key);
+        }
+        return accountToken721Info;
+    }
+
+    private ChainInfo queryChainInfo(int chainId) {
+        for (ChainInfo chainInfo : chainInfoList) {
+            if (chainInfo != null) {
+                return chainInfo;
+            }
+        }
+        ChainInfo chainInfo = chainService.getChainInfo(chainId);
+        if (chainInfo != null) {
+            chainInfoList.add(chainInfo);
+        }
+        return chainInfo;
+    }
+
     private void clear() {
         accountInfoMap.clear();
         accountLedgerInfoMap.clear();
@@ -859,6 +1096,9 @@ public class RollbackService {
         contractTxHashList.clear();
         accountTokenMap.clear();
         tokenTransferHashList.clear();
+        accountToken721Map.clear();
+        token721TransferHashList.clear();
+        token721IdList.clear();
         chainInfoList.clear();
         txRelationInfoSet.clear();
     }

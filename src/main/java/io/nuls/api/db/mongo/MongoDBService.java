@@ -180,6 +180,18 @@ public class MongoDBService implements InitializingBean {
         return list;
     }
 
+    public List<Document> query(String collName, BasicDBObject fields) {
+        MongoCollection<Document> collection = getCollection(collName);
+
+        FindIterable<Document> iterable = collection.find().projection(fields);
+        List<Document> list = new ArrayList<>();
+        MongoCursor<Document> documentMongoCursor = iterable.iterator();
+        while (documentMongoCursor.hasNext()) {
+            list.add(documentMongoCursor.next());
+        }
+        return list;
+    }
+
     public List<Document> query(String collName, Bson var1, Bson sort) {
         MongoCollection<Document> collection = getCollection(collName);
 

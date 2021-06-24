@@ -22,16 +22,18 @@ package io.nuls.api;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.google.common.cache.Cache;
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.model.Sorts;
 import io.nuls.api.analysis.WalletRpcHandler;
 import io.nuls.api.constant.config.ApiConfig;
-import io.nuls.api.db.mongo.MongoChainServiceImpl;
-import io.nuls.api.db.mongo.MongoDBTableServiceImpl;
+import io.nuls.api.db.mongo.*;
 import io.nuls.api.manager.CacheManager;
 import io.nuls.api.manager.ScheduleManager;
-import io.nuls.api.model.po.AssetInfo;
-import io.nuls.api.model.po.ChainInfo;
-import io.nuls.api.model.po.SyncInfo;
+import io.nuls.api.model.po.*;
+import io.nuls.api.model.po.mini.MiniAccountInfo;
+import io.nuls.api.model.po.mini.MiniBlockHeaderInfo;
 import io.nuls.api.rpc.jsonRpc.JsonRpcServer;
+import io.nuls.api.utils.DocumentTransferTool;
 import io.nuls.api.utils.LoggerUtil;
 import io.nuls.base.api.provider.Provider;
 import io.nuls.base.api.provider.ServiceManager;
@@ -51,14 +53,14 @@ import io.nuls.core.rpc.modulebootstrap.RpcModule;
 import io.nuls.core.rpc.modulebootstrap.RpcModuleState;
 import io.nuls.core.rpc.util.AddressPrefixDatas;
 import org.bouncycastle.util.encoders.Hex;
+import org.bson.Document;
+import org.checkerframework.checker.units.qual.C;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static io.nuls.api.constant.ApiConstant.DEFAULT_SCAN_PACKAGE;
+import static io.nuls.api.constant.DBTableConstant.BLOCK_HEADER_TABLE;
 
 /**
  * public-service模块启动类
@@ -195,6 +197,8 @@ public class PublicServiceBootstrap extends RpcModule {
                 ApiContext.isRunCrossChain = true;
             }
 
+            initCache();
+
             ScheduleManager scheduleManager = SpringLiteContext.getBean(ScheduleManager.class);
             JsonRpcServer server = new JsonRpcServer();
             server.startServer(ApiContext.listenerIp, ApiContext.rpcPort);
@@ -238,6 +242,56 @@ public class PublicServiceBootstrap extends RpcModule {
             }
         }
     }
+
+    /**
+     * 缓存浏览器首页数据
+     * 提升查询效率
+     */
+    private void initCache() {
+        //缓存首页区块列表
+        MongoDBService mongoDBService = SpringLiteContext.getBean(MongoDBService.class);
+        cacheBlockHeaderList(mongoDBService);
+        //缓存所有共识节点
+        MongoAgentServiceImpl agentService = SpringLiteContext.getBean(MongoAgentServiceImpl.class);
+        PageInfo<AgentInfo> agentPageInfo = agentService.getAgentList(apiConfig.getChainId(), 0, 1, 200);
+        ApiContext.agentPageInfo = agentPageInfo;
+
+        //缓存首页轮次信息
+        cacheRoundList(mongoDBService);
+
+        //缓存nuls首页持币排名信息
+        MongoAccountLedgerServiceImpl accountLedgerService = SpringLiteContext.getBean(MongoAccountLedgerServiceImpl.class);
+        PageInfo<MiniAccountInfo> miniAccountPageInfo = accountLedgerService.getAssetRanking(apiConfig.getChainId(), apiConfig.getChainId(), apiConfig.getAssetId(), 1, 15);
+        ApiContext.miniAccountPageInfo = miniAccountPageInfo;
+    }
+
+    private void cacheBlockHeaderList(MongoDBService mongoDBService) {
+        BasicDBObject fields = new BasicDBObject();
+        fields.append("_id", 1).append("createTime", 1).append("txCount", 1).append("agentHash", 1).
+                append("agentId", 1).append("agentAlias", 1).append("size", 1).append("reward", 1);
+        List<Document> docsList = mongoDBService.pageQuery(BLOCK_HEADER_TABLE + apiConfig.getChainId(),
+                null, fields, Sorts.descending("_id"), 1, 15);
+        List<MiniBlockHeaderInfo> list = new ArrayList<>();
+        for (Document document : docsList) {
+            list.add(DocumentTransferTool.toInfo(document, "height", MiniBlockHeaderInfo.class));
+        }
+        ApiContext.blockList = list;
+    }
+
+    private void cacheRoundList(MongoDBService mongoDBService) {
+        MongoRoundServiceImpl roundService = SpringLiteContext.getBean(MongoRoundServiceImpl.class);
+        List<PocRound> roundList = roundService.getRoundList(apiConfig.getChainId(), 1, 5);
+        List<CurrentRound> currentRoundList = new ArrayList<>();
+        for (PocRound round : roundList) {
+            CurrentRound currentRound = new CurrentRound();
+            currentRound.initByPocRound(round);
+            List<PocRoundItem> itemList = roundService.getRoundItemList(apiConfig.getChainId(), currentRound.getIndex());
+            currentRound.setItemList(itemList);
+            currentRoundList.add(currentRound);
+        }
+        ApiContext.roundList = currentRoundList;
+    }
+
 
     @Override
     public RpcModuleState onDependenciesLoss(Module dependenciesModule) {

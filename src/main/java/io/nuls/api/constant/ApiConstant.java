@@ -121,4 +121,7 @@ public interface ApiConstant {
     long CONTRACT_MINIMUM_PRICE = 25;
     String CROSS_CHAIN_SYSTEM_CONTRACT_TRANSFER_IN_METHOD_NAME = "crossChainTokenTransfer";
 
+    int TOKEN_TYPE_NRC20 = 1;
+    int TOKEN_TYPE_NRC721 = 2;
+    String EMPTY_STRING = "";
 }
