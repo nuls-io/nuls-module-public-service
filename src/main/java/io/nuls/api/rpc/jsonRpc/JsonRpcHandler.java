@@ -22,6 +22,7 @@ package io.nuls.api.rpc.jsonRpc;
 
 import io.nuls.api.model.rpc.RpcResult;
 import io.nuls.api.model.rpc.RpcResultError;
+import io.nuls.api.rpc.rest.TvlController;
 import io.nuls.api.utils.AssetTool;
 import io.nuls.api.utils.LoggerUtil;
 import io.nuls.core.model.StringUtils;
@@ -60,6 +61,10 @@ public class JsonRpcHandler extends HttpHandler {
         }
 
         if (request.getMethod().equals(Method.GET)) {
+            if (request.getRequestURI().endsWith("nuls/tvl") || request.getRequestURI().endsWith("nuls/tvl/")) {
+                TvlController.doGet(request,response);
+                return;
+            }
             if (request.getRequestURI().endsWith("nuls/assets/get") || request.getRequestURI().endsWith("nuls/assets/get/")) {
                 Map<String, Object> result = new HashMap<>();
                 result.put("success", true);
