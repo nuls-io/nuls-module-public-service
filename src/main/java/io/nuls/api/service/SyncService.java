@@ -845,9 +845,15 @@ public class SyncService {
             }
         }
 
-        LoggerUtil.commonLog.info("input:{},   fee:{}",input.getAddress(),tx.getFee());
+        if(output.getAmount()==null){
+            output.setAmount(BigInteger.ZERO);
+        }
 
         AccountLedgerInfo ledgerInfo = calcBalance(chainId, input.getChainId(), input.getAssetsId(), accountInfo, output.getAmount().add(tx.getFee().getValue()));
+
+
+
+
         txRelationInfoSet.add(new TxRelationInfo(input, tx, output.getAmount().add(tx.getFee().getValue()), ledgerInfo.getTotalBalance()));
 
         AccountInfo destroyAccount = queryAccountInfo(chainId, output.getAddress());
