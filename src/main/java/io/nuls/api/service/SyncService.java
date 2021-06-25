@@ -845,14 +845,12 @@ public class SyncService {
             }
         }
 
-        if(output.getAmount()==null){
+        LoggerUtil.commonLog.info("{}, chainId:{},   fee:{},  {},fee:{}", chainId, input.getChainId(), input.getAssetsId(), input.getAmount(), tx.getFee().getValue());
+        if (output.getAmount() == null) {
             output.setAmount(BigInteger.ZERO);
         }
 
         AccountLedgerInfo ledgerInfo = calcBalance(chainId, input.getChainId(), input.getAssetsId(), accountInfo, output.getAmount().add(tx.getFee().getValue()));
-
-
-
 
         txRelationInfoSet.add(new TxRelationInfo(input, tx, output.getAmount().add(tx.getFee().getValue()), ledgerInfo.getTotalBalance()));
 
