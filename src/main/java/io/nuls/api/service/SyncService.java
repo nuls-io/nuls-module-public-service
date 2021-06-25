@@ -839,15 +839,10 @@ public class SyncService {
 
         CoinToInfo output = null;
         for (CoinToInfo to : tx.getCoinTos()) {
-            if (!to.getAddress().equals(accountInfo.getAddress())) {
+            if (!to.getAddress().equals(accountInfo.getAddress()) || to.getAmount().compareTo(BigInteger.ZERO) == 0) {
                 output = to;
                 break;
             }
-        }
-
-        LoggerUtil.commonLog.info("{}, chainId:{},   fee:{},  {},fee:{}", chainId, input.getChainId(), input.getAssetsId(), input.getAmount(), tx.getFee().getValue());
-        if (output.getAmount() == null) {
-            output.setAmount(BigInteger.ZERO);
         }
 
         AccountLedgerInfo ledgerInfo = calcBalance(chainId, input.getChainId(), input.getAssetsId(), accountInfo, output.getAmount().add(tx.getFee().getValue()));
