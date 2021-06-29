@@ -28,7 +28,7 @@ public class TvlController implements Runnable {
 
     public static void doGet( Response response) {
         Log.info("TvlController.doGet");
-        ApiCache apiCache = CacheManager.getCache(1);
+        ApiCache apiCache = CacheManager.getCache(2);
         BigInteger consensusAmount = apiCache.getCoinContextInfo().getConsensusTotal();
 
         BigDecimal tvl = new BigDecimal((consensusAmount)).movePointLeft(8).multiply(BigDecimal.valueOf(nulsPrice));
