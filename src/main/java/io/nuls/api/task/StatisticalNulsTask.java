@@ -81,8 +81,9 @@ public class StatisticalNulsTask implements Runnable {
             // end code by pierre
             //商务持有数量
             BigInteger businessNuls = BigInteger.ZERO;
-            if (!StringUtils.isBlank(ApiContext.BUSINESS_ADDRESS)) {
-                businessNuls = accountService.getAccountTotalBalance(chainId, ApiContext.BUSINESS_ADDRESS);
+            for (String businessAddress : ApiContext.BUSINESS_ADDRESS) {
+                BigInteger amount = accountService.getAccountTotalBalance(chainId, businessAddress);
+                businessNuls = businessNuls.add(amount);
             }
             contextInfo.setBusiness(businessNuls);
             //社区持有数量
