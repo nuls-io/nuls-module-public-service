@@ -44,8 +44,7 @@ public class StatisticalNulsTask implements Runnable {
     @Override
     public void run() {
         try {
-
-            BigInteger totalCoin = BigInteger.ZERO;
+            BigInteger totalCoin = BigInteger.ZERO;         //总量
             SyncInfo syncInfo = chainService.getSyncInfo(chainId);
             if (syncInfo != null) {
                 totalCoin = syncInfo.getTotalSupply();
@@ -88,8 +87,9 @@ public class StatisticalNulsTask implements Runnable {
             contextInfo.setBusiness(businessNuls);
             //社区持有数量
             BigInteger communityNuls = BigInteger.ZERO;
-            if (!StringUtils.isBlank(ApiContext.COMMUNITY_ADDRESS)) {
-                communityNuls = accountService.getAccountTotalBalance(chainId, ApiContext.COMMUNITY_ADDRESS);
+            for (String communityAddress : ApiContext.COMMUNITY_ADDRESS) {
+                BigInteger amount = accountService.getAccountTotalBalance(chainId, communityAddress);
+                communityNuls = communityNuls.add(amount);
             }
             contextInfo.setCommunity(communityNuls);
 
