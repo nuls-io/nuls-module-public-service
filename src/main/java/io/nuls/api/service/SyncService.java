@@ -839,13 +839,14 @@ public class SyncService {
 
         CoinToInfo output = null;
         for (CoinToInfo to : tx.getCoinTos()) {
-            if (!to.getAddress().equals(accountInfo.getAddress())) {
+            if (!to.getAddress().equals(accountInfo.getAddress()) || to.getAmount().compareTo(BigInteger.ZERO) == 0) {
                 output = to;
                 break;
             }
         }
 
         AccountLedgerInfo ledgerInfo = calcBalance(chainId, input.getChainId(), input.getAssetsId(), accountInfo, output.getAmount().add(tx.getFee().getValue()));
+
         txRelationInfoSet.add(new TxRelationInfo(input, tx, output.getAmount().add(tx.getFee().getValue()), ledgerInfo.getTotalBalance()));
 
         AccountInfo destroyAccount = queryAccountInfo(chainId, output.getAddress());
