@@ -106,11 +106,11 @@ public class ApiContext {
     //映射地址
     public static Set<String> MAPPING_ADDRESS = new HashSet<>();
     //商务地址
-    public static String BUSINESS_ADDRESS = "";
+    public static Set<String> BUSINESS_ADDRESS = new HashSet<>();
     //团队地址
     public static String TEAM_ADDRESS = "";
     //社区地址
-    public static String COMMUNITY_ADDRESS = "";
+    public static Set<String> COMMUNITY_ADDRESS = new HashSet<>();
     //销毁地址公钥
     public static byte[] blackHolePublicKey;
 

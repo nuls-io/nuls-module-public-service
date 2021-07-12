@@ -21,7 +21,6 @@
 package io.nuls.api;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.google.common.cache.Cache;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.model.Sorts;
 import io.nuls.api.analysis.WalletRpcHandler;
@@ -54,7 +53,6 @@ import io.nuls.core.rpc.modulebootstrap.RpcModuleState;
 import io.nuls.core.rpc.util.AddressPrefixDatas;
 import org.bouncycastle.util.encoders.Hex;
 import org.bson.Document;
-import org.checkerframework.checker.units.qual.C;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -165,9 +163,14 @@ public class PublicServiceBootstrap extends RpcModule {
         if (apiConfig.getMappingAddress() != null) {
             ApiContext.MAPPING_ADDRESS = new HashSet(Arrays.asList(apiConfig.getMappingAddress().split(",")));
         }
-        ApiContext.BUSINESS_ADDRESS = apiConfig.getBusinessAddress();
+        if (apiConfig.getBusinessAddress() != null) {
+            ApiContext.BUSINESS_ADDRESS = new HashSet(Arrays.asList(apiConfig.getBusinessAddress().split(",")));
+        }
+        if (apiConfig.getCommunityAddress() != null) {
+            ApiContext.COMMUNITY_ADDRESS = new HashSet<>(Arrays.asList(apiConfig.getCommunityAddress().split(",")));
+        }
         ApiContext.TEAM_ADDRESS = apiConfig.getTeamAddress();
-        ApiContext.COMMUNITY_ADDRESS = apiConfig.getCommunityAddress();
+
         JSONUtils.getInstance().configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
 
     }
