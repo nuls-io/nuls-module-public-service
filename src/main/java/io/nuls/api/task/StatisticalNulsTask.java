@@ -106,12 +106,12 @@ public class StatisticalNulsTask implements Runnable {
             contextInfo.setDestroy(destroyNuls);
 
             BigInteger circulation = totalCoin.subtract(destroyNuls);
-            if (balanceInfo != null) {
-                circulation = circulation.subtract(balanceInfo.getTimeLock());
-            }
-            circulation = circulation.subtract(businessNuls);
+//            if (balanceInfo != null) {
+//                circulation = circulation.subtract(balanceInfo.getTimeLock());
+//            }
+//            circulation = circulation.subtract(businessNuls);
             circulation = circulation.subtract(communityNuls);
-            circulation = circulation.subtract(unmapped);
+//            circulation = circulation.subtract(unmapped);
             contextInfo.setCirculation(circulation);
 
             setDestroyInfo(contextInfo);
