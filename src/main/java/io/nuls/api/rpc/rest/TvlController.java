@@ -75,6 +75,7 @@ public class TvlController implements Runnable {
             if (null != price) {
                 nulsPrice = price;
             }
+            Log.info("nuls-price for tvl : " + nulsPrice);
             try {
                 Thread.sleep(30 * 60000L);
             } catch (InterruptedException e) {
