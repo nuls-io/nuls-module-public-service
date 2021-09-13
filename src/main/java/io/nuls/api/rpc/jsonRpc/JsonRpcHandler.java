@@ -62,7 +62,7 @@ public class JsonRpcHandler extends HttpHandler {
         }
 
         if (request.getMethod().equals(Method.GET)) {
-            Log.info("GetGetGetGetGetGet:{}", request.getRequestURI());
+//            Log.info("GetGetGetGetGetGet:{}", request.getRequestURI());
             if (request.getRequestURI().endsWith("nuls/tvl") || request.getRequestURI().endsWith("nuls/tvl/")) {
                 TvlController.doGet(response);
                 return;
@@ -96,13 +96,13 @@ public class JsonRpcHandler extends HttpHandler {
         }
         String content = "";
         if (!request.getMethod().equals(Method.POST)) {
-            LoggerUtil.commonLog.warn("the request is not POST!, remoteHost:" + request.getRemoteAddr());
-            try {
-                content = getParam(request);
-            } catch (IOException e) {
+//            LoggerUtil.commonLog.warn("the request is not POST!, remoteHost:" + request.getRemoteAddr());
+//            try {
+//                content = getParam(request);
+//            } catch (IOException e) {
                 //   LoggerUtil.commonLog.error(e);
-            }
-            LoggerUtil.commonLog.warn(content);
+//            }
+//            LoggerUtil.commonLog.warn(content);
             response.getWriter().write(JSONUtils.obj2json(responseError("-32600", "", "0")));
             return;
         }

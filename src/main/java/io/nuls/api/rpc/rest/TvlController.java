@@ -3,6 +3,7 @@ package io.nuls.api.rpc.rest;
 import io.nuls.api.cache.ApiCache;
 import io.nuls.api.manager.CacheManager;
 import io.nuls.api.rpc.rest.utils.*;
+import io.nuls.api.utils.LoggerUtil;
 import io.nuls.core.log.Log;
 import io.nuls.core.model.DoubleUtils;
 import io.nuls.core.parse.JSONUtils;
@@ -75,9 +76,13 @@ public class TvlController implements Runnable {
             if (null != price) {
                 nulsPrice = price;
             }
-            Log.info("nuls-price for tvl : " + nulsPrice);
+            LoggerUtil.commonLog.info("nuls-price for tvl : " + nulsPrice);
             try {
-                Thread.sleep(30 * 60000L);
+                long sleep = 30 * 60000L;
+                if (nulsPrice > 0) {
+                    sleep = 120000L;
+                }
+                Thread.sleep(sleep);
             } catch (InterruptedException e) {
                 Log.error(e);
             }

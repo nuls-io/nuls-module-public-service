@@ -24,6 +24,7 @@
 
 package io.nuls.api.rpc.rest.utils;
 
+import io.nuls.api.utils.LoggerUtil;
 import io.nuls.core.log.Log;
 
 import java.math.BigDecimal;
@@ -35,7 +36,7 @@ import java.util.Map;
  */
 public class OkexPriceProvider extends BasePriceProvider {
 
-    private String CMD_FORMAT ="/api/spot/v3/instruments/%s-USDT/ticker";
+    private String CMD_FORMAT = "/api/spot/v3/instruments/%s-USDT/ticker";
 
     public OkexPriceProvider(String url) {
         super(url);
@@ -45,15 +46,16 @@ public class OkexPriceProvider extends BasePriceProvider {
         String whole = String.format(this.url + CMD_FORMAT, symbol.toUpperCase());
 
         try {
-            Map<String, Object> data = httpRequest( whole);
-            if(null == data){
-                return null;
+            Map<String, Object> data = httpRequest(whole);
+            if (null == data) {
+                LoggerUtil.commonLog.warn("未能从okex获取数据");
+                return BigDecimal.ZERO;
             }
             BigDecimal res = new BigDecimal((String) data.get("last"));
-            Log.info("Okex 获取到交易对[{}]价格:{}", symbol.toUpperCase(), res);
+            LoggerUtil.commonLog.info("Okex 获取到交易对[{}]价格:{}", symbol.toUpperCase(), res);
             return res;
         } catch (Throwable e) {
-            Log.error("Okex, 调用接口 {}, symbol:{} 获取价格失败", whole, symbol);
+            LoggerUtil.commonLog.error("Okex, 调用接口 {}, symbol:{} 获取价格失败", whole, symbol);
             return null;
         }
     }
