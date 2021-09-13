@@ -43,12 +43,12 @@ public class TvlController implements Runnable {
         }
     }
 
-    private static BinancePriceProvider binancePriceProvider = new BinancePriceProvider("https://api.binance.com");
-    private static HuobiPriceProvider huobiPriceProvider = new HuobiPriceProvider("https://api-aws.huobi.pro");
-    private static OkexPriceProvider okexPriceProvider = new OkexPriceProvider("https://aws.okex.com");
-    private static NerveDexPriceProvider dexPriceProvider = new NerveDexPriceProvider("https://api.nervedex.com");
+    public static BinancePriceProvider binancePriceProvider = new BinancePriceProvider("https://api.binance.com");
+    public static HuobiPriceProvider huobiPriceProvider = new HuobiPriceProvider("https://api-aws.huobi.pro");
+    public static OkexPriceProvider okexPriceProvider = new OkexPriceProvider("https://aws.okex.com");
+    public static NerveDexPriceProvider dexPriceProvider = new NerveDexPriceProvider("https://api.nervedex.com");
 
-    private static Double getNulsPriceFromEx(PriceProvider priceProvider) {
+    public static Double getNulsPriceFromEx(PriceProvider priceProvider) {
         try {
             BigDecimal price = priceProvider.queryPrice("NULS");
             if (null != price) {
@@ -69,7 +69,7 @@ public class TvlController implements Runnable {
             if (null == price || price == 0) {
                 price = getNulsPriceFromEx(huobiPriceProvider);
             }
-            if (null == price) {
+            if (null == price || price == 0) {
                 price = getNulsPriceFromEx(okexPriceProvider);
             }
             if (null != price) {
