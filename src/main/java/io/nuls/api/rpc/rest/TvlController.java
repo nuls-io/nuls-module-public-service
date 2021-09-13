@@ -26,7 +26,7 @@ public class TvlController implements Runnable {
         new Thread(runner).start();
     }
 
-    public static void doGet( Response response) {
+    public static void doGet(Response response) {
         Log.info("TvlController.doGet");
         ApiCache apiCache = CacheManager.getCache(1);
         BigInteger consensusAmount = apiCache.getCoinContextInfo().getConsensusTotal();
@@ -64,15 +64,13 @@ public class TvlController implements Runnable {
     @Override
     public void run() {
         while (true) {
-            Double price = getNulsPriceFromEx(dexPriceProvider);
+            Double price = getNulsPriceFromEx(binancePriceProvider);
+//                    price = getNulsPriceFromEx(dexPriceProvider);
             if (null == price || price == 0) {
                 price = getNulsPriceFromEx(huobiPriceProvider);
             }
             if (null == price) {
                 price = getNulsPriceFromEx(okexPriceProvider);
-            }
-            if (null == price) {
-                price = getNulsPriceFromEx(binancePriceProvider);
             }
             if (null != price) {
                 nulsPrice = price;
