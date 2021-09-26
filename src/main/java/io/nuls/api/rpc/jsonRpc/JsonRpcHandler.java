@@ -22,6 +22,7 @@ package io.nuls.api.rpc.jsonRpc;
 
 import io.nuls.api.model.rpc.RpcResult;
 import io.nuls.api.model.rpc.RpcResultError;
+import io.nuls.api.rpc.rest.IpLookupController;
 import io.nuls.api.rpc.rest.TvlController;
 import io.nuls.api.utils.AssetTool;
 import io.nuls.api.utils.LoggerUtil;
@@ -62,12 +63,16 @@ public class JsonRpcHandler extends HttpHandler {
         }
 
         if (request.getMethod().equals(Method.GET)) {
-            Log.info("GetGetGetGetGetGet:{}", request.getRequestURI());
+//            Log.info("GetGetGetGetGetGet:{}", request.getRequestURI());
             if (request.getRequestURI().endsWith("nuls/tvl") || request.getRequestURI().endsWith("nuls/tvl/")) {
                 TvlController.doGet(response);
                 return;
             }
-            if (request.getRequestURI().endsWith("nuls/assets/get") || request.getRequestURI().endsWith("nuls/assets/get/")) {
+            if (request.getRequestURI().endsWith("iplookup") || request.getRequestURI().endsWith("iplookup/")) {
+                IpLookupController.doGet(request, response);
+                return;
+            }
+            if (request.getRequestURI().endsWith(" ") || request.getRequestURI().endsWith("nuls/assets/get/")) {
                 Map<String, Object> result = new HashMap<>();
                 result.put("success", true);
                 result.put("code", 1000);
@@ -96,13 +101,13 @@ public class JsonRpcHandler extends HttpHandler {
         }
         String content = "";
         if (!request.getMethod().equals(Method.POST)) {
-            LoggerUtil.commonLog.warn("the request is not POST!, remoteHost:" + request.getRemoteAddr());
-            try {
-                content = getParam(request);
-            } catch (IOException e) {
-                //   LoggerUtil.commonLog.error(e);
-            }
-            LoggerUtil.commonLog.warn(content);
+//            LoggerUtil.commonLog.warn("the request is not POST!, remoteHost:" + request.getRemoteAddr());
+//            try {
+//                content = getParam(request);
+//            } catch (IOException e) {
+            //   LoggerUtil.commonLog.error(e);
+//            }
+//            LoggerUtil.commonLog.warn(content);
             response.getWriter().write(JSONUtils.obj2json(responseError("-32600", "", "0")));
             return;
         }
