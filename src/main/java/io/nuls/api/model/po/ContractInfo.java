@@ -67,6 +67,7 @@ public class ContractInfo extends TxDataInfo {
     private boolean crossAsset;
     @JsonIgnore
     private boolean isNew;
+    private boolean directPayableByOtherAsset;
 
     public ContractInfo() {
         this.totalSupply = "0";
@@ -349,5 +350,13 @@ public class ContractInfo extends TxDataInfo {
 
     public void setCrossAsset(boolean crossAsset) {
         this.crossAsset = crossAsset;
+    }
+
+    public boolean isDirectPayableByOtherAsset() {
+        return directPayableByOtherAsset;
+    }
+
+    public void setDirectPayableByOtherAsset(boolean directPayableByOtherAsset) {
+        this.directPayableByOtherAsset = directPayableByOtherAsset;
     }
 }
