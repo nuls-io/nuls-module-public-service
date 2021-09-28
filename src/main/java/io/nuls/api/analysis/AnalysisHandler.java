@@ -559,6 +559,10 @@ public class AnalysisHandler {
             method.setReturnType((String) map1.get("returnArg"));
             method.setView((boolean) map1.get("view"));
             method.setPayable((boolean) map1.get("payable"));
+            Boolean payableMultyAsset = (Boolean) map1.get("payableMultyAsset");
+            if (payableMultyAsset != null) {
+                method.setPayableMultyAsset(payableMultyAsset);
+            }
             method.setEvent((boolean) map1.get("event"));
             method.setJsonSerializable((boolean) map1.get("jsonSerializable"));
             argsList = (List<Map<String, Object>>) map1.get("args");
