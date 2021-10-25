@@ -26,7 +26,6 @@ import io.nuls.api.rpc.rest.IpLookupController;
 import io.nuls.api.rpc.rest.TvlController;
 import io.nuls.api.utils.AssetTool;
 import io.nuls.api.utils.LoggerUtil;
-import io.nuls.core.log.Log;
 import io.nuls.core.model.StringUtils;
 import io.nuls.core.parse.JSONUtils;
 import org.glassfish.grizzly.http.Method;
@@ -105,7 +104,7 @@ public class JsonRpcHandler extends HttpHandler {
 //            try {
 //                content = getParam(request);
 //            } catch (IOException e) {
-                //   LoggerUtil.commonLog.error(e);
+            //   LoggerUtil.commonLog.error(e);
 //            }
 //            LoggerUtil.commonLog.warn(content);
             response.getWriter().write(JSONUtils.obj2json(responseError("-32600", "", "0")));
