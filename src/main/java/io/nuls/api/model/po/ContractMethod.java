@@ -12,6 +12,7 @@ public class ContractMethod {
     private boolean event;
     private boolean jsonSerializable;
     private List<ContractMethodArg> params;
+    private boolean payableMultyAsset;
 
     public String getName() {
         return name;
@@ -75,5 +76,13 @@ public class ContractMethod {
 
     public void setParams(List<ContractMethodArg> params) {
         this.params = params;
+    }
+
+    public boolean isPayableMultyAsset() {
+        return payableMultyAsset;
+    }
+
+    public void setPayableMultyAsset(boolean payableMultyAsset) {
+        this.payableMultyAsset = payableMultyAsset;
     }
 }

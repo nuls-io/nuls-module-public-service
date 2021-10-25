@@ -249,6 +249,10 @@ public class WalletRpcHandler {
         contractInfo.setNrc20((Boolean) map.get("nrc20"));
         contractInfo.setTokenType((Integer) map.get("tokenType"));
         contractInfo.setDirectPayable((Boolean) map.get("directPayable"));
+        Boolean directPayableByOtherAsset = (Boolean) map.get("directPayableByOtherAsset");
+        if (directPayableByOtherAsset != null) {
+            contractInfo.setDirectPayableByOtherAsset(directPayableByOtherAsset);
+        }
         boolean isNrc721 = contractInfo.getTokenType() == TOKEN_TYPE_NRC721;
         if (isNrc721) {
             Object tokenName = map.get("nrc20TokenName");
@@ -278,6 +282,10 @@ public class WalletRpcHandler {
             method.setReturnType((String) map1.get("returnArg"));
             method.setView((boolean) map1.get("view"));
             method.setPayable((boolean) map1.get("payable"));
+            Boolean payableMultyAsset = (Boolean) map1.get("payableMultyAsset");
+            if (payableMultyAsset != null) {
+                method.setPayableMultyAsset(payableMultyAsset);
+            }
             method.setEvent((boolean) map1.get("event"));
             method.setJsonSerializable((boolean) map1.get("jsonSerializable"));
             argsList = (List<Map<String, Object>>) map1.get("args");
