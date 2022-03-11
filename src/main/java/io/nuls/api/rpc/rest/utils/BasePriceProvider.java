@@ -120,17 +120,5 @@ public abstract class BasePriceProvider implements PriceProvider {
         return sslContext;
     }
 
-    public static void main(String[] args) {
-        BasePriceProvider priceProvider = new BasePriceProvider("") {
-            @Override
-            public BigDecimal queryPrice(String symbol) {
-                return null;
-            }
-        };
-
-        priceProvider.httpRequest("https://www.baidu.com/");
-
-    }
-
 
 }
