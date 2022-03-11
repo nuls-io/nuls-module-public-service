@@ -21,7 +21,7 @@ import java.util.Map;
  */
 public abstract class BasePriceProvider implements PriceProvider {
 
-    public static final int TIMEOUT_MILLIS = 15000;
+    public static final int TIMEOUT_MILLIS = 60000;
 
     protected String url;
     public BasePriceProvider(String url){
