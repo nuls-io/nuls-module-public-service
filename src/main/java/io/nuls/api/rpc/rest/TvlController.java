@@ -19,7 +19,7 @@ import java.util.Map;
  * @author Niels
  */
 public class TvlController implements Runnable {
-    private static double nulsPrice = 0d;
+    private static double nulsPrice = 0.3833;
 
     static {
         TvlController runner = new TvlController();
@@ -82,5 +82,20 @@ public class TvlController implements Runnable {
                 Log.error(e);
             }
         }
+    }
+
+    public static void main(String[] args) {
+        Double price = getNulsPriceFromEx(binancePriceProvider);
+//                    price = getNulsPriceFromEx(dexPriceProvider);
+        if (null == price || price == 0) {
+            price = getNulsPriceFromEx(huobiPriceProvider);
+        }
+        if (null == price) {
+            price = getNulsPriceFromEx(okexPriceProvider);
+        }
+        if (null != price) {
+            nulsPrice = price;
+        }
+        System.out.println(nulsPrice);
     }
 }
