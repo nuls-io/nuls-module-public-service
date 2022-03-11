@@ -1,5 +1,5 @@
 package io.nuls.api.rpc.rest.utils;
- 
+
 import io.nuls.core.log.Log;
 import io.nuls.core.parse.JSONUtils;
 import org.apache.http.HttpEntity;
@@ -21,17 +21,20 @@ import java.util.Map;
  */
 public abstract class BasePriceProvider implements PriceProvider {
 
-    public static final int TIMEOUT_MILLIS = 60000;
+    public static final int TIMEOUT_MILLIS = 30000;
 
     protected String url;
-    public BasePriceProvider(String url){
+
+    public BasePriceProvider(String url) {
         this.url = url;
     }
 
     public Map<String, Object> httpRequest(String url) {
-        CloseableHttpClient httpClient = HttpClientBuilder.create().setSSLHostnameVerifier((hostName, sslSession) -> {
-            return true; // 证书校验通过
-        }).build();
+        CloseableHttpClient httpClient = HttpClientBuilder.create()
+//                .setSSLHostnameVerifier((hostName, sslSession) -> {
+//            return true; // 证书校验通过
+//        })
+                .build();
 
         HttpGet httpGet = new HttpGet(url);
 //        本地调试专用
