@@ -8,8 +8,8 @@ import io.nuls.api.constant.CommandConstant;
 import io.nuls.api.manager.CacheManager;
 import io.nuls.api.model.entity.*;
 import io.nuls.api.model.po.*;
+import io.nuls.api.model.po.mini.DelayStopAgent;
 import io.nuls.api.rpc.RpcCall;
-import io.nuls.api.utils.LoggerUtil;
 import io.nuls.base.RPCUtil;
 import io.nuls.base.basic.AddressTool;
 import io.nuls.base.basic.NulsByteBuffer;
@@ -20,7 +20,6 @@ import io.nuls.core.constant.TxStatusEnum;
 import io.nuls.core.constant.TxType;
 import io.nuls.core.crypto.HexUtil;
 import io.nuls.core.exception.NulsException;
-import io.nuls.core.log.Log;
 import io.nuls.core.parse.JSONUtils;
 import io.nuls.core.rpc.info.Constants;
 import io.nuls.core.rpc.model.ModuleE;
@@ -350,8 +349,19 @@ public class AnalysisHandler {
             return toChainInfo(tx, version);
         } else if (tx.getType() == TxType.ADD_ASSET_TO_CHAIN || tx.getType() == TxType.REMOVE_ASSET_FROM_CHAIN) {
             return toAssetInfo(tx, version);
+        } else if (tx.getType() == 34) {
+            return toDelayStopAgent(tx, version);
         }
         return null;
+    }
+
+    private static DelayStopAgentInfo toDelayStopAgent(Transaction tx, int version) throws NulsException {
+        DelayStopAgent alias = new DelayStopAgent();
+        alias.parse(new NulsByteBuffer(tx.getTxData()));
+        DelayStopAgentInfo info = new DelayStopAgentInfo();
+        info.setAgentHash(alias.getAgentHash());
+        info.setHeight(alias.getHeight());
+        return info;
     }
 
     public static TxDataInfo toTxData(int chainId, Transaction tx, ContractResultInfo resultInfo) throws NulsException {
