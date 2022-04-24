@@ -219,6 +219,8 @@ public class SyncService {
                 processCancelDepositTx(chainId, tx);
             } else if (tx.getType() == TxType.STOP_AGENT || tx.getType() == TxType.CONTRACT_STOP_AGENT) {
                 processStopAgentTx(chainId, tx);
+            } else if (tx.getType() == 34) {
+                processDelayStopAgentTx(chainId, tx);
             } else if (tx.getType() == TxType.YELLOW_PUNISH) {
                 processYellowPunishTx(chainId, tx);
             } else if (tx.getType() == TxType.RED_PUNISH) {
@@ -538,6 +540,65 @@ public class SyncService {
         AgentInfo agentInfo = queryAgentInfo(chainId, depositInfo.getAgentHash(), 1);
         agentInfo.setTotalDeposit(agentInfo.getTotalDeposit().subtract(depositInfo.getAmount()));
         agentInfo.setNew(false);
+    }
+
+    private void processDelayStopAgentTx(int chainId, TransactionInfo tx) {
+        DelayStopAgentInfo info = (DelayStopAgentInfo) tx.getTxData();
+        AgentInfo agentInfo = queryAgentInfo(chainId, info.getAgentHash().toHex(), 1);
+        agentInfo.setDeleteHash(tx.getHash());
+        agentInfo.setDeleteHeight(info.getHeight());
+        agentInfo.setStatus(ApiConstant.STOP_AGENT);
+        agentInfo.setNew(false);
+
+        AccountInfo accountInfo;
+        AccountLedgerInfo ledgerInfo;
+        CoinToInfo output;
+        addressSet.clear();
+        //处理各个用户的锁定金额，尤其是创建节点的地址要特殊处理
+        for (int i = 0; i < tx.getCoinTos().size(); i++) {
+            output = tx.getCoinTos().get(i);
+            accountInfo = queryAccountInfo(chainId, output.getAddress());
+            if (!addressSet.contains(output.getAddress())) {
+                accountInfo.setTxCount(accountInfo.getTxCount() + 1);
+            }
+            //lockTime > 0 这条output的金额就是节点的保证金
+            if (output.getLockTime() > 0) {
+                accountInfo.setConsensusLock(accountInfo.getConsensusLock().subtract(agentInfo.getDeposit()));
+                ledgerInfo = calcBalance(chainId, output.getChainId(), output.getAssetsId(), accountInfo, tx.getFee().getValue());
+                TxRelationInfo relationInfo = new TxRelationInfo(output, tx, tx.getFee().getValue(), ledgerInfo.getTotalBalance());
+                relationInfo.setTransferType(TRANSFER_FROM_TYPE);
+                txRelationInfoSet.add(relationInfo);
+            } else {
+                accountInfo.setConsensusLock(accountInfo.getConsensusLock().subtract(output.getAmount()));
+                if (!output.getAddress().equals(agentInfo.getAgentAddress())) {
+                    ledgerInfo = queryLedgerInfo(chainId, output.getAddress(), output.getChainId(), output.getAssetsId());
+                    txRelationInfoSet.add(new TxRelationInfo(output, tx, BigInteger.ZERO, ledgerInfo.getTotalBalance()));
+                }
+            }
+            addressSet.add(output.getAddress());
+        }
+
+        //查询所有当前节点下的委托，生成取消委托记录
+        List<DepositInfo> depositInfos = depositService.getDepositListByAgentHash(chainId, agentInfo.getTxHash());
+        for (DepositInfo depositInfo : depositInfos) {
+            DepositInfo cancelDeposit = new DepositInfo();
+            cancelDeposit.setNew(true);
+            cancelDeposit.setType(ApiConstant.CANCEL_CONSENSUS);
+            cancelDeposit.copyInfoWithDeposit(depositInfo);
+            cancelDeposit.setKey(DBUtil.getDepositKey(tx.getHash(), depositInfo.getKey()));
+            cancelDeposit.setTxHash(tx.getHash());
+            cancelDeposit.setBlockHeight(tx.getHeight());
+            cancelDeposit.setDeleteKey(depositInfo.getKey());
+            cancelDeposit.setFee(BigInteger.ZERO);
+            cancelDeposit.setCreateTime(tx.getCreateTime());
+
+            depositInfo.setDeleteKey(cancelDeposit.getKey());
+            depositInfo.setDeleteHeight(tx.getHeight());
+            depositInfoList.add(depositInfo);
+            depositInfoList.add(cancelDeposit);
+
+            agentInfo.setTotalDeposit(agentInfo.getTotalDeposit().subtract(depositInfo.getAmount()));
+        }
     }
 
     private void processStopAgentTx(int chainId, TransactionInfo tx) {
