@@ -2,6 +2,7 @@ package io.nuls.api.model.po;
 
 
 import java.math.BigInteger;
+import java.util.Map;
 
 public class ContractCallInfo extends TxDataInfo {
 
@@ -24,6 +25,8 @@ public class ContractCallInfo extends TxDataInfo {
     private BigInteger value;
 
     private ContractResultInfo resultInfo;
+
+    private Map<String, ContractInfo> internalCreateContractInfos;
 
     public String getContractAddress() {
         return contractAddress;
@@ -103,5 +106,13 @@ public class ContractCallInfo extends TxDataInfo {
 
     public void setValue(BigInteger value) {
         this.value = value;
+    }
+
+    public Map<String, ContractInfo> getInternalCreateContractInfos() {
+        return internalCreateContractInfos;
+    }
+
+    public void setInternalCreateContractInfos(Map<String, ContractInfo> internalCreateContractInfos) {
+        this.internalCreateContractInfos = internalCreateContractInfos;
     }
 }

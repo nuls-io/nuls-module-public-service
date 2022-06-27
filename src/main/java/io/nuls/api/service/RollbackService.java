@@ -644,6 +644,24 @@ public class RollbackService {
 
         if (resultInfo.isSuccess()) {
             processTokenTransfers(chainId, resultInfo.getTokenTransfers(), resultInfo.getToken721Transfers(), tx);
+            // add by pierre at 2022/6/27 内部合约创建
+            processInternalCreates(chainId, resultInfo.getInternalCreates(), tx);
+        }
+    }
+
+    private void processInternalCreates(int chainId, List<ContractInternalCreateInfo> internalCreates, TransactionInfo tx) {
+        if (internalCreates.isEmpty()) {
+            return;
+        }
+        for (ContractInternalCreateInfo internalCreate : internalCreates) {
+            String contractAddress = internalCreate.getContractAddress();
+            ContractInfo contractInfo = contractInfoMap.get(contractAddress);
+            if (contractInfo == null) {
+                contractInfo = new ContractInfo();
+            }
+            contractInfo.setNew(true);
+            contractInfo.setContractAddress(contractAddress);
+            contractInfoMap.put(contractInfo.getContractAddress(), contractInfo);
         }
     }
 

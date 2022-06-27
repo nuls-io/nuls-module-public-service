@@ -696,7 +696,92 @@ public class AnalysisHandler {
             throw new NulsException(CommonCodeConstanst.DATA_PARSE_ERROR);
         }
         callInfo.setResultInfo(resultInfo);
+        // add by pierre at 2022/6/27 解析内部创建合约
+        List<ContractInternalCreateInfo> internalCreates = resultInfo.getInternalCreates();
+        if (!internalCreates.isEmpty()) {
+            Map<String, ContractInfo> contractInfoMap = new HashMap<>();
+            for (ContractInternalCreateInfo internalCreate : internalCreates) {
+                contractInfoMap.put(internalCreate.getContractAddress(), toContractInfoByInternalCreate(chainId, tx, internalCreate, resultInfo));
+            }
+        }
         return callInfo;
+    }
+
+    private static ContractInfo toContractInfoByInternalCreate(int chainId, Transaction tx, ContractInternalCreateInfo internalCreate, ContractResultInfo resultInfo) throws NulsException {
+        ContractInfo contractInfo = new ContractInfo();
+        contractInfo.setCreateTxHash(tx.getHash().toHex());
+        contractInfo.setAlias("internal_create");
+        contractInfo.setContractAddress(internalCreate.getContractAddress());
+        contractInfo.setBlockHeight(tx.getBlockHeight());
+        contractInfo.setCreateTime(tx.getTime());
+        contractInfo.setArgs(internalCreate.getArgs());
+        contractInfo.setResultInfo(resultInfo);
+        if (!resultInfo.isSuccess()) {
+            contractInfo.setSuccess(false);
+            contractInfo.setStatus(ApiConstant.CONTRACT_STATUS_FAIL);
+            contractInfo.setErrorMsg(resultInfo.getErrorMessage());
+            return contractInfo;
+        }
+        contractInfo.setStatus(ApiConstant.CONTRACT_STATUS_NORMAL);
+        contractInfo.setSuccess(true);
+        Map<String, Object> params = new HashMap<>();
+        params.put(Constants.CHAIN_ID, chainId);
+        params.put("contractAddress", contractInfo.getContractAddress());
+        Map map = (Map) RpcCall.request(ModuleE.SC.abbr, CommandConstant.CONTRACT_INFO, params);
+
+        contractInfo.setCreater(map.get("creater").toString());
+        contractInfo.setNrc20((Boolean) map.get("nrc20"));
+        contractInfo.setTokenType((Integer) map.get("tokenType"));
+        contractInfo.setDirectPayable((Boolean) map.get("directPayable"));
+        Boolean directPayableByOtherAsset = (Boolean) map.get("directPayableByOtherAsset");
+        if (directPayableByOtherAsset != null) {
+            contractInfo.setDirectPayableByOtherAsset(directPayableByOtherAsset);
+        }
+        boolean isNrc721 = contractInfo.getTokenType() == TOKEN_TYPE_NRC721;
+        if (isNrc721) {
+            Object tokenName = map.get("nrc20TokenName");
+            tokenName = tokenName == null ? EMPTY_STRING : tokenName;
+            Object tokenSymbol = map.get("nrc20TokenSymbol");
+            tokenSymbol = tokenSymbol == null ? EMPTY_STRING : tokenSymbol;
+            contractInfo.setTokenName(tokenName.toString());
+            contractInfo.setSymbol(tokenSymbol.toString());
+            contractInfo.setOwners(new ArrayList<>());
+        }
+        if (contractInfo.isNrc20()) {
+            contractInfo.setTokenName(map.get("nrc20TokenName").toString());
+            contractInfo.setSymbol(map.get("nrc20TokenSymbol").toString());
+            contractInfo.setDecimals((Integer) map.get("decimals"));
+            contractInfo.setTotalSupply(map.get("totalSupply").toString());
+            contractInfo.setOwners(new ArrayList<>());
+        }
+
+        List<Map<String, Object>> methodMap = (List<Map<String, Object>>) map.get("method");
+        List<ContractMethod> methodList = new ArrayList<>();
+        List<Map<String, Object>> argsList;
+        List<ContractMethodArg> paramList;
+        for (Map<String, Object> map1 : methodMap) {
+            ContractMethod method = new ContractMethod();
+            method.setName((String) map1.get("name"));
+            method.setDesc((String) map1.get("desc"));
+            method.setReturnType((String) map1.get("returnArg"));
+            method.setView((boolean) map1.get("view"));
+            method.setPayable((boolean) map1.get("payable"));
+            Boolean payableMultyAsset = (Boolean) map1.get("payableMultyAsset");
+            if (payableMultyAsset != null) {
+                method.setPayableMultyAsset(payableMultyAsset);
+            }
+            method.setEvent((boolean) map1.get("event"));
+            method.setJsonSerializable((boolean) map1.get("jsonSerializable"));
+            argsList = (List<Map<String, Object>>) map1.get("args");
+            paramList = new ArrayList<>();
+            for (Map<String, Object> arg : argsList) {
+                paramList.add(makeContractMethodArg(arg));
+            }
+            method.setParams(paramList);
+            methodList.add(method);
+        }
+        contractInfo.setMethods(methodList);
+        return contractInfo;
     }
 
     public static ContractCallInfo toContractCallInfoForCrossChain(int chainId, Transaction tx, ContractResultInfo resultInfo) throws NulsException {
@@ -834,6 +919,17 @@ public class AnalysisHandler {
         }
         resultInfo.setToken721Transfers(token721TransferList);
 
+        List<Map<String, Object>> internalCreates = (List<Map<String, Object>>) resultMap.get("internalCreates");
+        List<ContractInternalCreateInfo> internalCreateList = new ArrayList<>();
+        for (Map map1 : internalCreates) {
+            ContractInternalCreateInfo internalCreate = new ContractInternalCreateInfo();
+            internalCreate.setSender((String) map1.get("sender"));
+            internalCreate.setContractAddress((String) map1.get("contractAddress"));
+            internalCreate.setCodeCopyBy((String) map1.get("codeCopyBy"));
+            internalCreate.setArgs((String) map1.get("args"));
+            internalCreateList.add(internalCreate);
+        }
+        resultInfo.setInternalCreates(internalCreateList);
         return resultInfo;
     }
 
