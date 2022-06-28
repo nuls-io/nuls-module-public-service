@@ -48,6 +48,8 @@ public class ContractResultInfo {
 
     private List<String> events;
 
+    private List<ContractInternalCreateInfo> internalCreates;
+
     public Document toDocument() {
         Document document = DocumentTransferTool.toDocument(this, "txHash");
         List<Document> nulsTransferList = new ArrayList<>();
@@ -68,9 +70,16 @@ public class ContractResultInfo {
             token721TransferList.add(doc);
         }
 
+        List<Document> internalCreateList = new ArrayList<>();
+        for (ContractInternalCreateInfo internalCreate : internalCreates) {
+            Document doc = DocumentTransferTool.toDocument(internalCreate);
+            internalCreateList.add(doc);
+        }
+
         document.put("nulsTransfers", nulsTransferList);
         document.put("tokenTransfers", tokenTransferList);
         document.put("token721Transfers", token721TransferList);
+        document.put("internalCreates", internalCreateList);
         return document;
     }
 
@@ -96,15 +105,32 @@ public class ContractResultInfo {
             token721TransferList.add(token721Transfer);
         }
 
+        documentList = (List<Document>) document.get("internalCreates");
+        List<ContractInternalCreateInfo> internalCreateList = new ArrayList<>();
+        for (Document doc : documentList) {
+            ContractInternalCreateInfo internalCreate = DocumentTransferTool.toInfo(doc, ContractInternalCreateInfo.class);
+            internalCreateList.add(internalCreate);
+        }
+
         document.remove("nulsTransfers");
         document.remove("tokenTransfers");
         document.remove("token721Transfers");
+        document.remove("internalCreates");
 
         ContractResultInfo resultInfo = DocumentTransferTool.toInfo(document, "txHash", ContractResultInfo.class);
         resultInfo.setNulsTransfers(nulsTransferList);
         resultInfo.setTokenTransfers(tokenTransferList);
         resultInfo.setToken721Transfers(token721TransferList);
+        resultInfo.setInternalCreates(internalCreateList);
         return resultInfo;
+    }
+
+    public List<ContractInternalCreateInfo> getInternalCreates() {
+        return internalCreates;
+    }
+
+    public void setInternalCreates(List<ContractInternalCreateInfo> internalCreates) {
+        this.internalCreates = internalCreates;
     }
 
     public String getTxHash() {

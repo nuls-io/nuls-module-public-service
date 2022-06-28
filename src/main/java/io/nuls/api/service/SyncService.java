@@ -811,7 +811,28 @@ public class SyncService {
         createContractTxInfo(tx, contractInfo, callInfo.getMethodName());
 
         if (callInfo.getResultInfo().isSuccess()) {
+            processInternalCreates(chainId, callInfo.getResultInfo().getInternalCreates(), tx);
             processTokenTransfers(chainId, callInfo.getResultInfo().getTokenTransfers(), callInfo.getResultInfo().getToken721Transfers(), tx);
+        }
+    }
+
+    private void processInternalCreates(int chainId, List<ContractInternalCreateInfo> internalCreates, TransactionInfo tx) {
+        if (internalCreates.isEmpty()) {
+            return;
+        }
+        ContractCallInfo callInfo = (ContractCallInfo) tx.getTxData();
+        Map<String, ContractInfo> internalCreateContractInfos = callInfo.getInternalCreateContractInfos();
+        for (int i = 0; i < internalCreates.size(); i++) {
+            ContractInternalCreateInfo internalCreate = internalCreates.get(i);
+            String contractAddress = internalCreate.getContractAddress();
+            ContractInfo contractInfo = internalCreateContractInfos.get(contractAddress);
+            contractInfo.setTxCount(1);
+            contractInfo.setNew(true);
+            contractInfo.setRemark(tx.getRemark());
+            createContractTxInfo(tx, contractInfo, null);
+            addNrc20Info(chainId, contractInfo);
+            addNrc721Info(chainId, contractInfo);
+            contractInfoMap.put(contractInfo.getContractAddress(), contractInfo);
         }
     }
 
