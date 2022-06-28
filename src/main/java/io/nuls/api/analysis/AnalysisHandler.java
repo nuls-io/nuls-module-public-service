@@ -703,6 +703,7 @@ public class AnalysisHandler {
             for (ContractInternalCreateInfo internalCreate : internalCreates) {
                 contractInfoMap.put(internalCreate.getContractAddress(), toContractInfoByInternalCreate(chainId, tx, internalCreate, resultInfo));
             }
+            callInfo.setInternalCreateContractInfos(contractInfoMap);
         }
         return callInfo;
     }
