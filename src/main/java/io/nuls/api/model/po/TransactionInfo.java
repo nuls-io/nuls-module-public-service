@@ -43,17 +43,36 @@ public class TransactionInfo {
 
     private int decimal;
 
-    public void calcValue() {
+    public void calcValue(int chainId) {
         BigInteger value = BigInteger.ZERO;
+        boolean calc = type == 10 || type == 26;
         if (coinTos != null && !coinTos.isEmpty()) {
-            for (CoinToInfo output : coinTos) {
-                value = value.add(output.getAmount());
+            if (calc) {
+                for (CoinToInfo output : coinTos) {
+                    value = value.add(output.getAmount());
+                }
+            } else {
+                for (CoinToInfo output : coinTos) {
+                    if (output.getChainId() == chainId && output.getAssetsId() == 1) {
+                        value = value.add(output.getAmount());
+                    }
+                }
             }
         }
         if (coinFroms != null && !coinFroms.isEmpty()) {
-            CoinFromInfo input = coinFroms.get(0);
-            this.symbol = input.getSymbol();
-            this.decimal = input.getDecimal();
+            if (calc) {
+                CoinFromInfo input = coinFroms.get(0);
+                this.symbol = input.getSymbol();
+                this.decimal = input.getDecimal();
+            } else {
+                for (CoinFromInfo fromInfo : coinFroms) {
+                    if (fromInfo.getChainId() == chainId && fromInfo.getAssetsId() == 1) {
+                        this.symbol = fromInfo.getSymbol();
+                        this.decimal = fromInfo.getDecimal();
+                        break;
+                    }
+                }
+            }
         }
         this.value = value;
 //        if (type == TxType.COIN_BASE ||

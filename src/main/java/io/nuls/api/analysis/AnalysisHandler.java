@@ -228,7 +228,7 @@ public class AnalysisHandler {
         } else {
             info.setTxData(toTxData(chainId, tx, version));
         }
-        info.calcValue();
+        info.calcValue(chainId);
         info.calcFee(chainId);
         return info;
     }
@@ -269,7 +269,7 @@ public class AnalysisHandler {
         } else {
             info.setTxData(toTxData(chainId, tx, resultInfo));
         }
-        info.calcValue();
+        info.calcValue(chainId);
         info.calcFee(chainId);
         if (tx.getStatus() == TxStatusEnum.UNCONFIRM) {
             info.setStatus(ApiConstant.TX_UNCONFIRM);
