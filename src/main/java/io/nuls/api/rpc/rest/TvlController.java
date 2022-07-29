@@ -3,6 +3,7 @@ package io.nuls.api.rpc.rest;
 import io.nuls.api.cache.ApiCache;
 import io.nuls.api.manager.CacheManager;
 import io.nuls.api.rpc.rest.utils.*;
+import io.nuls.api.utils.LoggerUtil;
 import io.nuls.core.log.Log;
 import io.nuls.core.model.DoubleUtils;
 import io.nuls.core.parse.JSONUtils;
@@ -77,6 +78,7 @@ public class TvlController implements Runnable {
             }
             try {
                 Thread.sleep(30 * 60000L);
+                LoggerUtil.commonLog.info("tvl calc start......");
             } catch (InterruptedException e) {
                 Log.error(e);
             }
