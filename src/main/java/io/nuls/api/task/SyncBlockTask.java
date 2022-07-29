@@ -28,6 +28,7 @@ public class SyncBlockTask implements Runnable {
         this.chainId = chainId;
         syncService = SpringLiteContext.getBean(SyncService.class);
         rollbackService = SpringLiteContext.getBean(RollbackService.class);
+        LoggerUtil.commonLog.info("------SyncBlockTask init:" + chainId);
     }
 
     @Override
@@ -111,13 +112,16 @@ public class SyncBlockTask implements Runnable {
         if (localBestBlockHeader != null) {
             nextHeight = localBestBlockHeader.getHeight() + 1;
         }
+        LoggerUtil.commonLog.info("------localBestBlock:" + (nextHeight - 1));
         Result<BlockInfo> result = WalletRpcHandler.getBlockInfo(chainId, nextHeight);
         if (result.isFailed()) {
+            LoggerUtil.commonLog.info("------get block info failed: {},{}", chainId, nextHeight);
             return false;
         }
         BlockInfo newBlock = result.getData();
         if (null == newBlock) {
             Thread.sleep(5000L);
+            LoggerUtil.commonLog.info("------block info is null: {},{}", chainId, nextHeight);
             return false;
         }
         if (checkBlockContinuity(localBestBlockHeader, newBlock.getHeader())) {
