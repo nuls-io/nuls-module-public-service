@@ -26,7 +26,6 @@ import io.nuls.api.rpc.rest.IpLookupController;
 import io.nuls.api.rpc.rest.TvlController;
 import io.nuls.api.utils.AssetTool;
 import io.nuls.api.utils.LoggerUtil;
-import io.nuls.core.log.Log;
 import io.nuls.core.model.StringUtils;
 import io.nuls.core.parse.JSONUtils;
 import org.glassfish.grizzly.http.Method;
@@ -72,7 +71,7 @@ public class JsonRpcHandler extends HttpHandler {
                 IpLookupController.doGet(request, response);
                 return;
             }
-            if (request.getRequestURI().endsWith(" ") || request.getRequestURI().endsWith("nuls/assets/get/")) {
+            if (request.getRequestURI().endsWith("nuls/assets/get") || request.getRequestURI().endsWith("nuls/assets/get/")) {
                 Map<String, Object> result = new HashMap<>();
                 result.put("success", true);
                 result.put("code", 1000);

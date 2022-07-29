@@ -20,7 +20,7 @@ import java.util.Map;
  * @author Niels
  */
 public class TvlController implements Runnable {
-    private static double nulsPrice = 0d;
+    private static double nulsPrice = 0.384D;
 
     static {
         TvlController runner = new TvlController();
@@ -44,12 +44,12 @@ public class TvlController implements Runnable {
         }
     }
 
-    private static BinancePriceProvider binancePriceProvider = new BinancePriceProvider("https://api.binance.com");
-    private static HuobiPriceProvider huobiPriceProvider = new HuobiPriceProvider("https://api-aws.huobi.pro");
-    private static OkexPriceProvider okexPriceProvider = new OkexPriceProvider("https://aws.okex.com");
-    private static NerveDexPriceProvider dexPriceProvider = new NerveDexPriceProvider("https://api.nervedex.com");
+    public static BinancePriceProvider binancePriceProvider = new BinancePriceProvider("https://api.binance.com");
+    public static HuobiPriceProvider huobiPriceProvider = new HuobiPriceProvider("https://api-aws.huobi.pro");
+    public static OkexPriceProvider okexPriceProvider = new OkexPriceProvider("https://aws.okex.com");
+    public static NerveDexPriceProvider dexPriceProvider = new NerveDexPriceProvider("https://api.nervedex.com");
 
-    private static Double getNulsPriceFromEx(PriceProvider priceProvider) {
+    public static Double getNulsPriceFromEx(PriceProvider priceProvider) {
         try {
             BigDecimal price = priceProvider.queryPrice("NULS");
             if (null != price) {
@@ -66,22 +66,29 @@ public class TvlController implements Runnable {
     public void run() {
         while (true) {
             Double price = getNulsPriceFromEx(binancePriceProvider);
-//                    price = getNulsPriceFromEx(dexPriceProvider);
             if (null == price || price == 0) {
                 price = getNulsPriceFromEx(huobiPriceProvider);
             }
-            if (null == price) {
+            if (null == price || price == 0) {
                 price = getNulsPriceFromEx(okexPriceProvider);
             }
-            if (null != price) {
+            if (null != price && price > 0) {
                 nulsPrice = price;
             }
+            LoggerUtil.commonLog.info("nuls-price for tvl : " + nulsPrice);
             try {
-                Thread.sleep(30 * 60000L);
-                LoggerUtil.commonLog.info("tvl calc start......");
+                long sleep = 30 * 60000L;
+                if (nulsPrice == 0) {
+                    sleep = 120000L;
+                }
+                Thread.sleep(sleep);
             } catch (InterruptedException e) {
                 Log.error(e);
             }
         }
+    }
+
+    public static void main(String[] args) {
+        System.out.println(nulsPrice);
     }
 }

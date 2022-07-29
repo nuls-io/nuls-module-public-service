@@ -1,6 +1,7 @@
 package io.nuls.api.rpc.rest.utils;
 
 
+import io.nuls.api.utils.LoggerUtil;
 import io.nuls.core.log.Log;
 
 import java.math.BigDecimal;
@@ -22,16 +23,17 @@ public class BinancePriceProvider extends BasePriceProvider {
     @Override
     public BigDecimal queryPrice(String symbol) {
         try {
-            String url = this.url+ "/api/v3/ticker/price?symbol=" + symbol + "USDT";
+            String url = this.url + "/api/v3/ticker/price?symbol=" + symbol + "USDT";
             Map<String, Object> data = httpRequest(url);
             if (null == data) {
+                LoggerUtil.commonLog.info("未能从币安获取到价格：" + url);
                 return BigDecimal.ZERO;
             }
             BigDecimal res = new BigDecimal((String) data.get("price"));
-            Log.debug("获取到当前{}兑USDT的价格:{}", symbol, res);
+            LoggerUtil.commonLog.debug("获取到当前{}兑USDT的价格:{}", symbol, res);
             return res;
         } catch (Exception e) {
-            Log.error("调用{}接口获取{}价格失败", this.url, symbol, e);
+            LoggerUtil.commonLog.error("调用{}接口获取{}价格失败", this.url, symbol, e);
             return BigDecimal.ZERO;
         }
     }
