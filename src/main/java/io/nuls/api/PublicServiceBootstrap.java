@@ -225,10 +225,14 @@ public class PublicServiceBootstrap extends RpcModule {
     private void initDB() {
         LoggerUtil.commonLog.info("init db......");
         MongoDBTableServiceImpl tableService = SpringLiteContext.getBean(MongoDBTableServiceImpl.class);
+        LoggerUtil.commonLog.info("init db a......");
         List<ChainInfo> chainList = tableService.getChainList();
+        LoggerUtil.commonLog.info("init db b......");
         if (chainList == null) {
+            LoggerUtil.commonLog.info("init db c......");
             tableService.addDefaultChainCache();
         } else {
+            LoggerUtil.commonLog.info("init db d......");
             tableService.initCache();
         }
         LoggerUtil.commonLog.info("init db 2");
