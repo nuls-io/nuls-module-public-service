@@ -5,6 +5,7 @@ import io.nuls.api.db.mongo.MongoAccountLedgerServiceImpl;
 import io.nuls.api.db.mongo.MongoAgentServiceImpl;
 import io.nuls.api.db.mongo.MongoTransactionServiceImpl;
 import io.nuls.api.task.*;
+import io.nuls.api.utils.LoggerUtil;
 import io.nuls.core.core.annotation.Component;
 import io.nuls.core.core.ioc.SpringLiteContext;
 
@@ -16,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 public class ScheduleManager {
 
     public void start() {
+        LoggerUtil.commonLog.info("init tasks......");
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(9);
         executorService.scheduleAtFixedRate(new DeleteTxsTask(ApiContext.defaultChainId), 2, 60, TimeUnit.SECONDS);
         executorService.scheduleAtFixedRate(new QueryChainInfoTask(ApiContext.defaultChainId), 2, 60, TimeUnit.SECONDS);
@@ -30,5 +32,6 @@ public class ScheduleManager {
         MongoAgentServiceImpl mongoAgentService = SpringLiteContext.getBean(MongoAgentServiceImpl.class);
         MongoAccountLedgerServiceImpl accountLedgerService = SpringLiteContext.getBean(MongoAccountLedgerServiceImpl.class);
         executorService.scheduleAtFixedRate(new RefreshCacheTask(ApiContext.defaultChainId, mongoAgentService, accountLedgerService), 10, 10, TimeUnit.MINUTES);
+        LoggerUtil.commonLog.info("init tasks finished");
     }
 }
