@@ -183,6 +183,7 @@ public class PublicServiceBootstrap extends RpcModule {
     @Override
     public RpcModuleState onDependenciesReady() {
         try {
+            LoggerUtil.commonLog.info("public service onDependenciesReady......");
             Result<Map> result = WalletRpcHandler.getConsensusConfig(ApiContext.defaultChainId);
             if (result.isSuccess()) {
                 Map<String, Object> configMap = result.getData();
@@ -207,6 +208,7 @@ public class PublicServiceBootstrap extends RpcModule {
             server.startServer(ApiContext.listenerIp, ApiContext.rpcPort);
             Thread.sleep(3000);
             scheduleManager.start();
+            LoggerUtil.commonLog.info("public service start......");
         } catch (Exception e) {
             LoggerUtil.commonLog.error("------------------------public-service running failed---------------------------");
             LoggerUtil.commonLog.error(e);
