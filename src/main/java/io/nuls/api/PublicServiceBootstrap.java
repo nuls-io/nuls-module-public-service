@@ -223,6 +223,7 @@ public class PublicServiceBootstrap extends RpcModule {
      * 初始化数据库连接
      */
     private void initDB() {
+        LoggerUtil.commonLog.info("init db......");
         MongoDBTableServiceImpl tableService = SpringLiteContext.getBean(MongoDBTableServiceImpl.class);
         List<ChainInfo> chainList = tableService.getChainList();
         if (chainList == null) {
@@ -230,13 +231,13 @@ public class PublicServiceBootstrap extends RpcModule {
         } else {
             tableService.initCache();
         }
-
+        LoggerUtil.commonLog.info("init db 2");
         MongoChainServiceImpl chainService = SpringLiteContext.getBean(MongoChainServiceImpl.class);
         SyncInfo syncInfo = chainService.getSyncInfo(ApiContext.defaultChainId);
         if (syncInfo != null) {
             ApiContext.protocolVersion = syncInfo.getVersion();
         }
-
+        LoggerUtil.commonLog.info("init db 3");
         List<ChainInfo> chainInfoList = chainService.getChainInfoList();
         if (chainInfoList != null) {
             for (ChainInfo chainInfo : chainInfoList) {
@@ -245,6 +246,7 @@ public class PublicServiceBootstrap extends RpcModule {
                     CacheManager.getAssetInfoMap().put(assetInfo.getKey(), assetInfo);
                 }
             }
+            LoggerUtil.commonLog.info("init db 4");
         }
     }
 
@@ -253,6 +255,7 @@ public class PublicServiceBootstrap extends RpcModule {
      * 提升查询效率
      */
     private void initCache() {
+        LoggerUtil.commonLog.info("init cache......");
         //缓存首页区块列表
         MongoDBService mongoDBService = SpringLiteContext.getBean(MongoDBService.class);
         cacheBlockHeaderList(mongoDBService);
