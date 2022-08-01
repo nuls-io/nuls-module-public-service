@@ -23,6 +23,7 @@ public class SyncBlockTask implements Runnable {
     private RollbackService rollbackService;
     //记录同步出错次数
     private int syncErrorCount = 0;
+    private boolean first = true;
 
     public SyncBlockTask(int chainId) {
         this.chainId = chainId;
@@ -112,7 +113,10 @@ public class SyncBlockTask implements Runnable {
         if (localBestBlockHeader != null) {
             nextHeight = localBestBlockHeader.getHeight() + 1;
         }
-        LoggerUtil.commonLog.info("------localBestBlock:" + (nextHeight - 1));
+        if (first) {
+            LoggerUtil.commonLog.info("------localBestBlock:" + (nextHeight - 1));
+            first = false;
+        }
         Result<BlockInfo> result = WalletRpcHandler.getBlockInfo(chainId, nextHeight);
         if (result.isFailed()) {
             LoggerUtil.commonLog.info("------get block info failed: {},{}", chainId, nextHeight);
@@ -121,7 +125,7 @@ public class SyncBlockTask implements Runnable {
         BlockInfo newBlock = result.getData();
         if (null == newBlock) {
             Thread.sleep(5000L);
-            LoggerUtil.commonLog.info("------block info is null: {},{}", chainId, nextHeight);
+//            LoggerUtil.commonLog.info("------block info is null: {},{}", chainId, nextHeight);
             return false;
         }
         if (checkBlockContinuity(localBestBlockHeader, newBlock.getHeader())) {
