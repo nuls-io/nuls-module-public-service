@@ -183,7 +183,7 @@ public class PublicServiceBootstrap extends RpcModule {
     @Override
     public RpcModuleState onDependenciesReady() {
         try {
-            LoggerUtil.commonLog.info("public service onDependenciesReady......");
+//            LoggerUtil.commonLog.info("public service onDependenciesReady......");
             Result<Map> result = WalletRpcHandler.getConsensusConfig(ApiContext.defaultChainId);
             if (result.isSuccess()) {
                 Map<String, Object> configMap = result.getData();
@@ -223,25 +223,25 @@ public class PublicServiceBootstrap extends RpcModule {
      * 初始化数据库连接
      */
     private void initDB() {
-        LoggerUtil.commonLog.info("init db......");
+//        LoggerUtil.commonLog.info("init db......");
         MongoDBTableServiceImpl tableService = SpringLiteContext.getBean(MongoDBTableServiceImpl.class);
-        LoggerUtil.commonLog.info("init db a......");
+//        LoggerUtil.commonLog.info("init db a......");
         List<ChainInfo> chainList = tableService.getChainList();
-        LoggerUtil.commonLog.info("init db b......");
+//        LoggerUtil.commonLog.info("init db b......");
         if (chainList == null) {
-            LoggerUtil.commonLog.info("init db c......");
+//            LoggerUtil.commonLog.info("init db c......");
             tableService.addDefaultChainCache();
         } else {
-            LoggerUtil.commonLog.info("init db d......");
+//            LoggerUtil.commonLog.info("init db d......");
             tableService.initCache();
         }
-        LoggerUtil.commonLog.info("init db 2");
+//        LoggerUtil.commonLog.info("init db 2");
         MongoChainServiceImpl chainService = SpringLiteContext.getBean(MongoChainServiceImpl.class);
         SyncInfo syncInfo = chainService.getSyncInfo(ApiContext.defaultChainId);
         if (syncInfo != null) {
             ApiContext.protocolVersion = syncInfo.getVersion();
         }
-        LoggerUtil.commonLog.info("init db 3");
+//        LoggerUtil.commonLog.info("init db 3");
         List<ChainInfo> chainInfoList = chainService.getChainInfoList();
         if (chainInfoList != null) {
             for (ChainInfo chainInfo : chainInfoList) {
@@ -250,7 +250,7 @@ public class PublicServiceBootstrap extends RpcModule {
                     CacheManager.getAssetInfoMap().put(assetInfo.getKey(), assetInfo);
                 }
             }
-            LoggerUtil.commonLog.info("init db 4");
+//            LoggerUtil.commonLog.info("init db 4");
         }
     }
 
@@ -259,7 +259,7 @@ public class PublicServiceBootstrap extends RpcModule {
      * 提升查询效率
      */
     private void initCache() {
-        LoggerUtil.commonLog.info("init cache......");
+//        LoggerUtil.commonLog.info("init cache......");
         //缓存首页区块列表
         MongoDBService mongoDBService = SpringLiteContext.getBean(MongoDBService.class);
         cacheBlockHeaderList(mongoDBService);

@@ -97,7 +97,7 @@ public class StatisticalTask implements Runnable {
             if (end > header.getCreateTime() * 1000) {
                 break;
             }
-            LoggerUtil.commonLog.info("Statistical task start......");
+//            LoggerUtil.commonLog.info("Statistical task start......");
             statistical(start, end);
             start = end + 1;
             end = end + day;
