@@ -56,7 +56,7 @@ public class MongoDBTableServiceImpl implements DBTableService {
         agentService.initCache();
 //        LoggerUtil.commonLog.info("init cache 6......");
 //        transactionService.initCache();
-        contractService.initCache();
+//        contractService.initCache();
 //        LoggerUtil.commonLog.info("init cache 7......");
     }
 
