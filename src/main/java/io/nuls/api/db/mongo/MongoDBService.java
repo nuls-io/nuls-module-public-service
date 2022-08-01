@@ -159,12 +159,19 @@ public class MongoDBService implements InitializingBean {
     }
 
     public List<Document> query(String collName) {
+        LoggerUtil.commonLog.info(" {}", collName);
         MongoCollection<Document> collection = getCollection(collName);
+
+        LoggerUtil.commonLog.info(" db-get", collName);
         FindIterable<Document> iterable = collection.find();
+
+        LoggerUtil.commonLog.info("find over", collName);
         List<Document> list = new ArrayList<>();
         MongoCursor<Document> documentMongoCursor = iterable.iterator();
+        LoggerUtil.commonLog.info("循环 {}", collName);
         while (documentMongoCursor.hasNext()) {
             list.add(documentMongoCursor.next());
+            LoggerUtil.commonLog.info("循环2 {}", collName);
         }
         return list;
     }
