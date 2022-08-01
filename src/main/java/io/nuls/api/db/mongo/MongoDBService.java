@@ -139,8 +139,14 @@ public class MongoDBService implements InitializingBean {
         FindIterable<Document> findIterable = collection.find();
         MongoCursor<Document> mongoCursor = findIterable.iterator();
         List<Document> docList = new ArrayList<>();
-        while (mongoCursor.hasNext()) {
-            docList.add(mongoCursor.next());
+        try {
+            while (mongoCursor.hasNext()) {
+                docList.add(mongoCursor.next());
+            }
+        } finally {
+            if (null != mongoCursor) {
+                mongoCursor.close();
+            }
         }
         return docList;
     }
@@ -177,8 +183,6 @@ public class MongoDBService implements InitializingBean {
                 list.add(documentMongoCursor.next());
 //                LoggerUtil.commonLog.info("循环2 {}", list.get(list.size() - 1).get("_id"));
             }
-        } catch (Throwable t) {
-            LoggerUtil.commonLog.error(t);
         } finally {
             if (null != documentMongoCursor) {
 //                LoggerUtil.commonLog.info("循环Done {}", collName);
@@ -194,8 +198,14 @@ public class MongoDBService implements InitializingBean {
         FindIterable<Document> iterable = collection.find(var1);
         List<Document> list = new ArrayList<>();
         MongoCursor<Document> documentMongoCursor = iterable.iterator();
-        while (documentMongoCursor.hasNext()) {
-            list.add(documentMongoCursor.next());
+        try {
+            while (documentMongoCursor.hasNext()) {
+                list.add(documentMongoCursor.next());
+            }
+        } finally {
+            if (null != documentMongoCursor) {
+                documentMongoCursor.close();
+            }
         }
         return list;
     }
@@ -206,8 +216,14 @@ public class MongoDBService implements InitializingBean {
         FindIterable<Document> iterable = collection.find().projection(fields);
         List<Document> list = new ArrayList<>();
         MongoCursor<Document> documentMongoCursor = iterable.iterator();
-        while (documentMongoCursor.hasNext()) {
-            list.add(documentMongoCursor.next());
+        try {
+            while (documentMongoCursor.hasNext()) {
+                list.add(documentMongoCursor.next());
+            }
+        } finally {
+            if (null != documentMongoCursor) {
+                documentMongoCursor.close();
+            }
         }
         return list;
     }
@@ -218,8 +234,14 @@ public class MongoDBService implements InitializingBean {
         FindIterable<Document> iterable = collection.find(var1).sort(sort);
         List<Document> list = new ArrayList<>();
         MongoCursor<Document> documentMongoCursor = iterable.iterator();
-        while (documentMongoCursor.hasNext()) {
-            list.add(documentMongoCursor.next());
+        try {
+            while (documentMongoCursor.hasNext()) {
+                list.add(documentMongoCursor.next());
+            }
+        } finally {
+            if (null != documentMongoCursor) {
+                documentMongoCursor.close();
+            }
         }
         return list;
     }
@@ -230,8 +252,14 @@ public class MongoDBService implements InitializingBean {
         FindIterable<Document> iterable = collection.find(var1).projection(fields);
         List<Document> list = new ArrayList<>();
         MongoCursor<Document> documentMongoCursor = iterable.iterator();
-        while (documentMongoCursor.hasNext()) {
-            list.add(documentMongoCursor.next());
+        try {
+            while (documentMongoCursor.hasNext()) {
+                list.add(documentMongoCursor.next());
+            }
+        } finally {
+            if (null != documentMongoCursor) {
+                documentMongoCursor.close();
+            }
         }
         return list;
     }
@@ -243,8 +271,14 @@ public class MongoDBService implements InitializingBean {
         FindIterable<Document> iterable = collection.find(var1).projection(fields).sort(sort);
         List<Document> list = new ArrayList<>();
         MongoCursor<Document> documentMongoCursor = iterable.iterator();
-        while (documentMongoCursor.hasNext()) {
-            list.add(documentMongoCursor.next());
+        try {
+            while (documentMongoCursor.hasNext()) {
+                list.add(documentMongoCursor.next());
+            }
+        } finally {
+            if (null != documentMongoCursor) {
+                documentMongoCursor.close();
+            }
         }
         return list;
     }

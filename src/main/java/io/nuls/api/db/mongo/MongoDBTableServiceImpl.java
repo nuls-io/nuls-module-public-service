@@ -44,20 +44,20 @@ public class MongoDBTableServiceImpl implements DBTableService {
     }
 
     public void initCache() {
-        LoggerUtil.commonLog.info("init cache 1......");
+//        LoggerUtil.commonLog.info("init cache 1......");
         chainService.initCache();
-        LoggerUtil.commonLog.info("init cache 2......");
+//        LoggerUtil.commonLog.info("init cache 2......");
         accountService.initCache();
-        LoggerUtil.commonLog.info("init cache 3......");
+//        LoggerUtil.commonLog.info("init cache 3......");
         ledgerService.initCache();
-        LoggerUtil.commonLog.info("init cache 4......");
+//        LoggerUtil.commonLog.info("init cache 4......");
         aliasService.initCache();
-        LoggerUtil.commonLog.info("init cache 5......");
+//        LoggerUtil.commonLog.info("init cache 5......");
         agentService.initCache();
-        LoggerUtil.commonLog.info("init cache 6......");
+//        LoggerUtil.commonLog.info("init cache 6......");
 //        transactionService.initCache();
         contractService.initCache();
-        LoggerUtil.commonLog.info("init cache 7......");
+//        LoggerUtil.commonLog.info("init cache 7......");
     }
 
     public void addDefaultChainCache() {
