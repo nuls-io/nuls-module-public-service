@@ -190,6 +190,7 @@ public class MongoDBService implements InitializingBean {
 //                LoggerUtil.commonLog.info("循环Done 2 {}", collName);
             }
         }
+        LoggerUtil.commonLog.info("Query {} == {}", collName, list.size());
         return list;
     }
 
