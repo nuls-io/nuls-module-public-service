@@ -183,6 +183,8 @@ public class MongoDBService implements InitializingBean {
                 list.add(documentMongoCursor.next());
 //                LoggerUtil.commonLog.info("循环2 {}", list.get(list.size() - 1).get("_id"));
             }
+        } catch (Throwable t) {
+            LoggerUtil.commonLog.error(t);
         } finally {
             if (null != documentMongoCursor) {
 //                LoggerUtil.commonLog.info("循环Done {}", collName);
