@@ -34,13 +34,13 @@ public class MongoContractServiceImpl implements ContractService {
     @Override
     public void initCache() {
         //缓存NRC20 token信息
-        LoggerUtil.commonLog.info("contract cache 1 , {}", CacheManager.getApiCaches().size());
+//        LoggerUtil.commonLog.info("contract cache 1 , {}", CacheManager.getApiCaches().size());
         for (ApiCache apiCache : CacheManager.getApiCaches().values()) {
-            LoggerUtil.commonLog.info("contract cache 1,1 , {}", apiCache.getChainInfo().getChainId());
+//            LoggerUtil.commonLog.info("contract cache 1,1 , {}", apiCache.getChainInfo().getChainId());
             List<Document> documentList = mongoDBService.query(DBTableConstant.CONTRACT_TABLE + apiCache.getChainInfo().getChainId());
-            LoggerUtil.commonLog.info("contract cache 2 , {}", documentList.size());
+//            LoggerUtil.commonLog.info("contract cache 2 , {}", documentList.size());
             for (Document document : documentList) {
-                LoggerUtil.commonLog.info("contract cache 3 , {}", document.getString("_id"));
+//                LoggerUtil.commonLog.info("contract cache 3 , {}", document.getString("_id"));
                 if (document.getBoolean("isNrc20")) {
                     Nrc20Info nrc20Info = new Nrc20Info();
                     nrc20Info.setContractAddress(document.getString("_id"));
@@ -56,7 +56,7 @@ public class MongoContractServiceImpl implements ContractService {
                     apiCache.addNrc721Info(nrc721Info);
                 }
             }
-            LoggerUtil.commonLog.info("contract cache 4 , {}", documentList.size());
+//            LoggerUtil.commonLog.info("contract cache 4 , {}", documentList.size());
         }
     }
 
