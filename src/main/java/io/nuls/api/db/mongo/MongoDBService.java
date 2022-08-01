@@ -159,19 +159,32 @@ public class MongoDBService implements InitializingBean {
     }
 
     public List<Document> query(String collName) {
-        LoggerUtil.commonLog.info(" {}", collName);
-        MongoCollection<Document> collection = getCollection(collName);
+        MongoCursor<Document> documentMongoCursor = null;
+        List<Document> list = null;
+        try {
+            LoggerUtil.commonLog.info(" {}", collName);
+            MongoCollection<Document> collection = getCollection(collName);
 
-        LoggerUtil.commonLog.info(" db-get", collName);
-        FindIterable<Document> iterable = collection.find();
+            LoggerUtil.commonLog.info(" db-get", collName);
+            FindIterable<Document> iterable = collection.find();
 
-        LoggerUtil.commonLog.info("find over", collName);
-        List<Document> list = new ArrayList<>();
-        MongoCursor<Document> documentMongoCursor = iterable.iterator();
-        LoggerUtil.commonLog.info("循环 {}", collName);
-        while (documentMongoCursor.hasNext()) {
-            list.add(documentMongoCursor.next());
-            LoggerUtil.commonLog.info("循环2 {}", collName);
+            LoggerUtil.commonLog.info("find over", collName);
+            list = new ArrayList<>();
+            documentMongoCursor = iterable.iterator();
+            LoggerUtil.commonLog.info("循环 {}", collName);
+            while (documentMongoCursor.hasNext()) {
+                LoggerUtil.commonLog.info("循环1 {}", collName);
+                list.add(documentMongoCursor.next());
+                LoggerUtil.commonLog.info("循环2 {}", list.get(list.size() - 1).get("_id"));
+            }
+        } catch (Throwable t) {
+            LoggerUtil.commonLog.error(t);
+        } finally {
+            if (null != documentMongoCursor) {
+                LoggerUtil.commonLog.info("循环Done {}", collName);
+                documentMongoCursor.close();
+                LoggerUtil.commonLog.info("循环Done 2 {}", collName);
+            }
         }
         return list;
     }
