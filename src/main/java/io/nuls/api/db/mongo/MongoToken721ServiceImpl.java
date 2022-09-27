@@ -152,8 +152,10 @@ public class MongoToken721ServiceImpl implements Token721Service {
                 // 转账
                 Bson query = Filters.eq("_id", tokenIdInfo.getKey());
                 Document currentDocument = mongoDBService.findOne(TOKEN721_IDS_TABLE + chainId, query);
-                currentDocument.put("owner", tokenIdInfo.getOwner());
-                modelList.add(new ReplaceOneModel<>(Filters.eq("_id", tokenIdInfo.getKey()), currentDocument));
+                if (currentDocument != null) {
+                    currentDocument.put("owner", tokenIdInfo.getOwner());
+                    modelList.add(new ReplaceOneModel<>(Filters.eq("_id", tokenIdInfo.getKey()), currentDocument));
+                }
             } else {
                 // 销毁
                 modelList.add(new DeleteOneModel<>(Filters.eq("_id", tokenIdInfo.getKey())));
