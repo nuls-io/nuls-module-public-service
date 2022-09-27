@@ -133,33 +133,44 @@ public class MongoToken721ServiceImpl implements Token721Service {
             return;
         }
         Set<String> insertKeys = new HashSet<>();
+        LinkedHashMap<String, Document> insertDocuments = new LinkedHashMap<>();
         List<WriteModel<Document>> modelList = new ArrayList<>();
         for (Nrc721TokenIdInfo tokenIdInfo : tokenIdInfos) {
+            String tokenKey = tokenIdInfo.getKey();
             if (tokenIdInfo.getTime() != null) {
                 // 造币
-                boolean notExist = insertKeys.add(tokenIdInfo.getKey());
+                boolean notExist = insertKeys.add(tokenKey);
                 if (!notExist) {
                     // 已存在，跳过
+                    Document document = insertDocuments.get(tokenKey);
+                    document.put("owner", tokenIdInfo.getOwner());
                     continue;
                 }
-                Bson query = Filters.eq("_id", tokenIdInfo.getKey());
+                Bson query = Filters.eq("_id", tokenKey);
                 Document currentDocument = mongoDBService.findOne(TOKEN721_IDS_TABLE + chainId, query);
                 if (currentDocument == null) {
                     Document document = DocumentTransferTool.toDocument(tokenIdInfo, "key");
-                    modelList.add(new InsertOneModel(document));
+                    insertDocuments.put(tokenKey, document);
+                    //modelList.add(new InsertOneModel(document));
                 }
             } else if (tokenIdInfo.getOwner() != null) {
                 // 转账
-                Bson query = Filters.eq("_id", tokenIdInfo.getKey());
+                Bson query = Filters.eq("_id", tokenKey);
                 Document currentDocument = mongoDBService.findOne(TOKEN721_IDS_TABLE + chainId, query);
                 if (currentDocument != null) {
                     currentDocument.put("owner", tokenIdInfo.getOwner());
-                    modelList.add(new ReplaceOneModel<>(Filters.eq("_id", tokenIdInfo.getKey()), currentDocument));
+                    modelList.add(new ReplaceOneModel<>(Filters.eq("_id", tokenKey), currentDocument));
+                } else if (insertKeys.contains(tokenKey)){
+                    Document document = insertDocuments.get(tokenKey);
+                    document.put("owner", tokenIdInfo.getOwner());
                 }
             } else {
                 // 销毁
-                modelList.add(new DeleteOneModel<>(Filters.eq("_id", tokenIdInfo.getKey())));
+                modelList.add(new DeleteOneModel<>(Filters.eq("_id", tokenKey)));
             }
+        }
+        for (Document document : insertDocuments.values()) {
+            modelList.add(new InsertOneModel(document));
         }
         if (modelList.isEmpty()) {
             return;
@@ -175,31 +186,44 @@ public class MongoToken721ServiceImpl implements Token721Service {
             return;
         }
         Set<String> insertKeys = new HashSet<>();
+        LinkedHashMap<String, Document> insertDocuments = new LinkedHashMap<>();
         List<WriteModel<Document>> modelList = new ArrayList<>();
         for (Nrc721TokenIdInfo tokenIdInfo : tokenIdInfos) {
+            String tokenKey = tokenIdInfo.getKey();
             if (tokenIdInfo.getTime() != null) {
                 // 销毁回滚
-                boolean notExist = insertKeys.add(tokenIdInfo.getKey());
+                boolean notExist = insertKeys.add(tokenKey);
                 if (!notExist) {
                     // 已存在，跳过
+                    Document document = insertDocuments.get(tokenKey);
+                    document.put("owner", tokenIdInfo.getOwner());
                     continue;
                 }
-                Bson query = Filters.eq("_id", tokenIdInfo.getKey());
+                Bson query = Filters.eq("_id", tokenKey);
                 Document currentDocument = mongoDBService.findOne(TOKEN721_IDS_TABLE + chainId, query);
                 if (currentDocument == null) {
                     Document document = DocumentTransferTool.toDocument(tokenIdInfo, "key");
-                    modelList.add(new InsertOneModel(document));
+                    insertDocuments.put(tokenKey, document);
+                    //modelList.add(new InsertOneModel(document));
                 }
             } else if (tokenIdInfo.getOwner() != null) {
                 // 转账回滚token的拥有者
-                Bson query = Filters.eq("_id", tokenIdInfo.getKey());
+                Bson query = Filters.eq("_id", tokenKey);
                 Document currentDocument = mongoDBService.findOne(TOKEN721_IDS_TABLE + chainId, query);
-                currentDocument.put("owner", tokenIdInfo.getOwner());
-                modelList.add(new ReplaceOneModel<>(Filters.eq("_id", tokenIdInfo.getKey()), currentDocument));
+                if (currentDocument != null) {
+                    currentDocument.put("owner", tokenIdInfo.getOwner());
+                    modelList.add(new ReplaceOneModel<>(Filters.eq("_id", tokenKey), currentDocument));
+                } else if (insertKeys.contains(tokenKey)){
+                    Document document = insertDocuments.get(tokenKey);
+                    document.put("owner", tokenIdInfo.getOwner());
+                }
             } else {
                 // 造币回滚
-                modelList.add(new DeleteOneModel<>(Filters.eq("_id", tokenIdInfo.getKey())));
+                modelList.add(new DeleteOneModel<>(Filters.eq("_id", tokenKey)));
             }
+        }
+        for (Document document : insertDocuments.values()) {
+            modelList.add(new InsertOneModel(document));
         }
         if (!modelList.isEmpty()) {
             BulkWriteOptions options = new BulkWriteOptions();
