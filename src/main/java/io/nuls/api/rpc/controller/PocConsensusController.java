@@ -169,8 +169,8 @@ public class PocConsensusController {
         } else {
             pageInfo = agentService.getAgentList(chainId, type, pageNumber, pageSize);
         }
-
-        for (AgentInfo agentInfo : pageInfo.getList()) {
+        List<AgentInfo> copyList = new ArrayList<>(pageInfo.getList());
+        for (AgentInfo agentInfo : copyList) {
             long count = punishService.getYellowCount(chainId, agentInfo.getAgentAddress());
             if (agentInfo.getTotalPackingCount() != 0 || count != 0) {
                 agentInfo.setLostRate(DoubleUtils.div(count, count + agentInfo.getTotalPackingCount()));
