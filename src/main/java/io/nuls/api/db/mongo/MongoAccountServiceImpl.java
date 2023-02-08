@@ -214,16 +214,6 @@ public class MongoAccountServiceImpl implements AccountService {
         Bson filter = Filters.and(filters);
         long confirmCount = mongoDBService.getCount(TX_RELATION_TABLE + chainId + "_" + index, filter);
         List<TxRelationInfo> txRelationInfoList = confirmLimitQuery(chainId, index, filter, start, 10);
-        //当记录是主资产，且等于手续费的时候
-        if ((assetChainId == 1 || assetChainId == 2) && assetId == 1) {
-            for (int i = txRelationInfoList.size() - 1; i >= 0; i--) {
-                TxRelationInfo relationInfo = txRelationInfoList.get(i);
-                if (relationInfo.getFee().getValue().compareTo(relationInfo.getValues()) == 0) {
-                    txRelationInfoList.remove(i);
-                }
-            }
-        }
-
         PageInfo<TxRelationInfo> pageInfo = new PageInfo<>(pageIndex, 10, confirmCount, txRelationInfoList);
         return pageInfo;
     }
