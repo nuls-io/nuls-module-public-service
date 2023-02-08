@@ -187,7 +187,6 @@ public class AccountController {
         return result;
     }
 
-
     /**
      * 查询账户普通转账和跨链转账交易
      *
@@ -242,11 +241,33 @@ public class AccountController {
                 }
                 Result<TransactionInfo> txResult = WalletRpcHandler.getTx(chainId, d.getTxHash());
                 TransactionInfo tx = txResult.getData();
-                res.put("from", tx.getCoinFroms().get(0).getAddress());
-                res.put("to", tx.getCoinTos().get(0).getAddress());
+
+                boolean has = false;
+                for (CoinFromInfo fromInfo : tx.getCoinFroms()) {
+                    if (fromInfo.getChainId() == assetChainId && fromInfo.getAssetsId() == assetId) {
+                        res.put("from", fromInfo.getAddress());
+                        has = true;
+                        break;
+                    }
+                }
+                if (!has) {
+                    res.put("to", tx.getCoinFroms().get(0).getAddress());
+                }
+
+                has = false;
+                for (CoinToInfo toInfo : tx.getCoinTos()) {
+                    if (toInfo.getChainId() == assetChainId && toInfo.getAssetsId() == assetId) {
+                        res.put("from", toInfo.getAddress());
+                        has = true;
+                        break;
+                    }
+                }
+                if (!has) {
+                    res.put("to", tx.getCoinTos().get(0).getAddress());
+                }
+                res.put("remark", tx.getRemark());
                 return res;
             }).collect(Collectors.toList())));
-
         } catch (Exception e) {
             LoggerUtil.commonLog.error(e);
         }
