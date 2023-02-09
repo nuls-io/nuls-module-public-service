@@ -251,13 +251,13 @@ public class AccountController {
                     }
                 }
                 if (!has) {
-                    res.put("to", tx.getCoinFroms().get(0).getAddress());
+                    res.put("from", tx.getCoinFroms().get(0).getAddress());
                 }
 
                 has = false;
                 for (CoinToInfo toInfo : tx.getCoinTos()) {
                     if (toInfo.getChainId() == assetChainId && toInfo.getAssetsId() == assetId) {
-                        res.put("from", toInfo.getAddress());
+                        res.put("to", toInfo.getAddress());
                         has = true;
                         break;
                     }
