@@ -198,6 +198,26 @@ public class MongoAccountServiceImpl implements AccountService {
         return pageInfo;
     }
 
+    public PageInfo<TxRelationInfo> queryAccountTxs(int chainId, String address, int pageIndex, int assetChainId, int assetId) {
+        List<Bson> filters = new ArrayList<>();
+        filters.add(Filters.eq("address", address));
+        filters.add(Filters.or(Filters.eq("type", 2), Filters.eq("type", 10)));
+
+        if (assetChainId > 0 && assetId > 0) {
+            filters.add(Filters.eq("chainId", assetChainId));
+            filters.add(Filters.eq("assetId", assetId));
+        }
+
+        int start = (pageIndex - 1) * 10;
+        int index = DBUtil.getShardNumber(address);
+
+        Bson filter = Filters.and(filters);
+        long confirmCount = mongoDBService.getCount(TX_RELATION_TABLE + chainId + "_" + index, filter);
+        List<TxRelationInfo> txRelationInfoList = confirmLimitQuery(chainId, index, filter, start, 10);
+        PageInfo<TxRelationInfo> pageInfo = new PageInfo<>(pageIndex, 10, confirmCount, txRelationInfoList);
+        return pageInfo;
+    }
+
     public PageInfo<TxRelationInfo> getAcctTxs(int chainId, int assetChainId, int assetId, String address,
                                                int type, long startTime, long endTime, int pageIndex, int pageSize) {
 

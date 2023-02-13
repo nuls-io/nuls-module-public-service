@@ -187,6 +187,93 @@ public class AccountController {
         return result;
     }
 
+    /**
+     * 查询账户普通转账和跨链转账交易
+     *
+     * @param params
+     * @return
+     */
+    @RpcMethod("queryAccountTxs")
+    public RpcResult queryAccountTxs(List<Object> params) {
+        VerifyUtils.verifyParams(params, 5);
+        int chainId, assetChainId, assetId, pageNumber;
+        String address;
+        try {
+            chainId = (int) params.get(0);
+        } catch (Exception e) {
+            return RpcResult.paramError("[chainId] is inValid");
+        }
+        try {
+            pageNumber = (int) params.get(1);
+        } catch (Exception e) {
+            return RpcResult.paramError("[pageNumber] is inValid");
+        }
+        try {
+            address = (String) params.get(2);
+        } catch (Exception e) {
+            return RpcResult.paramError("[address] is inValid");
+        }
+        try {
+            assetChainId = (int) params.get(3);
+        } catch (Exception e) {
+            return RpcResult.paramError("[assetChainId] is invalid");
+        }
+        try {
+            assetId = (int) params.get(4);
+        } catch (Exception e) {
+            return RpcResult.paramError("[assetId] is invalid");
+        }
+        if (!AddressTool.validAddress(chainId, address)) {
+            return RpcResult.paramError("[address] is inValid");
+        }
+        if (pageNumber <= 0) {
+            pageNumber = 1;
+        }
+        RpcResult result = new RpcResult();
+        try {
+            PageInfo<TxRelationInfo> pageInfo = accountService.queryAccountTxs(chainId, address, pageNumber, assetChainId, assetId);
+            result.setResult(new PageInfo<>(pageNumber, 10, pageInfo.getTotalCount(), pageInfo.getList().stream().map(d -> {
+                Map res = MapUtils.beanToMap(d);
+                AssetInfo assetInfo = CacheManager.getAssetInfoMap().get(d.getChainId() + "-" + d.getAssetId());
+                if (assetInfo != null) {
+                    res.put("symbol", assetInfo.getSymbol());
+                    res.put("decimals", assetInfo.getDecimals());
+                }
+                Result<TransactionInfo> txResult = WalletRpcHandler.getTx(chainId, d.getTxHash());
+                TransactionInfo tx = txResult.getData();
+
+                boolean has = false;
+                for (CoinFromInfo fromInfo : tx.getCoinFroms()) {
+                    if (fromInfo.getChainId() == assetChainId && fromInfo.getAssetsId() == assetId) {
+                        res.put("from", fromInfo.getAddress());
+                        has = true;
+                        break;
+                    }
+                }
+                if (!has) {
+                    res.put("from", tx.getCoinFroms().get(0).getAddress());
+                }
+
+                has = false;
+                for (CoinToInfo toInfo : tx.getCoinTos()) {
+                    if (toInfo.getChainId() == assetChainId && toInfo.getAssetsId() == assetId) {
+                        res.put("to", toInfo.getAddress());
+                        has = true;
+                        break;
+                    }
+                }
+                if (!has) {
+                    res.put("to", tx.getCoinTos().get(0).getAddress());
+                }
+                res.put("remark", tx.getRemark());
+                return res;
+            }).collect(Collectors.toList())));
+        } catch (Exception e) {
+            LoggerUtil.commonLog.error(e);
+        }
+        return result;
+    }
+
     @RpcMethod("getAcctTxs")
     public RpcResult getAcctTxs(List<Object> params) {
         VerifyUtils.verifyParams(params, 7);
