@@ -26,6 +26,8 @@ public class TokenTransfer extends TxDataInfo {
 
     private String toBalance;
 
+    private String remark;
+
     public String getTxHash() {
         return txHash;
     }
@@ -120,5 +122,13 @@ public class TokenTransfer extends TxDataInfo {
 
     public void setToBalance(String toBalance) {
         this.toBalance = toBalance;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }

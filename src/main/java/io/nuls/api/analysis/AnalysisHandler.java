@@ -23,6 +23,7 @@ import io.nuls.core.exception.NulsException;
 import io.nuls.core.parse.JSONUtils;
 import io.nuls.core.rpc.info.Constants;
 import io.nuls.core.rpc.model.ModuleE;
+import org.apache.commons.codec.binary.Hex;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -499,6 +500,16 @@ public class AnalysisHandler {
             Result<ContractInfo> result = WalletRpcHandler.getContractInfo(chainId, contractInfo);
             return result.getData();
         }
+
+        String remark = "";
+        if (tx.getRemark() != null) {
+            remark = new String(tx.getRemark(), StandardCharsets.UTF_8);
+        }
+        if (contractInfo.getResultInfo() != null && contractInfo.getResultInfo().getTokenTransfers() != null) {
+            for (TokenTransfer tokenTransfer : contractInfo.getResultInfo().getTokenTransfers()) {
+                tokenTransfer.setRemark(remark);
+            }
+        }
         return contractInfo;
     }
 
@@ -584,6 +595,16 @@ public class AnalysisHandler {
             methodList.add(method);
         }
         contractInfo.setMethods(methodList);
+
+        String remark = "";
+        if (tx.getRemark() != null) {
+            remark = new String(tx.getRemark(), StandardCharsets.UTF_8);
+        }
+        if (contractInfo.getResultInfo() != null && contractInfo.getResultInfo().getTokenTransfers() != null) {
+            for (TokenTransfer tokenTransfer : contractInfo.getResultInfo().getTokenTransfers()) {
+                tokenTransfer.setRemark(remark);
+            }
+        }
         return contractInfo;
     }
 
@@ -615,6 +636,16 @@ public class AnalysisHandler {
         if (tx.getStatus() == TxStatusEnum.CONFIRMED) {
             Result<ContractResultInfo> result = WalletRpcHandler.getContractResultInfo(chainId, callInfo.getCreateTxHash());
             callInfo.setResultInfo(result.getData());
+        }
+
+        String remark = "";
+        if (tx.getRemark() != null) {
+            remark = new String(tx.getRemark(), StandardCharsets.UTF_8);
+        }
+        if (callInfo.getResultInfo() != null && callInfo.getResultInfo().getTokenTransfers() != null) {
+            for (TokenTransfer tokenTransfer : callInfo.getResultInfo().getTokenTransfers()) {
+                tokenTransfer.setRemark(remark);
+            }
         }
         return callInfo;
     }
@@ -673,6 +704,16 @@ public class AnalysisHandler {
             throw new NulsException(CommonCodeConstanst.DATA_PARSE_ERROR);
         }
         callInfo.setResultInfo(contractResultInfo);
+
+        String remark = "";
+        if (tx.getRemark() != null) {
+            remark = new String(tx.getRemark(), StandardCharsets.UTF_8);
+        }
+        if (callInfo.getResultInfo() != null && callInfo.getResultInfo().getTokenTransfers() != null) {
+            for (TokenTransfer tokenTransfer : callInfo.getResultInfo().getTokenTransfers()) {
+                tokenTransfer.setRemark(remark);
+            }
+        }
         return callInfo;
     }
 
@@ -704,6 +745,16 @@ public class AnalysisHandler {
                 contractInfoMap.put(internalCreate.getContractAddress(), toContractInfoByInternalCreate(chainId, tx, internalCreate, resultInfo));
             }
             callInfo.setInternalCreateContractInfos(contractInfoMap);
+        }
+
+        String remark = "";
+        if (tx.getRemark() != null) {
+            remark = new String(tx.getRemark(), StandardCharsets.UTF_8);
+        }
+        if (callInfo.getResultInfo() != null && callInfo.getResultInfo().getTokenTransfers() != null) {
+            for (TokenTransfer tokenTransfer : callInfo.getResultInfo().getTokenTransfers()) {
+                tokenTransfer.setRemark(remark);
+            }
         }
         return callInfo;
     }
