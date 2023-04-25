@@ -39,8 +39,13 @@ import io.nuls.core.core.ioc.SpringLiteContext;
 import io.nuls.core.model.DateUtils;
 import io.nuls.core.model.DoubleUtils;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -126,7 +131,9 @@ public class StatisticalTask implements Runnable {
             Result<Map> result = WalletRpcHandler.getConsensusConfig(chainId);
             Map map = result.getData();
             String inflationAmount = map.get("inflationAmount").toString();
-            double d = DoubleUtils.mul(365, new BigInteger(inflationAmount).doubleValue());
+            double month = new BigInteger(inflationAmount).doubleValue();
+            double realMonth = getDeflationRatio(month);
+            double d = DoubleUtils.mul(365, realMonth);
             d = DoubleUtils.div(d, 30, 0);
             annualizedReward = DoubleUtils.mul(100, DoubleUtils.div(d, consensusLocked.doubleValue(), 4), 2);
         }
@@ -148,6 +155,22 @@ public class StatisticalTask implements Runnable {
             LoggerUtil.commonLog.error(e);
         }
         this.statisticalService.updateBestId(chainId, info.getTime());
+    }
+
+    public static double getDeflationRatio(double month) {
+        DateFormat dft = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date star = dft.parse("2020-07-12");//开始时间
+            Long starTime = star.getTime();
+            Long endTime = new Date().getTime();
+            Long num = endTime - starTime;//时间戳相差的毫秒数
+            long days = num / 24 / 60 / 60 / 1000;
+            BigDecimal value = BigDecimal.valueOf(0.996).pow((int) (days/30));
+            return DoubleUtils.mul(month,value);
+        } catch (ParseException e) {
+            LoggerUtil.commonLog.error(e);
+        }
+        return month;
     }
 
 }
