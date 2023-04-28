@@ -67,6 +67,13 @@ public interface DBTableConstant {
 
     String LAST_DAY_REWARD_TABLE = "token721_transfer_table_";
 
+    //token1155的造币信息表
+    String TOKEN1155_IDS_TABLE = "token1155_ids_table_";
+    //账户token1155信息表
+    String ACCOUNT_TOKEN1155_TABLE = "account_token1155_table_";
+    //智能合约token1155转账记录表
+    String TOKEN1155_TRANSFER_TABLE = "token1155_transfer_table_";
+
     //---------------------------------字段(field)------------------------------
     //new_info表，最新统计的时间点
     String LAST_STATISTICAL_TIME = "last_statistical_time";

@@ -23,7 +23,6 @@ import io.nuls.core.exception.NulsException;
 import io.nuls.core.parse.JSONUtils;
 import io.nuls.core.rpc.info.Constants;
 import io.nuls.core.rpc.model.ModuleE;
-import org.apache.commons.codec.binary.Hex;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -537,64 +536,7 @@ public class AnalysisHandler {
         }
         contractInfo.setStatus(ApiConstant.CONTRACT_STATUS_NORMAL);
         contractInfo.setSuccess(true);
-        Map<String, Object> params = new HashMap<>();
-        params.put(Constants.CHAIN_ID, chainId);
-        params.put("contractAddress", contractInfo.getContractAddress());
-        params.put("hash", contractInfo.getCreateTxHash());
-        Map map = (Map) RpcCall.request(ModuleE.SC.abbr, CommandConstant.CONTRACT_INFO, params);
-
-        contractInfo.setCreater(map.get("creater").toString());
-        contractInfo.setNrc20((Boolean) map.get("nrc20"));
-        contractInfo.setTokenType((Integer) map.get("tokenType"));
-        contractInfo.setDirectPayable((Boolean) map.get("directPayable"));
-        Boolean directPayableByOtherAsset = (Boolean) map.get("directPayableByOtherAsset");
-        if (directPayableByOtherAsset != null) {
-            contractInfo.setDirectPayableByOtherAsset(directPayableByOtherAsset);
-        }
-        boolean isNrc721 = contractInfo.getTokenType() == TOKEN_TYPE_NRC721;
-        if (isNrc721) {
-            Object tokenName = map.get("nrc20TokenName");
-            tokenName = tokenName == null ? EMPTY_STRING : tokenName;
-            Object tokenSymbol = map.get("nrc20TokenSymbol");
-            tokenSymbol = tokenSymbol == null ? EMPTY_STRING : tokenSymbol;
-            contractInfo.setTokenName(tokenName.toString());
-            contractInfo.setSymbol(tokenSymbol.toString());
-            contractInfo.setOwners(new ArrayList<>());
-        }
-        if (contractInfo.isNrc20()) {
-            contractInfo.setTokenName(map.get("nrc20TokenName").toString());
-            contractInfo.setSymbol(map.get("nrc20TokenSymbol").toString());
-            contractInfo.setDecimals((Integer) map.get("decimals"));
-            contractInfo.setTotalSupply(map.get("totalSupply").toString());
-            contractInfo.setOwners(new ArrayList<>());
-        }
-
-        List<Map<String, Object>> methodMap = (List<Map<String, Object>>) map.get("method");
-        List<ContractMethod> methodList = new ArrayList<>();
-        List<Map<String, Object>> argsList;
-        List<ContractMethodArg> paramList;
-        for (Map<String, Object> map1 : methodMap) {
-            ContractMethod method = new ContractMethod();
-            method.setName((String) map1.get("name"));
-            method.setDesc((String) map1.get("desc"));
-            method.setReturnType((String) map1.get("returnArg"));
-            method.setView((boolean) map1.get("view"));
-            method.setPayable((boolean) map1.get("payable"));
-            Boolean payableMultyAsset = (Boolean) map1.get("payableMultyAsset");
-            if (payableMultyAsset != null) {
-                method.setPayableMultyAsset(payableMultyAsset);
-            }
-            method.setEvent((boolean) map1.get("event"));
-            method.setJsonSerializable((boolean) map1.get("jsonSerializable"));
-            argsList = (List<Map<String, Object>>) map1.get("args");
-            paramList = new ArrayList<>();
-            for (Map<String, Object> arg : argsList) {
-                paramList.add(makeContractMethodArg(arg));
-            }
-            method.setParams(paramList);
-            methodList.add(method);
-        }
-        contractInfo.setMethods(methodList);
+        fillContractInfo(chainId, contractInfo);
 
         String remark = "";
         if (tx.getRemark() != null) {
@@ -776,6 +718,11 @@ public class AnalysisHandler {
         }
         contractInfo.setStatus(ApiConstant.CONTRACT_STATUS_NORMAL);
         contractInfo.setSuccess(true);
+        fillContractInfo(chainId, contractInfo);
+        return contractInfo;
+    }
+
+    public static void fillContractInfo(int chainId, ContractInfo contractInfo) throws NulsException {
         Map<String, Object> params = new HashMap<>();
         params.put(Constants.CHAIN_ID, chainId);
         params.put("contractAddress", contractInfo.getContractAddress());
@@ -788,6 +735,11 @@ public class AnalysisHandler {
         Boolean directPayableByOtherAsset = (Boolean) map.get("directPayableByOtherAsset");
         if (directPayableByOtherAsset != null) {
             contractInfo.setDirectPayableByOtherAsset(directPayableByOtherAsset);
+        }
+        // nrc1155数据
+        boolean isNrc1155 = contractInfo.getTokenType() == TOKEN_TYPE_NRC1155;
+        if (isNrc1155) {
+            contractInfo.setUri(map.get("tokenUri").toString());
         }
         boolean isNrc721 = contractInfo.getTokenType() == TOKEN_TYPE_NRC721;
         if (isNrc721) {
@@ -833,7 +785,6 @@ public class AnalysisHandler {
             methodList.add(method);
         }
         contractInfo.setMethods(methodList);
-        return contractInfo;
     }
 
     public static ContractCallInfo toContractCallInfoForCrossChain(int chainId, Transaction tx, ContractResultInfo resultInfo) throws NulsException {
@@ -970,6 +921,28 @@ public class AnalysisHandler {
             token721TransferList.add(token721Transfer);
         }
         resultInfo.setToken721Transfers(token721TransferList);
+
+        // nrc1155
+        transfers = (List<Map<String, Object>>) resultMap.get("token1155Transfers");
+        List<Token1155Transfer> token1155TransferList = new ArrayList<>();
+        for (Map map1 : transfers) {
+            List<String> ids = (List<String>) map1.get("ids");
+            List<String> values = (List<String>) map1.get("values");
+            for (int i = 0; i < ids.size(); i++) {
+                String id = ids.get(i);
+                String value = values.get(i);
+                Token1155Transfer token1155Transfer = new Token1155Transfer();
+                token1155Transfer.setContractAddress((String) map1.get("contractAddress"));
+                token1155Transfer.setOperatorAddress((String) map1.get("operator"));
+                token1155Transfer.setFromAddress((String) map1.get("from"));
+                token1155Transfer.setToAddress((String) map1.get("to"));
+                token1155Transfer.setTokenId(id);
+                token1155Transfer.setValue(value);
+                token1155Transfer.setName((String) map1.get("name"));
+                token1155Transfer.setSymbol((String) map1.get("symbol"));
+                token1155TransferList.add(token1155Transfer);
+            }
+        }
 
         List<Map<String, Object>> internalCreates = (List<Map<String, Object>>) resultMap.get("internalCreates");
         List<ContractInternalCreateInfo> internalCreateList = new ArrayList<>();
