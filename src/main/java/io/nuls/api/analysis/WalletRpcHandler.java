@@ -478,7 +478,7 @@ public class WalletRpcHandler {
 
     public static String token1155URI(int chainid, Object contractAddress) {
         try {
-            Result<Map> result = invokeView(chainid, contractAddress, "uri", null, new Object[0]);
+            Result<Map> result = invokeView(chainid, contractAddress, "uri", "() return String", new Object[0]);
             Map map = result.getData();
             if (map == null) {
                 return EMPTY_STRING;

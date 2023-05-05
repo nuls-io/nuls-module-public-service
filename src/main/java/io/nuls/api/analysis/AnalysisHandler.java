@@ -739,10 +739,10 @@ public class AnalysisHandler {
         // nrc1155数据
         boolean isNrc1155 = contractInfo.getTokenType() == TOKEN_TYPE_NRC1155;
         if (isNrc1155) {
-            contractInfo.setUri(map.get("tokenUri").toString());
+            contractInfo.setUri((String) map.get("tokenUri"));
         }
         boolean isNrc721 = contractInfo.getTokenType() == TOKEN_TYPE_NRC721;
-        if (isNrc721) {
+        if (isNrc721 || isNrc1155) {
             Object tokenName = map.get("nrc20TokenName");
             tokenName = tokenName == null ? EMPTY_STRING : tokenName;
             Object tokenSymbol = map.get("nrc20TokenSymbol");
@@ -943,6 +943,7 @@ public class AnalysisHandler {
                 token1155TransferList.add(token1155Transfer);
             }
         }
+        resultInfo.setToken1155Transfers(token1155TransferList);
 
         List<Map<String, Object>> internalCreates = (List<Map<String, Object>>) resultMap.get("internalCreates");
         List<ContractInternalCreateInfo> internalCreateList = new ArrayList<>();

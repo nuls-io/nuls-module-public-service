@@ -110,26 +110,21 @@ public class MongoToken1155ServiceImpl implements Token1155Service {
     }
 
     public PageInfo<Token1155Transfer> getTokenTransfers(int chainId, String address, String contractAddress, String tokenId, int pageIndex, int pageSize) {
-        Bson filter = new BasicDBObject("1", "1");
-        //if (StringUtils.isNotBlank(address) && StringUtils.isNotBlank(contractAddress)) {
-        //    Bson addressFilter = Filters.or(Filters.eq("fromAddress", address), Filters.eq("toAddress", address));
-        //    filter = Filters.and(Filters.eq("contractAddress", contractAddress), addressFilter);
-        //    filter = Filters.and(Filters.eq("tokenId", tokenId), filter);
-        //} else if (StringUtils.isNotBlank(contractAddress)) {
-        //    filter = Filters.eq("contractAddress", contractAddress);
-        //} else if (StringUtils.isNotBlank(address)) {
-        //    filter = Filters.or(Filters.eq("fromAddress", address), Filters.eq("toAddress", address));
-        //}
-        if (StringUtils.isNotBlank(contractAddress)) {
-            filter = Filters.and(Filters.eq("contractAddress", contractAddress), filter);
+        Bson filter = null;
+        if (StringUtils.isNotBlank(address) && StringUtils.isNotBlank(contractAddress)) {
+            Bson addressFilter = Filters.or(Filters.eq("fromAddress", address), Filters.eq("toAddress", address));
+            filter = Filters.and(Filters.eq("contractAddress", contractAddress), addressFilter);
             if (StringUtils.isNotBlank(tokenId)) {
                 filter = Filters.and(Filters.eq("tokenId", tokenId), filter);
             }
+        } else if (StringUtils.isNotBlank(contractAddress)) {
+            filter = Filters.eq("contractAddress", contractAddress);
+            if (StringUtils.isNotBlank(tokenId)) {
+                filter = Filters.and(Filters.eq("tokenId", tokenId), filter);
+            }
+        } else if (StringUtils.isNotBlank(address)) {
+            filter = Filters.or(Filters.eq("fromAddress", address), Filters.eq("toAddress", address));
         }
-        if (StringUtils.isNotBlank(address)) {
-            filter = Filters.and(Filters.or(Filters.eq("fromAddress", address), Filters.eq("toAddress", address)), filter);
-        }
-
         Bson sort = Sorts.descending("time");
         List<Document> docsList = this.mongoDBService.pageQuery(TOKEN1155_TRANSFER_TABLE + chainId, filter, sort, pageIndex, pageSize);
         List<Token1155Transfer> tokenTransfers = new ArrayList<>();
@@ -154,16 +149,16 @@ public class MongoToken1155ServiceImpl implements Token1155Service {
         for (Nrc1155TokenIdInfo tokenIdInfo : infos) {
             String tokenKey = tokenIdInfo.getKey();
             Bson tokenKeyBson = Filters.eq("_id", tokenKey);
+            Document document = DocumentTransferTool.toDocument(tokenIdInfo, "key");
             Document currentDocument = mongoDBService.findOne(TOKEN1155_IDS_TABLE + chainId, tokenKeyBson);
             if (currentDocument != null) {
                 if (new BigInteger(tokenIdInfo.getTotalSupply()).compareTo(BigInteger.ZERO) == 0) {
                     // 销毁
                     modelList.add(new DeleteOneModel<>(tokenKeyBson));
                 } else {
-                    modelList.add(new ReplaceOneModel<>(tokenKeyBson, currentDocument));
+                    modelList.add(new ReplaceOneModel<>(tokenKeyBson, document));
                 }
             } else if (new BigInteger(tokenIdInfo.getTotalSupply()).compareTo(BigInteger.ZERO) > 0) {
-                Document document = DocumentTransferTool.toDocument(tokenIdInfo, "key");
                 insertDocuments.put(tokenKey, document);
             }
         }

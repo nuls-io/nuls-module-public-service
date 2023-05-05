@@ -1117,7 +1117,7 @@ public class SyncService {
             contractAddress = tokenTransfer.getContractAddress();
             tokenId = tokenTransfer.getTokenId();
             contractInfo = this.queryContractInfo(chainId, contractAddress);
-            if (tokenTransfer.getToAddress() != null && !contractInfo.getOwners().contains(tokenTransfer.getToAddress())) {
+            if (tokenTransfer.getToAddress() != null && contractInfo.getOwners() != null && !contractInfo.getOwners().contains(tokenTransfer.getToAddress())) {
                 contractInfo.getOwners().add(tokenTransfer.getToAddress());
             }
             contractInfo.setTransferCount(contractInfo.getTransferCount() + 1);
@@ -1138,18 +1138,22 @@ public class SyncService {
             if (isMint) {
                 if (tokenIdInfo == null) {
                     // from为空时，视为NRC721的造币
+                    Nrc1155Info nrc1155Info = CacheManager.getCache(chainId).getNrc1155Info(contractAddress);
                     tokenIdInfo = new Nrc1155TokenIdInfo(
                             contractAddress,
                             contractInfo.getTokenName(),
                             contractInfo.getSymbol(),
                             tokenId,
-                            CacheManager.getCache(chainId).getNrc1155Info(contractAddress).getTokenURI(),
+                            nrc1155Info == null ? null : nrc1155Info.getTokenURI(),
                             tokenTransfer.getTime()
                     );
                 }
                 tokenIdInfo.addTotalSupply(value);
             } else if (isBurn) {
                 tokenIdInfo.subTotalSupply(value);
+            }
+            if (!nrc1155TokenIdMap.containsKey(contractAddress + tokenId)) {
+                nrc1155TokenIdMap.put(contractAddress + tokenId, tokenIdInfo);
             }
             token1155TransferList.add(tokenTransfer);
         }
@@ -1520,9 +1524,6 @@ public class SyncService {
         Nrc1155TokenIdInfo tokenIdInfo = nrc1155TokenIdMap.get(key);
         if (tokenIdInfo == null) {
             tokenIdInfo = token1155Service.getContractTokenId(chainId, contractAddress, tokenId);
-            if (tokenIdInfo != null) {
-                nrc1155TokenIdMap.put(key, tokenIdInfo);
-            }
         }
         return tokenIdInfo;
     }

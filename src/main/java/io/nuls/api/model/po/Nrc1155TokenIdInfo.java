@@ -30,6 +30,7 @@ public class Nrc1155TokenIdInfo {
     }
 
     public Nrc1155TokenIdInfo(String contractAddress, String name, String symbol, String tokenId, String tokenURI, Long time) {
+        this.key = contractAddress + tokenId;
         this.contractAddress = contractAddress;
         this.name = name;
         this.symbol = symbol;
