@@ -105,4 +105,8 @@ public interface CommandConstant {
      * 获取跨链资产注册信息
      */
     String CMD_ASSET = "cm_asset";
+
+    String CODE_HASH = "sc_code_hash";
+    String CONTRACT_CODE = "sc_contract_code";
+    String COMPUTE_ADDRESS = "sc_compute_address";
 }
