@@ -120,6 +120,70 @@ public class ContractController {
         }
     }
 
+    @RpcMethod("getContractCodeHash")
+    public RpcResult getContractCodeHash(List<Object> params) {
+        VerifyUtils.verifyParams(params, 2);
+        int chainId;
+        String contractAddress;
+        try {
+            chainId = (int) params.get(0);
+        } catch (Exception e) {
+            return RpcResult.paramError("[chainId] is invalid");
+        }
+        try {
+            contractAddress = (String) params.get(1);
+        } catch (Exception e) {
+            return RpcResult.paramError("[contractAddress] is invalid");
+        }
+        Result<Map> result = WalletRpcHandler.getContractCodeHash(chainId, contractAddress);
+        if (result.isSuccess()) {
+            return RpcResult.success(result.getData());
+        } else {
+            return RpcResult.failed(result.getErrorCode());
+        }
+    }
+
+    @RpcMethod("getContractCode")
+    public RpcResult getContractCode(List<Object> params) {
+        VerifyUtils.verifyParams(params, 2);
+        int chainId;
+        String contractAddress;
+        try {
+            chainId = (int) params.get(0);
+        } catch (Exception e) {
+            return RpcResult.paramError("[chainId] is invalid");
+        }
+        try {
+            contractAddress = (String) params.get(1);
+        } catch (Exception e) {
+            return RpcResult.paramError("[contractAddress] is invalid");
+        }
+        Result<Map> result = WalletRpcHandler.getContractCode(chainId, contractAddress);
+        if (result.isSuccess()) {
+            return RpcResult.success(result.getData());
+        } else {
+            return RpcResult.failed(result.getErrorCode());
+        }
+    }
+
+    @RpcMethod("computeContractAddress")
+    public RpcResult computeContractAddress(List<Object> params) {
+        VerifyUtils.verifyParams(params, 4);
+        int chainId;
+        try {
+            chainId = (int) params.get(0);
+        } catch (Exception e) {
+            return RpcResult.paramError("[chainId] is invalid");
+        }
+        int i = 1;
+        Result<Map> result = WalletRpcHandler.computeContractAddress(chainId, params.get(i++), params.get(i++), params.get(i++));
+        if (result.isSuccess()) {
+            return RpcResult.success(result.getData());
+        } else {
+            return RpcResult.failed(result.getErrorCode());
+        }
+    }
+
     @RpcMethod("getNrc20List")
     public RpcResult getNrc20List(List<Object> params) {
         int chainId;

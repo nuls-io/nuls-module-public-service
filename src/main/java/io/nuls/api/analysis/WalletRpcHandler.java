@@ -758,6 +758,44 @@ public class WalletRpcHandler {
         }
     }
 
+    public static Result<Map> getContractCodeHash(int chainId, String contractAddress) {
+        try {
+            Map<String, Object> params = new HashMap<>();
+            params.put(Constants.CHAIN_ID, ApiContext.defaultChainId);
+            params.put("contractAddress", contractAddress);
+            Map map = (Map) RpcCall.request(ModuleE.SC.abbr, CommandConstant.CODE_HASH, params);
+            return Result.getSuccess(null).setData(map);
+        } catch (NulsException e) {
+            return Result.getFailed(e.getErrorCode());
+        }
+    }
+
+    public static Result<Map> getContractCode(int chainId, String contractAddress) {
+        try {
+            Map<String, Object> params = new HashMap<>();
+            params.put(Constants.CHAIN_ID, ApiContext.defaultChainId);
+            params.put("contractAddress", contractAddress);
+            Map map = (Map) RpcCall.request(ModuleE.SC.abbr, CommandConstant.CONTRACT_CODE, params);
+            return Result.getSuccess(null).setData(map);
+        } catch (NulsException e) {
+            return Result.getFailed(e.getErrorCode());
+        }
+    }
+
+    public static Result computeContractAddress(int chainId, Object sender, Object codeHash, Object salt) {
+        try {
+            Map<String, Object> params = new HashMap<>();
+            params.put(Constants.CHAIN_ID, ApiContext.defaultChainId);
+            params.put("sender", sender);
+            params.put("codeHash", codeHash);
+            params.put("salt", salt);
+            Map map = (Map) RpcCall.request(ModuleE.SC.abbr, CommandConstant.COMPUTE_ADDRESS, params);
+            return Result.getSuccess(null).setData(map);
+        } catch (NulsException e) {
+            return Result.getFailed(e.getErrorCode());
+        }
+    }
+
     /**
      * 查询NRC20的资产ID
      */
