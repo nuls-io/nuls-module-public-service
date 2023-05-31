@@ -515,7 +515,7 @@ public class WalletRpcHandler {
         }
 
         String hash = (String) params.get("hash");
-        ContractResultInfo resultInfo = AnalysisHandler.toContractResultInfo(hash, map);
+        ContractResultInfo resultInfo = AnalysisHandler.toContractResultInfo((Integer) params.get(Constants.CHAIN_ID), hash, map);
         return Result.getSuccess(null).setData(resultInfo);
     }
 
@@ -592,7 +592,7 @@ public class WalletRpcHandler {
 
             Map<String, ContractResultInfo> resultInfoMap = new HashMap<>();
             for (Map.Entry<String, Object> entry : map.entrySet()) {
-                ContractResultInfo resultInfo = AnalysisHandler.toContractResultInfo(entry.getKey(), (Map<String, Object>) entry.getValue());
+                ContractResultInfo resultInfo = AnalysisHandler.toContractResultInfo(chainId, entry.getKey(), (Map<String, Object>) entry.getValue());
                 resultInfoMap.put(resultInfo.getTxHash(), resultInfo);
             }
             return Result.getSuccess(null).setData(resultInfoMap);

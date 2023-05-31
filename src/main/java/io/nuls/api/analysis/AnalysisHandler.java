@@ -859,7 +859,7 @@ public class AnalysisHandler {
         return info;
     }
 
-    public static ContractResultInfo toContractResultInfo(String hash, Map<String, Object> resultMap) {
+    public static ContractResultInfo toContractResultInfo(int chainId, String hash, Map<String, Object> resultMap) throws NulsException {
         ContractResultInfo resultInfo = new ContractResultInfo();
         resultInfo.setTxHash(hash);
         resultInfo.setSuccess((Boolean) resultMap.get("success"));
@@ -956,6 +956,29 @@ public class AnalysisHandler {
             internalCreateList.add(internalCreate);
         }
         resultInfo.setInternalCreates(internalCreateList);
+
+        List<CrossAssetTransfer> crossAssetTransferList = new ArrayList<>();
+        List<String> contractTxList = resultInfo.getContractTxList();
+        for (String contractTxHex : contractTxList) {
+            Transaction tx = new Transaction();
+            tx.parse(HexUtil.decode(contractTxHex), 0);
+            CoinData coinData = tx.getCoinDataInstance();
+            List<CoinFrom> froms = coinData.getFrom();
+            CoinFrom from = froms.get(0);
+            if (from.getAssetsChainId() == chainId && from.getAssetsId() == 1) {
+                continue;
+            }
+            CoinTo coinTo = coinData.getTo().get(0);
+            crossAssetTransferList.add(new CrossAssetTransfer(
+                AddressTool.getStringAddressByBytes(from.getAddress()),
+                AddressTool.getStringAddressByBytes(coinTo.getAddress()),
+                coinTo.getAmount().toString(),
+                coinTo.getAssetsChainId(),
+                coinTo.getAssetsId(),
+                coinTo.getLockTime()
+            ));
+        }
+        resultInfo.setCrossAssetTransfers(crossAssetTransferList);
         return resultInfo;
     }
 
