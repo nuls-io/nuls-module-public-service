@@ -51,6 +51,8 @@ public class ContractResultInfo {
     private List<ContractInternalCreateInfo> internalCreates;
 
     private List<Token1155Transfer> token1155Transfers;
+    // 增加跨链资产合约内部转账的数据
+    private List<CrossAssetTransfer> crossAssetTransfers;
 
     public Document toDocument() {
         Document document = DocumentTransferTool.toDocument(this, "txHash");
@@ -84,11 +86,18 @@ public class ContractResultInfo {
             internalCreateList.add(doc);
         }
 
+        List<Document> crossAssetTransferList = new ArrayList<>();
+        for (CrossAssetTransfer crossAssetTransfer : crossAssetTransfers) {
+            Document doc = DocumentTransferTool.toDocument(crossAssetTransfer);
+            crossAssetTransferList.add(doc);
+        }
+
         document.put("nulsTransfers", nulsTransferList);
         document.put("tokenTransfers", tokenTransferList);
         document.put("token721Transfers", token721TransferList);
         document.put("token1155Transfers", token1155TransferList);
         document.put("internalCreates", internalCreateList);
+        document.put("crossAssetTransfers", crossAssetTransferList);
         return document;
     }
 
@@ -128,11 +137,19 @@ public class ContractResultInfo {
             internalCreateList.add(internalCreate);
         }
 
+        documentList = (List<Document>) document.get("crossAssetTransfers");
+        List<CrossAssetTransfer> crossAssetTransferList = new ArrayList<>();
+        for (Document doc : documentList) {
+            CrossAssetTransfer crossAssetTransfer = DocumentTransferTool.toInfo(doc, CrossAssetTransfer.class);
+            crossAssetTransferList.add(crossAssetTransfer);
+        }
+
         document.remove("nulsTransfers");
         document.remove("tokenTransfers");
         document.remove("token721Transfers");
         document.remove("token1155Transfers");
         document.remove("internalCreates");
+        document.remove("crossAssetTransfers");
 
         ContractResultInfo resultInfo = DocumentTransferTool.toInfo(document, "txHash", ContractResultInfo.class);
         resultInfo.setNulsTransfers(nulsTransferList);
@@ -140,7 +157,16 @@ public class ContractResultInfo {
         resultInfo.setToken721Transfers(token721TransferList);
         resultInfo.setToken1155Transfers(token1155TransferList);
         resultInfo.setInternalCreates(internalCreateList);
+        resultInfo.setCrossAssetTransfers(crossAssetTransferList);
         return resultInfo;
+    }
+
+    public List<CrossAssetTransfer> getCrossAssetTransfers() {
+        return crossAssetTransfers;
+    }
+
+    public void setCrossAssetTransfers(List<CrossAssetTransfer> crossAssetTransfers) {
+        this.crossAssetTransfers = crossAssetTransfers;
     }
 
     public List<ContractInternalCreateInfo> getInternalCreates() {
