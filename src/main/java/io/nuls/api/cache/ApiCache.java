@@ -2,10 +2,11 @@ package io.nuls.api.cache;
 
 import io.nuls.api.model.po.*;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class ApiCache {
 
@@ -27,9 +28,11 @@ public class ApiCache {
 
     private Map<String, AliasInfo> aliasMap = new ConcurrentHashMap<>();
 
-    private List<Nrc20Info> nrc20InfoList = new ArrayList<>();
+    private Map<String, Nrc20Info> nrc20InfoMap = new ConcurrentHashMap<>();
 
-    private List<Nrc721Info> nrc721InfoList = new ArrayList<>();
+    private Map<String, Nrc721Info> nrc721InfoMap = new ConcurrentHashMap<>();
+
+    private Map<String, Nrc1155Info> nrc1155InfoMap = new ConcurrentHashMap<>();
 
     public ApiCache() {
         currentRound = new CurrentRound();
@@ -51,20 +54,40 @@ public class ApiCache {
         ledgerMap.put(ledgerInfo.getKey(), ledgerInfo);
     }
 
-    public void addNrc20Info(Nrc20Info nrc20Info) {
-        nrc20InfoList.add(nrc20Info);
-    }
-
     public List<Nrc20Info> getNrc20InfoList() {
-        return nrc20InfoList;
+        return nrc20InfoMap.values().stream().collect(Collectors.toList());
     }
 
     public List<Nrc721Info> getNrc721InfoList() {
-        return nrc721InfoList;
+        return nrc721InfoMap.values().stream().collect(Collectors.toList());
+    }
+
+    public List<Nrc1155Info> getNrc1155InfoList() {
+        return nrc1155InfoMap.values().stream().collect(Collectors.toList());
+    }
+
+    public void addNrc20Info(Nrc20Info nrc20Info) {
+        nrc20InfoMap.put(nrc20Info.getContractAddress(), nrc20Info);
     }
 
     public void addNrc721Info(Nrc721Info nrc721Info) {
-        nrc721InfoList.add(nrc721Info);
+        nrc721InfoMap.put(nrc721Info.getContractAddress(), nrc721Info);
+    }
+
+    public void addNrc1155Info(Nrc1155Info nrc1155Info) {
+        nrc1155InfoMap.put(nrc1155Info.getContractAddress(), nrc1155Info);
+    }
+
+    public Nrc20Info getNrc20Info(String contract) {
+        return nrc20InfoMap.get(contract);
+    }
+
+    public Nrc721Info getNrc721Info(String contract) {
+        return nrc721InfoMap.get(contract);
+    }
+
+    public Nrc1155Info getNrc1155Info(String contract) {
+        return nrc1155InfoMap.get(contract);
     }
 
     public void addAgentInfo(AgentInfo agentInfo) {

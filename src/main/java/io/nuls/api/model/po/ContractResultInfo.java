@@ -50,6 +50,10 @@ public class ContractResultInfo {
 
     private List<ContractInternalCreateInfo> internalCreates;
 
+    private List<Token1155Transfer> token1155Transfers;
+    // 增加跨链资产合约内部转账的数据
+    private List<CrossAssetTransfer> crossAssetTransfers;
+
     public Document toDocument() {
         Document document = DocumentTransferTool.toDocument(this, "txHash");
         List<Document> nulsTransferList = new ArrayList<>();
@@ -70,16 +74,30 @@ public class ContractResultInfo {
             token721TransferList.add(doc);
         }
 
+        List<Document> token1155TransferList = new ArrayList<>();
+        for (Token1155Transfer transfer1155 : token1155Transfers) {
+            Document doc = DocumentTransferTool.toDocument(transfer1155);
+            token1155TransferList.add(doc);
+        }
+
         List<Document> internalCreateList = new ArrayList<>();
         for (ContractInternalCreateInfo internalCreate : internalCreates) {
             Document doc = DocumentTransferTool.toDocument(internalCreate);
             internalCreateList.add(doc);
         }
 
+        List<Document> crossAssetTransferList = new ArrayList<>();
+        for (CrossAssetTransfer crossAssetTransfer : crossAssetTransfers) {
+            Document doc = DocumentTransferTool.toDocument(crossAssetTransfer);
+            crossAssetTransferList.add(doc);
+        }
+
         document.put("nulsTransfers", nulsTransferList);
         document.put("tokenTransfers", tokenTransferList);
         document.put("token721Transfers", token721TransferList);
+        document.put("token1155Transfers", token1155TransferList);
         document.put("internalCreates", internalCreateList);
+        document.put("crossAssetTransfers", crossAssetTransferList);
         return document;
     }
 
@@ -105,6 +123,13 @@ public class ContractResultInfo {
             token721TransferList.add(token721Transfer);
         }
 
+        documentList = (List<Document>) document.get("token1155Transfers");
+        List<Token1155Transfer> token1155TransferList = new ArrayList<>();
+        for (Document doc : documentList) {
+            Token1155Transfer token1155Transfer = DocumentTransferTool.toInfo(doc, Token1155Transfer.class);
+            token1155TransferList.add(token1155Transfer);
+        }
+
         documentList = (List<Document>) document.get("internalCreates");
         List<ContractInternalCreateInfo> internalCreateList = new ArrayList<>();
         for (Document doc : documentList) {
@@ -112,17 +137,36 @@ public class ContractResultInfo {
             internalCreateList.add(internalCreate);
         }
 
+        documentList = (List<Document>) document.get("crossAssetTransfers");
+        List<CrossAssetTransfer> crossAssetTransferList = new ArrayList<>();
+        for (Document doc : documentList) {
+            CrossAssetTransfer crossAssetTransfer = DocumentTransferTool.toInfo(doc, CrossAssetTransfer.class);
+            crossAssetTransferList.add(crossAssetTransfer);
+        }
+
         document.remove("nulsTransfers");
         document.remove("tokenTransfers");
         document.remove("token721Transfers");
+        document.remove("token1155Transfers");
         document.remove("internalCreates");
+        document.remove("crossAssetTransfers");
 
         ContractResultInfo resultInfo = DocumentTransferTool.toInfo(document, "txHash", ContractResultInfo.class);
         resultInfo.setNulsTransfers(nulsTransferList);
         resultInfo.setTokenTransfers(tokenTransferList);
         resultInfo.setToken721Transfers(token721TransferList);
+        resultInfo.setToken1155Transfers(token1155TransferList);
         resultInfo.setInternalCreates(internalCreateList);
+        resultInfo.setCrossAssetTransfers(crossAssetTransferList);
         return resultInfo;
+    }
+
+    public List<CrossAssetTransfer> getCrossAssetTransfers() {
+        return crossAssetTransfers;
+    }
+
+    public void setCrossAssetTransfers(List<CrossAssetTransfer> crossAssetTransfers) {
+        this.crossAssetTransfers = crossAssetTransfers;
     }
 
     public List<ContractInternalCreateInfo> getInternalCreates() {
@@ -283,5 +327,13 @@ public class ContractResultInfo {
 
     public void setEvents(List<String> events) {
         this.events = events;
+    }
+
+    public List<Token1155Transfer> getToken1155Transfers() {
+        return token1155Transfers;
+    }
+
+    public void setToken1155Transfers(List<Token1155Transfer> token1155Transfers) {
+        this.token1155Transfers = token1155Transfers;
     }
 }
