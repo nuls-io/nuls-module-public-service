@@ -27,7 +27,7 @@ public class ContractInfo extends TxDataInfo {
 
     private String errorMsg;
 
-    //token类型, 0 - 非token, 1 - NRC20, 2 - NRC721
+    //token类型, 0 - 非token, 1 - NRC20, 2 - NRC721, 3 - NRC1155
     private int tokenType;
 
     private boolean isNrc20;//是否支持NRC20协议(0-否、1-是)
@@ -68,6 +68,7 @@ public class ContractInfo extends TxDataInfo {
     @JsonIgnore
     private boolean isNew;
     private boolean directPayableByOtherAsset;
+    private String uri;
 
     public ContractInfo() {
         this.totalSupply = "0";
@@ -358,5 +359,13 @@ public class ContractInfo extends TxDataInfo {
 
     public void setDirectPayableByOtherAsset(boolean directPayableByOtherAsset) {
         this.directPayableByOtherAsset = directPayableByOtherAsset;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 }
