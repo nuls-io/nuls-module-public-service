@@ -63,6 +63,16 @@ public class MongoDBService implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() {
+
+        while (ApiContext.maxAliveConnect==0){
+            LoggerUtil.commonLog.info("waiting ready......");
+            try {
+                Thread.sleep(1000L);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         try {
             long time1, time2;
             time1 = System.currentTimeMillis();
