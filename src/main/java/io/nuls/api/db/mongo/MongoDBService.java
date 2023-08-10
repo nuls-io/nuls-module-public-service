@@ -63,6 +63,15 @@ public class MongoDBService implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                doit();
+            }
+        }).start();
+    }
+    public void doit() {
+
 
         while (ApiContext.maxAliveConnect == 0) {
             LoggerUtil.commonLog.info("waiting ready......");
