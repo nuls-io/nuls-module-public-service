@@ -47,7 +47,7 @@ import static io.nuls.api.constant.DBTableConstant.TEST_TABLE;
  * @author Niels
  */
 @Component
-@Order(0)
+@Order(1)
 public class MongoDBService implements InitializingBean {
 
     private MongoClient client;
