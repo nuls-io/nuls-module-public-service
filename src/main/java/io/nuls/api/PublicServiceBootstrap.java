@@ -42,6 +42,7 @@ import io.nuls.core.core.annotation.Autowired;
 import io.nuls.core.core.annotation.Component;
 import io.nuls.core.core.config.ConfigurationLoader;
 import io.nuls.core.core.ioc.SpringLiteContext;
+import io.nuls.core.log.Log;
 import io.nuls.core.model.StringUtils;
 import io.nuls.core.parse.JSONUtils;
 import io.nuls.core.rpc.info.HostInfo;
@@ -184,7 +185,7 @@ public class PublicServiceBootstrap extends RpcModule {
     @Override
     public RpcModuleState onDependenciesReady() {
         try {
-//            LoggerUtil.commonLog.info("public service onDependenciesReady......");
+            LoggerUtil.commonLog.info("public service onDependenciesReady......");
             Result<Map> result = WalletRpcHandler.getConsensusConfig(ApiContext.defaultChainId);
             if (result.isSuccess()) {
                 Map<String, Object> configMap = result.getData();
@@ -192,6 +193,9 @@ public class PublicServiceBootstrap extends RpcModule {
                 ApiContext.agentAssetId = (int) configMap.get("agentAssetId");
                 ApiContext.awardAssetId = (int) configMap.get("awardAssetId");
                 ApiContext.minDeposit = new BigInteger(configMap.get("commissionMin").toString());
+            } else {
+                LoggerUtil.commonLog.error("Get consensus config failed. {}",result.getMsg());
+                System.exit(-1);
             }
             initDB();
 
