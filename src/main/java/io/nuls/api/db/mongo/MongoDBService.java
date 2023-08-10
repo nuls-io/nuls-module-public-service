@@ -47,7 +47,7 @@ import static io.nuls.api.constant.DBTableConstant.TEST_TABLE;
  * @author Niels
  */
 @Component
-@Order(1)
+@Order(Integer.MAX_VALUE)
 public class MongoDBService implements InitializingBean {
 
     private MongoClient client;
@@ -64,7 +64,7 @@ public class MongoDBService implements InitializingBean {
     @Override
     public void afterPropertiesSet() {
 
-        while (ApiContext.maxAliveConnect==0){
+        while (ApiContext.maxAliveConnect == 0) {
             LoggerUtil.commonLog.info("waiting ready......");
             try {
                 Thread.sleep(1000L);
