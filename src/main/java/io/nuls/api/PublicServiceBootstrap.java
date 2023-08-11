@@ -199,10 +199,10 @@ public class PublicServiceBootstrap extends RpcModule {
             }
             initDB();
 
-            if (hasDependent(ModuleE.SC)) {
+            if (hasDependent(ModuleE.SC)||hasDependent(new Module("nuls-cores",ROLE))) {
                 ApiContext.isRunSmartContract = true;
             }
-            if (hasDependent(ModuleE.CC)) {
+            if (hasDependent(ModuleE.CC)||hasDependent(new Module("nuls-cores",ROLE))) {
                 ApiContext.isRunCrossChain = true;
             }
 

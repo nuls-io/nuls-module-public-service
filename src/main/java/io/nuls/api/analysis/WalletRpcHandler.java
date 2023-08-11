@@ -612,9 +612,9 @@ public class WalletRpcHandler {
         params.put("hashList", hashList);
 
         try {
-            Log.warn("-=-=-=-" + JSONUtils.obj2json(params));
+//            Log.warn("-=-=-=-" + JSONUtils.obj2json(params));
             Map<String, Object> map = (Map) RpcCall.request(ModuleE.SC.abbr, CommandConstant.CONTRACT_RESULT_LIST, params);
-            Log.warn("-=-=-=-" + JSONUtils.obj2json(map));
+//            Log.warn("-=-=-=-" + JSONUtils.obj2json(map));
             Map<String, ContractResultInfo> resultInfoMap = new HashMap<>();
             for (Map.Entry<String, Object> entry : map.entrySet()) {
                 ContractResultInfo resultInfo = AnalysisHandler.toContractResultInfo(chainId, entry.getKey(), (Map<String, Object>) entry.getValue());

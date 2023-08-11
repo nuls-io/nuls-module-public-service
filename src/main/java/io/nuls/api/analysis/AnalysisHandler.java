@@ -76,7 +76,7 @@ public class AnalysisHandler {
         blockInfo.setBlockHexInfo(hexInfo);
 
         Map<String, ContractResultInfo> resultInfoMap = null;
-        LoggerUtil.commonLog.warn("-=-=-=-{}",JSONUtils.obj2json(contactHashList));
+//        LoggerUtil.commonLog.warn("-=-=-=-{}",JSONUtils.obj2json(contactHashList));
         if (!contactHashList.isEmpty()) {
             Result<Map<String, ContractResultInfo>> result = WalletRpcHandler.getContractResults(chainId, contactHashList);
             if (result.isFailed()) {
@@ -88,7 +88,7 @@ public class AnalysisHandler {
         //执行成功的智能合约可能会产生系统内部交易，内部交易的序列化信息存放在执行结果中,将内部交易反序列后，一起解析
         //A successful intelligent contract execution may result in system internal trading.
         // The serialized information of internal trading is stored in the execution result, and the internal trading is reversed and parsed together
-        LoggerUtil.commonLog.warn("-=-=-=-{}",JSONUtils.obj2json(resultInfoMap));
+//        LoggerUtil.commonLog.warn("-=-=-=-{}",JSONUtils.obj2json(resultInfoMap));
         if (resultInfoMap != null) {
             for (ContractResultInfo resultInfo : resultInfoMap.values()) {
                 if (resultInfo.getContractTxList() != null) {
