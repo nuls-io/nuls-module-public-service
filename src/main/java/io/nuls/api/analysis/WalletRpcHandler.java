@@ -1,5 +1,6 @@
 package io.nuls.api.analysis;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.nuls.api.ApiContext;
 import io.nuls.api.constant.ApiConstant;
 import io.nuls.api.constant.ApiErrorCode;
@@ -18,6 +19,7 @@ import io.nuls.core.constant.TxStatusEnum;
 import io.nuls.core.exception.NulsException;
 import io.nuls.core.log.Log;
 import io.nuls.core.model.StringUtils;
+import io.nuls.core.parse.JSONUtils;
 import io.nuls.core.rpc.info.Constants;
 import io.nuls.core.rpc.model.ModuleE;
 import io.nuls.core.rpc.model.message.Response;
@@ -47,7 +49,8 @@ public class WalletRpcHandler {
 
             BlockInfo blockInfo = AnalysisHandler.toBlockInfo((String) map.get("value"), chainID);
             return Result.getSuccess(null).setData(blockInfo);
-        } catch (Exception e) {LoggerUtil.commonLog.error("",e);
+        } catch (Exception e) {
+            LoggerUtil.commonLog.error("", e);
             Log.error(e);
             return Result.getFailed(ApiErrorCode.DATA_PARSE_ERROR);
         }
@@ -65,7 +68,8 @@ public class WalletRpcHandler {
             }
             BlockInfo blockInfo = AnalysisHandler.toBlockInfo((String) map.get("value"), chainID);
             return Result.getSuccess(null).setData(blockInfo);
-        } catch (Exception e) {LoggerUtil.commonLog.error("",e);
+        } catch (Exception e) {
+            LoggerUtil.commonLog.error("", e);
             Log.error(e);
         }
         return Result.getFailed(ApiErrorCode.DATA_PARSE_ERROR);
@@ -78,7 +82,8 @@ public class WalletRpcHandler {
         try {
             Map map = (Map) RpcCall.request(ModuleE.BL.abbr, CommandConstant.INFO, params);
             return Result.getSuccess(null).setData(map);
-        } catch (Exception e) {LoggerUtil.commonLog.error("",e);
+        } catch (Exception e) {
+            LoggerUtil.commonLog.error("", e);
             Log.error(e);
         }
         return null;
@@ -102,7 +107,8 @@ public class WalletRpcHandler {
             balanceInfo.setTotalBalance(balanceInfo.getBalance().add(balanceInfo.getConsensusLock()).add(balanceInfo.getTimeLock()));
             balanceInfo.setNonceType((Integer) map.get("nonceType"));
             return balanceInfo;
-        } catch (Exception e) {LoggerUtil.commonLog.error("",e);
+        } catch (Exception e) {
+            LoggerUtil.commonLog.error("", e);
             Log.error(e);
         }
         return null;
@@ -160,7 +166,8 @@ public class WalletRpcHandler {
             }
             pageInfo.setList(freezeInfos);
             return Result.getSuccess(null).setData(pageInfo);
-        } catch (Exception e) {LoggerUtil.commonLog.error("",e);
+        } catch (Exception e) {
+            LoggerUtil.commonLog.error("", e);
             e.printStackTrace();
             return Result.getFailed(ApiErrorCode.DATA_PARSE_ERROR);
         }
@@ -191,9 +198,11 @@ public class WalletRpcHandler {
             TransactionInfo txInfo = AnalysisHandler.toTransaction(chainId, tx, ApiContext.protocolVersion);
 
             return Result.getSuccess(null).setData(txInfo);
-        } catch (NulsException e) {LoggerUtil.commonLog.error("",e);
+        } catch (NulsException e) {
+            LoggerUtil.commonLog.error("", e);
             return Result.getFailed(e.getErrorCode());
-        } catch (Exception e) {LoggerUtil.commonLog.error("",e);
+        } catch (Exception e) {
+            LoggerUtil.commonLog.error("", e);
             Log.error(e);
             return Result.getFailed(ApiErrorCode.DATA_PARSE_ERROR);
         }
@@ -211,7 +220,8 @@ public class WalletRpcHandler {
             agentInfo.setStatus((Integer) map.get("status"));
 
             return Result.getSuccess(null).setData(agentInfo);
-        } catch (NulsException e) {LoggerUtil.commonLog.error("",e);
+        } catch (NulsException e) {
+            LoggerUtil.commonLog.error("", e);
             return Result.getFailed(e.getErrorCode());
         }
     }
@@ -222,7 +232,8 @@ public class WalletRpcHandler {
         try {
             Map map = (Map) RpcCall.request(ModuleE.CS.abbr, CommandConstant.GET_CONSENSUS_CONFIG, params);
             return Result.getSuccess(null).setData(map);
-        } catch (NulsException e) {LoggerUtil.commonLog.error("",e);
+        } catch (NulsException e) {
+            LoggerUtil.commonLog.error("", e);
             return Result.getFailed(e.getErrorCode());
         }
     }
@@ -399,7 +410,8 @@ public class WalletRpcHandler {
                 return Result.getSuccess(null).setData(BigInteger.ZERO);
             }
             return Result.getSuccess(null).setData(new BigInteger(balance.toString()));
-        } catch (NulsException e) {LoggerUtil.commonLog.error("",e);
+        } catch (NulsException e) {
+            LoggerUtil.commonLog.error("", e);
             Log.error(e.format());
             return Result.getSuccess(null).setData(BigInteger.ZERO);
         }
@@ -417,7 +429,8 @@ public class WalletRpcHandler {
                 return Result.getSuccess(null).setData(BigInteger.ZERO);
             }
             return Result.getSuccess(null).setData(new BigInteger(totalSupply.toString()));
-        } catch (NulsException e) {LoggerUtil.commonLog.error("",e);
+        } catch (NulsException e) {
+            LoggerUtil.commonLog.error("", e);
             Log.error(e.format());
             return Result.getSuccess(null).setData(BigInteger.ZERO);
         }
@@ -435,7 +448,8 @@ public class WalletRpcHandler {
                 return EMPTY_STRING;
             }
             return tokenName.toString();
-        } catch (NulsException e) {LoggerUtil.commonLog.error("",e);
+        } catch (NulsException e) {
+            LoggerUtil.commonLog.error("", e);
             Log.error(e.format());
             return EMPTY_STRING;
         }
@@ -453,7 +467,8 @@ public class WalletRpcHandler {
                 return EMPTY_STRING;
             }
             return tokenSymbol.toString();
-        } catch (NulsException e) {LoggerUtil.commonLog.error("",e);
+        } catch (NulsException e) {
+            LoggerUtil.commonLog.error("", e);
             Log.error(e.format());
             return EMPTY_STRING;
         }
@@ -471,7 +486,8 @@ public class WalletRpcHandler {
                 return EMPTY_STRING;
             }
             return tokenURI.toString();
-        } catch (NulsException e) {LoggerUtil.commonLog.error("",e);
+        } catch (NulsException e) {
+            LoggerUtil.commonLog.error("", e);
             Log.error(e.format());
             return EMPTY_STRING;
         }
@@ -489,7 +505,8 @@ public class WalletRpcHandler {
                 return EMPTY_STRING;
             }
             return tokenURI.toString();
-        } catch (NulsException e) {LoggerUtil.commonLog.error("",e);
+        } catch (NulsException e) {
+            LoggerUtil.commonLog.error("", e);
             Log.error(e.format());
             return EMPTY_STRING;
         }
@@ -506,7 +523,8 @@ public class WalletRpcHandler {
         Map map = null;
         try {
             map = (Map) RpcCall.request(ModuleE.SC.abbr, CommandConstant.CONTRACT_RESULT, params);
-        } catch (NulsException e) {LoggerUtil.commonLog.error("",e);
+        } catch (NulsException e) {
+            LoggerUtil.commonLog.error("", e);
             return Result.getFailed(CommonCodeConstanst.DATA_NOT_FOUND);
         }
         map = (Map) RpcCall.request(ModuleE.SC.abbr, CommandConstant.CONTRACT_RESULT, params);
@@ -528,7 +546,8 @@ public class WalletRpcHandler {
         try {
             Map map = (Map) RpcCall.request(ModuleE.TX.abbr, CommandConstant.TX_VALIEDATE, params);
             return Result.getSuccess(null).setData(map);
-        } catch (NulsException e) {LoggerUtil.commonLog.error("",e);
+        } catch (NulsException e) {
+            LoggerUtil.commonLog.error("", e);
             return Result.getFailed(e.getErrorCode());
         }
     }
@@ -541,7 +560,8 @@ public class WalletRpcHandler {
         try {
             Map map = (Map) RpcCall.request(ModuleE.TX.abbr, CommandConstant.TX_NEWTX, params);
             return Result.getSuccess(null).setData(map);
-        } catch (NulsException e) {LoggerUtil.commonLog.error("",e);
+        } catch (NulsException e) {
+            LoggerUtil.commonLog.error("", e);
             return Result.getFailed(e.getErrorCode());
         }
     }
@@ -554,7 +574,8 @@ public class WalletRpcHandler {
         try {
             Map map = (Map) RpcCall.request(ModuleE.TX.abbr, CommandConstant.TX_BROADCAST, params);
             return Result.getSuccess(null).setData(map);
-        } catch (NulsException e) {LoggerUtil.commonLog.error("",e);
+        } catch (NulsException e) {
+            LoggerUtil.commonLog.error("", e);
             return Result.getFailed(e.getErrorCode());
         }
     }
@@ -566,7 +587,8 @@ public class WalletRpcHandler {
         try {
             Map map = (Map) RpcCall.request(ModuleE.CC.abbr, CommandConstant.SEND_CROSS_TX, params);
             return Result.getSuccess(null).setData(map);
-        } catch (NulsException e) {LoggerUtil.commonLog.error("",e);
+        } catch (NulsException e) {
+            LoggerUtil.commonLog.error("", e);
             return Result.getFailed(e.getErrorCode());
         }
     }
@@ -578,7 +600,8 @@ public class WalletRpcHandler {
         try {
             Map map = (Map) RpcCall.request(ModuleE.AC.abbr, CommandConstant.IS_ALAIS_USABLE, params);
             return Result.getSuccess(null).setData(map);
-        } catch (NulsException e) {LoggerUtil.commonLog.error("",e);
+        } catch (NulsException e) {
+            LoggerUtil.commonLog.error("", e);
             return Result.getFailed(e.getErrorCode());
         }
     }
@@ -589,8 +612,9 @@ public class WalletRpcHandler {
         params.put("hashList", hashList);
 
         try {
+            LoggerUtil.commonLog.warn("-=-=-=-" + JSONUtils.obj2json(params));
             Map<String, Object> map = (Map) RpcCall.request(ModuleE.SC.abbr, CommandConstant.CONTRACT_RESULT_LIST, params);
-
+            LoggerUtil.commonLog.warn("-=-=-=-" + JSONUtils.obj2json(map));
             Map<String, ContractResultInfo> resultInfoMap = new HashMap<>();
             for (Map.Entry<String, Object> entry : map.entrySet()) {
                 ContractResultInfo resultInfo = AnalysisHandler.toContractResultInfo(chainId, entry.getKey(), (Map<String, Object>) entry.getValue());
@@ -598,8 +622,11 @@ public class WalletRpcHandler {
             }
             return Result.getSuccess(null).setData(resultInfoMap);
         } catch (NulsException e) {
-            LoggerUtil.commonLog.error("",e);
+            LoggerUtil.commonLog.error("", e);
             return Result.getFailed(e.getErrorCode());
+        } catch (Exception e) {
+            LoggerUtil.commonLog.error("", e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -651,7 +678,8 @@ public class WalletRpcHandler {
             map.put("assetInfoMap", assetInfoMap);
 
             return Result.getSuccess(null).setData(map);
-        } catch (NulsException e) {LoggerUtil.commonLog.error("",e);
+        } catch (NulsException e) {
+            LoggerUtil.commonLog.error("", e);
             return Result.getFailed(e.getErrorCode());
         }
     }
@@ -660,7 +688,8 @@ public class WalletRpcHandler {
         try {
             List list = (List) RpcCall.request(ModuleE.AC.abbr, CommandConstant.GET_ALL_ADDRESS_PREFIX, null);
             return Result.getSuccess(null).setData(list);
-        } catch (NulsException e) {LoggerUtil.commonLog.error("",e);
+        } catch (NulsException e) {
+            LoggerUtil.commonLog.error("", e);
             return Result.getFailed(e.getErrorCode());
         }
     }
@@ -673,7 +702,8 @@ public class WalletRpcHandler {
             params.put("txHash", txHash);
             Map<String, Object> map = (Map<String, Object>) RpcCall.request(ModuleE.CC.abbr, CommandConstant.GET_BYZANTINE_COUNT, params);
             return Result.getSuccess(null).setData(map);
-        } catch (NulsException e) {LoggerUtil.commonLog.error("",e);
+        } catch (NulsException e) {
+            LoggerUtil.commonLog.error("", e);
             return Result.getFailed(e.getErrorCode());
         }
     }
@@ -684,7 +714,8 @@ public class WalletRpcHandler {
             params.put("chainId", chainId);
             Map<String, Object> map = (Map<String, Object>) RpcCall.request(ModuleE.NW.abbr, CommandConstant.GET_NETWORK_GROUP, params);
             return Result.getSuccess(null).setData(map);
-        } catch (NulsException e) {LoggerUtil.commonLog.error("",e);
+        } catch (NulsException e) {
+            LoggerUtil.commonLog.error("", e);
             return Result.getFailed(e.getErrorCode());
         }
     }
@@ -706,7 +737,8 @@ public class WalletRpcHandler {
             params.put("multyAssetValues", multyAssetValues);
             Map map = (Map) RpcCall.request(ModuleE.SC.abbr, CommandConstant.PREVIEW_CALL, params);
             return Result.getSuccess(null).setData(map);
-        } catch (NulsException e) {LoggerUtil.commonLog.error("",e);
+        } catch (NulsException e) {
+            LoggerUtil.commonLog.error("", e);
             return Result.getFailed(e.getErrorCode());
         }
 
@@ -720,7 +752,8 @@ public class WalletRpcHandler {
             params.put("assetId", assetId);
             Map map = (Map) RpcCall.request(ModuleE.LG.abbr, CommandConstant.CMD_GET_ASSET_BY_ID, params);
             return Result.getSuccess(null).setData(map);
-        } catch (NulsException e) {LoggerUtil.commonLog.error("",e);
+        } catch (NulsException e) {
+            LoggerUtil.commonLog.error("", e);
             return Result.getFailed(e.getErrorCode());
         }
     }
@@ -732,7 +765,8 @@ public class WalletRpcHandler {
             params.put("contractAddress", contractAddress);
             Map map = (Map) RpcCall.request(ModuleE.SC.abbr, CommandConstant.CODE_HASH, params);
             return Result.getSuccess(null).setData(map);
-        } catch (NulsException e) {LoggerUtil.commonLog.error("",e);
+        } catch (NulsException e) {
+            LoggerUtil.commonLog.error("", e);
             return Result.getFailed(e.getErrorCode());
         }
     }
@@ -744,7 +778,8 @@ public class WalletRpcHandler {
             params.put("contractAddress", contractAddress);
             Map map = (Map) RpcCall.request(ModuleE.SC.abbr, CommandConstant.CONTRACT_CODE, params);
             return Result.getSuccess(null).setData(map);
-        } catch (NulsException e) {LoggerUtil.commonLog.error("",e);
+        } catch (NulsException e) {
+            LoggerUtil.commonLog.error("", e);
             return Result.getFailed(e.getErrorCode());
         }
     }
@@ -758,7 +793,8 @@ public class WalletRpcHandler {
             params.put("salt", salt);
             Map map = (Map) RpcCall.request(ModuleE.SC.abbr, CommandConstant.COMPUTE_ADDRESS, params);
             return Result.getSuccess(null).setData(map);
-        } catch (NulsException e) {LoggerUtil.commonLog.error("",e);
+        } catch (NulsException e) {
+            LoggerUtil.commonLog.error("", e);
             return Result.getFailed(e.getErrorCode());
         }
     }
@@ -773,7 +809,8 @@ public class WalletRpcHandler {
             Map result = (Map) RpcCall.request(ModuleE.LG.abbr, CommandConstant.CMD_CHAIN_ASSET_CONTRACT_ASSETID, parameters);
             Integer assetId = Integer.parseInt(result.get("assetId").toString());
             return assetId;
-        } catch (NulsException e) {LoggerUtil.commonLog.error("",e);
+        } catch (NulsException e) {
+            LoggerUtil.commonLog.error("", e);
             Log.warn("查询NRC20资产ID异常, msg: {}", e.format());
             return null;
         }
@@ -789,7 +826,8 @@ public class WalletRpcHandler {
         try {
             Response callResp = ResponseMessageProcessor.requestAndResponse(ModuleE.CM.abbr, CommandConstant.CMD_ASSET, params);
             return callResp.isSuccess();
-        } catch (Exception e) {LoggerUtil.commonLog.error("",e);
+        } catch (Exception e) {
+            LoggerUtil.commonLog.error("", e);
             Log.warn("查询是否为跨链资产异常, msg: {}", e.getMessage());
             return false;
         }
