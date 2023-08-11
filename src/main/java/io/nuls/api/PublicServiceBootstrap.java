@@ -185,7 +185,7 @@ public class PublicServiceBootstrap extends RpcModule {
     @Override
     public RpcModuleState onDependenciesReady() {
         try {
-            LoggerUtil.commonLog.info("public service onDependenciesReady......");
+            LoggerUtil.commonLog.info("public service onDependenciesReady......{}",ApiContext.defaultChainId);
             Result<Map> result = WalletRpcHandler.getConsensusConfig(ApiContext.defaultChainId);
             if (result.isSuccess()) {
                 Map<String, Object> configMap = result.getData();
