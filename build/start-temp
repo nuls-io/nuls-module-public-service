@@ -98,6 +98,10 @@ fi
 START_DATE=`date +%Y%m%d%H%M%S`
 STDOUT_FILE=$LOGS_DIR/stdout.log
 
+if [ ! -n "$NulstarUrl" ]; then
+  NulstarUrl=ws://127.0.0.1:7771
+fi
+
 if [ -z "${config}" ]; then
     config="../../../../nuls.ncf"
 fi
