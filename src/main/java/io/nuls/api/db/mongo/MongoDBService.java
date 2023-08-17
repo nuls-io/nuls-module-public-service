@@ -48,7 +48,7 @@ import static io.nuls.api.constant.DBTableConstant.TEST_TABLE;
  * @author Niels
  */
 @Component
-@Order(0)
+@Order(2)
 public class MongoDBService implements InitializingBean {
 
     private MongoClient client;
@@ -64,9 +64,9 @@ public class MongoDBService implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() {
-        new Thread(()->{
+//        new Thread(()->{
             try {
-                TimeUnit.SECONDS.sleep(10);
+//                TimeUnit.SECONDS.sleep(10);
                 long time1, time2;
                 time1 = System.currentTimeMillis();
                 MongoClientOptions options = MongoClientOptions.builder()
@@ -89,7 +89,7 @@ public class MongoDBService implements InitializingBean {
                 LoggerUtil.commonLog.error(e);
                 System.exit(-1);
             }
-        }).start();
+//        }).start();
 
     }
 
