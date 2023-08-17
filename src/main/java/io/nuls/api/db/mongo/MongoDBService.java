@@ -64,9 +64,9 @@ public class MongoDBService implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() {
-        new Thread(()->{
+//        new Thread(()->{
             try {
-                TimeUnit.SECONDS.sleep(5);
+//                TimeUnit.SECONDS.sleep(5);
                 long time1, time2;
                 time1 = System.currentTimeMillis();
                 MongoClientOptions options = MongoClientOptions.builder()
@@ -89,7 +89,7 @@ public class MongoDBService implements InitializingBean {
                 LoggerUtil.commonLog.error(e);
                 System.exit(-1);
             }
-        }).start();
+//        }).start();
 
     }
 
