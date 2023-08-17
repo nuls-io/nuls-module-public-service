@@ -38,6 +38,7 @@ import org.bson.conversions.Bson;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import static io.nuls.api.constant.DBTableConstant.DATABASE_NAME;
@@ -63,29 +64,33 @@ public class MongoDBService implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() {
-        try {
-            long time1, time2;
-            time1 = System.currentTimeMillis();
-            MongoClientOptions options = MongoClientOptions.builder()
-                    .connectionsPerHost(ApiContext.maxAliveConnect)
-                    .threadsAllowedToBlockForConnectionMultiplier(ApiContext.maxAliveConnect)
-                    .socketTimeout(ApiContext.socketTimeout)
-                    .maxWaitTime(ApiContext.maxWaitTime)
-                    .connectTimeout(ApiContext.connectTimeOut)
-                    .build();
-            ServerAddress serverAddress = new ServerAddress(ApiContext.databaseUrl, ApiContext.databasePort);
-            MongoClient mongoClient = new MongoClient(serverAddress, options);
-            MongoDatabase mongoDatabase = mongoClient.getDatabase(DATABASE_NAME);
+        new Thread(()->{
+            try {
+                TimeUnit.SECONDS.sleep(5);
+                long time1, time2;
+                time1 = System.currentTimeMillis();
+                MongoClientOptions options = MongoClientOptions.builder()
+                        .connectionsPerHost(ApiContext.maxAliveConnect)
+                        .threadsAllowedToBlockForConnectionMultiplier(ApiContext.maxAliveConnect)
+                        .socketTimeout(ApiContext.socketTimeout)
+                        .maxWaitTime(ApiContext.maxWaitTime)
+                        .connectTimeout(ApiContext.connectTimeOut)
+                        .build();
+                ServerAddress serverAddress = new ServerAddress(ApiContext.databaseUrl, ApiContext.databasePort);
+                MongoClient mongoClient = new MongoClient(serverAddress, options);
+                MongoDatabase mongoDatabase = mongoClient.getDatabase(DATABASE_NAME);
 
-            mongoDatabase.getCollection(TEST_TABLE).drop();
-            time2 = System.currentTimeMillis();
-            LoggerUtil.commonLog.info("------connect mongodb use time:" + (time2 - time1));
-            this.client = mongoClient;
-            this.db = mongoDatabase;
-        } catch (Exception e) {
-            LoggerUtil.commonLog.error(e);
-            System.exit(-1);
-        }
+                mongoDatabase.getCollection(TEST_TABLE).drop();
+                time2 = System.currentTimeMillis();
+                LoggerUtil.commonLog.info("------connect mongodb use time:" + (time2 - time1));
+                this.client = mongoClient;
+                this.db = mongoDatabase;
+            } catch (Exception e) {
+                LoggerUtil.commonLog.error(e);
+                System.exit(-1);
+            }
+        }).start();
+
     }
 
     public void createCollection(String collName) {
