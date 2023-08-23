@@ -21,6 +21,6 @@ public interface TokenService {
 
     void rollbackTokenTransfers(int chainId, List<String> tokenTxHashs, long height);
 
-    PageInfo<TokenTransfer> getTokenTransfers(int chainId, String address, String contractAddress, int pageIndex, int pageSize);
+    PageInfo<TokenTransfer> getTokenTransfers(int chainId, String address, String contractAddress, int pageIndex, int pageSize,long startHeight,long endHeight);
 
 }

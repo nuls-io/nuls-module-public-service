@@ -109,7 +109,8 @@ public class MongoTokenServiceImpl implements TokenService {
         mongoDBService.delete(TOKEN_TRANSFER_TABLE + chainId, Filters.eq("height", height));
     }
 
-    public PageInfo<TokenTransfer> getTokenTransfers(int chainId, String address, String contractAddress, int pageIndex, int pageSize) {
+    public PageInfo<TokenTransfer> getTokenTransfers(int chainId, String address, String contractAddress, int pageIndex, int pageSize,long startHeight,long endHeight) {
+        List<Bson> filters = new ArrayList<>();
         Bson filter = null;
         if (StringUtils.isNotBlank(address) && StringUtils.isNotBlank(contractAddress)) {
             Bson addressFilter = Filters.or(Filters.eq("fromAddress", address), Filters.eq("toAddress", address));
@@ -119,8 +120,17 @@ public class MongoTokenServiceImpl implements TokenService {
         } else if (StringUtils.isNotBlank(address)) {
             filter = Filters.or(Filters.eq("fromAddress", address), Filters.eq("toAddress", address));
         }
+        if (startHeight >= 0) {
+            filters.add(Filters.gte("height", startHeight));
+        }
+        if (endHeight > 0) {
+            filters.add(Filters.lte("height", endHeight));
+        }
+        if(filter != null){
+            filters.add(filter);
+        }
         Bson sort = Sorts.descending("time");
-        List<Document> docsList = this.mongoDBService.pageQuery(TOKEN_TRANSFER_TABLE + chainId, filter, sort, pageIndex, pageSize);
+        List<Document> docsList = this.mongoDBService.pageQuery(TOKEN_TRANSFER_TABLE + chainId, Filters.and(filters), sort, pageIndex, pageSize);
         List<TokenTransfer> tokenTransfers = new ArrayList<>();
         long totalCount = mongoDBService.getCount(TOKEN_TRANSFER_TABLE + chainId, filter);
         for (Document document : docsList) {

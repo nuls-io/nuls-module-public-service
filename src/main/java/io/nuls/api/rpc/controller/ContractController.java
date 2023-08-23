@@ -354,6 +354,7 @@ public class ContractController {
     public RpcResult getTokenTransfers(List<Object> params) {
         VerifyUtils.verifyParams(params, 5);
         int chainId, pageNumber, pageSize;
+        long startHeight = 0,endHeight = 0;
         String address, contractAddress;
         try {
             chainId = (int) params.get(0);
@@ -381,6 +382,23 @@ public class ContractController {
             return RpcResult.paramError("[contractAddress] is invalid");
         }
 
+        if(params.size() > 5){
+            try {
+                startHeight = (int) params.get(5);
+            } catch (Exception e) {
+                return RpcResult.paramError("[startHeight] is invalid");
+            }
+        }
+
+        if(params.size() > 6){
+            try {
+                endHeight = (int) params.get(6);
+            } catch (Exception e) {
+                return RpcResult.paramError("[endHeight] is invalid");
+            }
+        }
+
+
         if (!StringUtils.isBlank(address) && !AddressTool.validAddress(chainId, address)) {
             return RpcResult.paramError("[address] is invalid");
         }
@@ -400,7 +418,7 @@ public class ContractController {
             if (!CacheManager.isChainExist(chainId)) {
                 pageInfo = new PageInfo<>(pageNumber, pageSize);
             } else {
-                pageInfo = tokenService.getTokenTransfers(chainId, address, contractAddress, pageNumber, pageSize);
+                pageInfo = tokenService.getTokenTransfers(chainId, address, contractAddress, pageNumber, pageSize,startHeight,endHeight);
             }
             RpcResult result = new RpcResult();
             result.setResult(pageInfo);
