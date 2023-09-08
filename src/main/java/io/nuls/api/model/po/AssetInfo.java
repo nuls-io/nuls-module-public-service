@@ -2,7 +2,6 @@ package io.nuls.api.model.po;
 
 import io.nuls.api.constant.ApiConstant;
 import io.nuls.api.utils.DBUtil;
-import org.bson.codecs.pojo.annotations.BsonIgnore;
 
 import java.math.BigInteger;
 

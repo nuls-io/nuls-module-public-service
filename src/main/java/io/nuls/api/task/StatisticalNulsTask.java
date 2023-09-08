@@ -19,8 +19,9 @@ import io.nuls.base.basic.AddressTool;
 import io.nuls.core.core.ioc.SpringLiteContext;
 import io.nuls.core.model.StringUtils;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
+import java.math.RoundingMode;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -115,9 +116,32 @@ public class StatisticalNulsTask implements Runnable {
             contextInfo.setCirculation(circulation);
 
             setDestroyInfo(contextInfo);
+
+            setDeflationInfo(contextInfo);
         } catch (Exception e) {
             LoggerUtil.commonLog.error(e);
         }
+    }
+
+
+    //          #初始通胀金额500w/365*30
+    long inflationAmount = 41095890410959L;
+    //          #通胀开始计算时间(单位:S)2020-07-12 00:00:00
+    long initTime = 1594483200;
+    //          #通缩比例(如果没有通缩则设为100)
+    double deflationRatio = 0.996;
+    //          #通缩间隔时间(单位：S),30天
+    long deflationTimeInterval = 2592000;
+
+    private void setDeflationInfo(CoinContextInfo contextInfo) {
+        long nowTime = System.currentTimeMillis() / 1000;
+        Long times = (nowTime - initTime) / deflationTimeInterval;
+        BigDecimal blockRewardAmount = BigDecimal.valueOf(inflationAmount).multiply(BigDecimal.valueOf(deflationRatio).pow(times.intValue())).divide(BigDecimal.valueOf(30 * 24 * 360));
+        BigDecimal afertBlockRewardAmount = BigDecimal.valueOf(inflationAmount).multiply(BigDecimal.valueOf(deflationRatio).pow(times.intValue() + 1)).divide(BigDecimal.valueOf(30 * 24 * 360));
+        contextInfo.setBlockRewardBeforeDeflation(blockRewardAmount.longValue());
+        contextInfo.setBlockRewardAfterDeflation(afertBlockRewardAmount.longValue());
+        long next = initTime + deflationTimeInterval * times + deflationTimeInterval;
+        contextInfo.setNextDeflationTime(next * 1000);
     }
 
 
@@ -125,17 +149,36 @@ public class StatisticalNulsTask implements Runnable {
         List<DestroyInfo> list = new LinkedList<>();
         //销毁数量
         byte[] address = AddressTool.getAddress(ApiContext.blackHolePublicKey, chainId);
+        AssetInfo assetInfo = CacheManager.getAssetInfoMap().get(chainId + "-" + 1);
+
+        BigInteger total = null;
+        if (null != assetInfo) {
+            total = assetInfo.getLocalTotalCoins();
+        }
+
         String destroyAddress = AddressTool.getStringAddressByBytes(address);
         BigInteger destroyNuls = accountService.getAccountTotalBalance(chainId, destroyAddress);
         String reason = "account set alias destroy nuls";
-        DestroyInfo destroyInfo = new DestroyInfo(destroyAddress, reason, AssetTool.toCoinString(destroyNuls));
+        String type = "NULL Address";
+        String aproportion = null;
+        if (total != null) {
+            double _proportion = new BigDecimal(destroyNuls).divide(new BigDecimal(total), 6, RoundingMode.HALF_UP).doubleValue() * 100;
+            aproportion = _proportion + "%";
+        }
+        DestroyInfo destroyInfo = new DestroyInfo(destroyAddress, type, reason, AssetTool.toCoinString(destroyNuls), aproportion);
         list.add(destroyInfo);
 
         reason = "stolen blacklist";
+        type = "Permanent lock";
         for (String blackAddress : AddressTool.BLOCK_HOLE_ADDRESS_SET) {
             BigInteger blackNuls = accountService.getAccountTotalBalance(chainId, blackAddress);
             destroyNuls = destroyNuls.add(blackNuls);
-            destroyInfo = new DestroyInfo(blackAddress, reason, AssetTool.toCoinString(blackNuls));
+            String proportion = null;
+            if (total != null) {
+                double _proportion = new BigDecimal(blackNuls).divide(new BigDecimal(total), 6, RoundingMode.HALF_UP).doubleValue() * 100;
+                proportion = _proportion + "%";
+            }
+            destroyInfo = new DestroyInfo(blackAddress, type, reason, AssetTool.toCoinString(blackNuls), proportion);
             list.add(destroyInfo);
         }
         // add by pierre at 2020-04-02 协议升级黑洞地址
@@ -143,7 +186,12 @@ public class StatisticalNulsTask implements Runnable {
             for (String blackAddress : AddressTool.BLOCK_HOLE_ADDRESS_SET_5) {
                 BigInteger blackNuls = accountService.getAccountTotalBalance(chainId, blackAddress);
                 destroyNuls = destroyNuls.add(blackNuls);
-                destroyInfo = new DestroyInfo(blackAddress, reason, AssetTool.toCoinString(blackNuls));
+                String proportion = null;
+                if (total != null) {
+                    double _proportion = new BigDecimal(blackNuls).divide(new BigDecimal(total), 6, RoundingMode.HALF_UP).doubleValue() * 100;
+                    proportion = _proportion + "%";
+                }
+                destroyInfo = new DestroyInfo(blackAddress, type, reason, AssetTool.toCoinString(blackNuls), proportion);
                 list.add(destroyInfo);
             }
         }

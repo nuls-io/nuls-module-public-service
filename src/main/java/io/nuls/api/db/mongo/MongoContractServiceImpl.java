@@ -10,7 +10,6 @@ import io.nuls.api.manager.CacheManager;
 import io.nuls.api.model.po.*;
 import io.nuls.api.model.po.mini.MiniContractInfo;
 import io.nuls.api.utils.DocumentTransferTool;
-import io.nuls.api.utils.LoggerUtil;
 import io.nuls.core.core.annotation.Autowired;
 import io.nuls.core.core.annotation.Component;
 import org.bson.Document;

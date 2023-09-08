@@ -22,7 +22,6 @@ import io.nuls.base.basic.NulsByteBuffer;
 import io.nuls.base.data.Transaction;
 import io.nuls.core.basic.Result;
 import io.nuls.core.constant.CommonCodeConstanst;
-import io.nuls.core.constant.ErrorCode;
 import io.nuls.core.constant.TxType;
 import io.nuls.core.core.annotation.Autowired;
 import io.nuls.core.core.annotation.Controller;

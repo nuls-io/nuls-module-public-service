@@ -22,14 +22,16 @@ import io.nuls.core.core.annotation.Controller;
 import io.nuls.core.core.annotation.RpcMethod;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Controller
 public class ChainController {
+
+    private static Pattern pattern = Pattern.compile("^[-\\+]?[\\d]*$");
 
     @Autowired
     private BlockService blockService;
@@ -190,17 +192,21 @@ public class ChainController {
         }
         int length = text.length();
         SearchResultDTO result = null;
-        if (length < 20) {
+        if (length <= 10 && isNumber(text)) {
             result = getBlockByHeight(chainId, text);
         } else if (length < 40) {
-            boolean isAddress = AddressTool.validAddress(chainId, text);
-            if (isAddress) {
-                byte[] address = AddressTool.getAddress(text);
-                if (address[2] == AddressType.CONTRACT_ADDRESS_TYPE) {
-                    result = getContractByAddress(chainId, text);
-                } else {
-                    result = getAccountByAddress(chainId, text);
+            if (text.startsWith("NULSd") || text.startsWith("tNULSe")) {
+                boolean isAddress = AddressTool.validAddress(chainId, text);
+                if (isAddress) {
+                    byte[] address = AddressTool.getAddress(text);
+                    if (address[2] == AddressType.CONTRACT_ADDRESS_TYPE) {
+                        result = getContractByAddress(chainId, text);
+                    } else {
+                        result = getAccountByAddress(chainId, text);
+                    }
                 }
+            } else {
+                //todo niels 2023 资产查询
             }
         } else {
             result = getResultByHash(chainId, text);
@@ -209,6 +215,10 @@ public class ChainController {
             return RpcResult.dataNotFound();
         }
         return new RpcResult().setResult(result);
+    }
+
+    private boolean isNumber(String text) {
+        return pattern.matcher(text).matches();
     }
 
     private SearchResultDTO getContractByAddress(int chainId, String text) {

@@ -20,7 +20,10 @@
 
 package io.nuls.api;
 
-import io.nuls.api.model.po.*;
+import io.nuls.api.model.po.AgentInfo;
+import io.nuls.api.model.po.BlockHeaderInfo;
+import io.nuls.api.model.po.CurrentRound;
+import io.nuls.api.model.po.PageInfo;
 import io.nuls.api.model.po.mini.MiniAccountInfo;
 import io.nuls.api.model.po.mini.MiniBlockHeaderInfo;
 
