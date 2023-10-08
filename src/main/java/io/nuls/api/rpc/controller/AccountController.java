@@ -66,6 +66,12 @@ public class AccountController {
     @Autowired
     TokenService tokenService;
 
+    @RpcMethod("getActiveAddressData")
+    public RpcResult getActiveAddressData(List<Object> params) {
+        RpcResult result = new RpcResult();
+        result.setResult(this.accountService.getActiveAddressData());
+        return result;
+    }
     @RpcMethod("getAccountList")
     public RpcResult getAccountList(List<Object> params) {
         VerifyUtils.verifyParams(params, 3);

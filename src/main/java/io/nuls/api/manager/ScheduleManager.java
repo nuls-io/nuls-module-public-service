@@ -32,6 +32,10 @@ public class ScheduleManager {
         MongoAgentServiceImpl mongoAgentService = SpringLiteContext.getBean(MongoAgentServiceImpl.class);
         MongoAccountLedgerServiceImpl accountLedgerService = SpringLiteContext.getBean(MongoAccountLedgerServiceImpl.class);
         executorService.scheduleAtFixedRate(new RefreshCacheTask(ApiContext.defaultChainId, mongoAgentService, accountLedgerService), 10, 10, TimeUnit.MINUTES);
+
+
+
+
         LoggerUtil.commonLog.info("init tasks finished");
     }
 }

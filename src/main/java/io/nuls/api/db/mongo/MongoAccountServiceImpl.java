@@ -4,9 +4,11 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.client.model.*;
 import io.nuls.api.cache.ApiCache;
 import io.nuls.api.constant.ApiConstant;
+import io.nuls.api.constant.DBTableConstant;
 import io.nuls.api.db.AccountService;
 import io.nuls.api.manager.CacheManager;
 import io.nuls.api.model.po.AccountInfo;
+import io.nuls.api.model.po.ActiveAddressVo;
 import io.nuls.api.model.po.PageInfo;
 import io.nuls.api.model.po.TxRelationInfo;
 import io.nuls.api.model.po.mini.MiniAccountInfo;
@@ -387,5 +389,19 @@ public class MongoAccountServiceImpl implements AccountService {
         if (cacheAccount != null) {
             apiCache.addAccountInfo(accountInfo);
         }
+    }
+
+    @Override
+    public List<ActiveAddressVo> getActiveAddressData() {
+        List<Document> list = this.mongoDBService.limitQuery(ACTIVE_ADDRESS_TABLE, Filters.gte("endHeight", getDayIndex(System.currentTimeMillis() / 1000) - 31), Sorts.descending("dayIndex"), 1, 30);
+        List<ActiveAddressVo> voList = new ArrayList<>();
+        for(Document doc:list){
+            voList.add(new ActiveAddressVo(doc.getString("_id"),doc.getInteger("count")));
+        }
+        return voList;
+    }
+
+    private int getDayIndex(long blockTime) {
+        return (int) (blockTime / 24 * 3600);
     }
 }
