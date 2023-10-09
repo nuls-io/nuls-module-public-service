@@ -58,6 +58,7 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
     }
 
     private static final String bestKey = "latest";
+    private static boolean bestExist = false;
 
     private static int currentDayIndex;
     private static Set<String> currentAddrSet = new HashSet<>();
@@ -118,6 +119,13 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
         po.setDayIndex(currentDayIndex);
         po.setEndHeight(endHeight);
         this.dbService.insertOne(DBTableConstant.ACTIVE_ADDRESS_TABLE, DocumentTransferTool.toDocument(po, "date"));
+        po.setDate(bestKey);
+        if (bestExist) {
+            this.dbService.updateOne(DBTableConstant.ACTIVE_ADDRESS_TABLE, Filters.eq("_id", bestKey), DocumentTransferTool.toDocument(po, "date"));
+        } else {
+            this.dbService.insertOne(DBTableConstant.ACTIVE_ADDRESS_TABLE, DocumentTransferTool.toDocument(po, "date"));
+            bestExist = true;
+        }
         LoggerUtil.commonLog.info("save aa data : {}", po.getDate());
     }
 
@@ -176,6 +184,7 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
                 startHeight = val <= 0 ? 0 : val;
             } else {
                 startHeight = doc.getLong("endHeight") + 1;
+                bestExist = true;
             }
 //        完成从endHeight到当前高度的统计
             for (long i = startHeight; i <= header.getHeight(); i++) {
