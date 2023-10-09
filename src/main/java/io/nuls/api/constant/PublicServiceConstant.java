@@ -1,5 +1,5 @@
 package io.nuls.api.constant;
 
 public class PublicServiceConstant {
-    public static int defaultChainId = 1;
+    public static int defaultChainId = 0;
 }
