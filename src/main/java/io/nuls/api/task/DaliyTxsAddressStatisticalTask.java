@@ -24,11 +24,8 @@ import com.mongodb.client.model.Filters;
 import io.nuls.api.analysis.WalletRpcHandler;
 import io.nuls.api.constant.DBTableConstant;
 import io.nuls.api.constant.PublicServiceConstant;
-import io.nuls.api.db.AgentService;
 import io.nuls.api.db.BlockService;
-import io.nuls.api.db.DepositService;
-import io.nuls.api.db.StatisticalService;
-import io.nuls.api.db.mongo.*;
+import io.nuls.api.db.mongo.MongoDBService;
 import io.nuls.api.exception.JsonRpcException;
 import io.nuls.api.model.po.*;
 import io.nuls.api.utils.DocumentTransferTool;
@@ -37,18 +34,13 @@ import io.nuls.core.basic.InitializingBean;
 import io.nuls.core.basic.Result;
 import io.nuls.core.core.annotation.Autowired;
 import io.nuls.core.core.annotation.Component;
-import io.nuls.core.core.ioc.SpringLiteContext;
 import io.nuls.core.exception.NulsException;
 import io.nuls.core.model.DateUtils;
-import io.nuls.core.model.DoubleUtils;
 import org.bson.Document;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -93,12 +85,11 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
             return;
         }
         long blockTime = block.getHeader().getCreateTime();
-        String date = getDate(blockTime);
         int blockDayIndex = getDayIndex(blockTime);
         if (0 == currentDayIndex) {
             currentDayIndex = blockDayIndex;
         } else if (blockDayIndex > currentDayIndex) {
-            saveActiveAccount(block.getHeader().getHeight() - 1);
+            saveActiveAccount(getDate(blockTime - 10), block.getHeader().getHeight() - 1);
             currentDayIndex = blockDayIndex;
             currentAddrSet.clear();
         } else if (blockDayIndex < currentDayIndex) {
@@ -120,10 +111,10 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
         LoggerUtil.commonLog.info("exec block : {}", lastHeight);
     }
 
-    private void saveActiveAccount(long endHeight) {
+    private void saveActiveAccount(String date, long endHeight) {
         ActiveAddressPo po = new ActiveAddressPo();
         po.setCount(currentAddrSet.size());
-        po.setDate(getDate(currentDayIndex));
+        po.setDate(date);
         po.setDayIndex(currentDayIndex);
         po.setEndHeight(endHeight);
         this.dbService.insertOne(DBTableConstant.ACTIVE_ADDRESS_TABLE, DocumentTransferTool.toDocument(po, "date"));
@@ -139,8 +130,8 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
     }
 
     public static void main(String[] args) {
-        long blockTime = System.currentTimeMillis()/1000;
-        long blockTime1 = blockTime+10;
+        long blockTime = System.currentTimeMillis() / 1000;
+        long blockTime1 = blockTime + 10;
         System.out.println(new DaliyTxsAddressStatisticalTask().getDayIndex(blockTime));
         System.out.println(new DaliyTxsAddressStatisticalTask().getDayIndex(blockTime1));
     }
@@ -190,7 +181,7 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
             for (long i = startHeight; i <= header.getHeight(); i++) {
                 try {
                     execute(download(i));
-                }catch (Exception e){
+                } catch (Exception e) {
                     LoggerUtil.commonLog.error(e);
                 }
             }
