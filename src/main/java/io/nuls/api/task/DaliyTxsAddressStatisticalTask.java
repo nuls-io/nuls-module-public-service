@@ -108,15 +108,19 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
             throw new RuntimeException("Data error: statistical day index wrong.");
         }
         for (TransactionInfo tx : block.getTxList()) {
-            for (CoinFromInfo from : tx.getCoinFroms()) {
-                currentAddrSet.add(from.getAddress());
+            if (null != tx.getCoinFroms()) {
+                for (CoinFromInfo from : tx.getCoinFroms()) {
+                    currentAddrSet.add(from.getAddress());
+                }
             }
-            for (CoinToInfo to : tx.getCoinTos()) {
-                currentAddrSet.add(to.getAddress());
+            if (null != tx.getCoinTos()) {
+                for (CoinToInfo to : tx.getCoinTos()) {
+                    currentAddrSet.add(to.getAddress());
+                }
             }
         }
         lastHeight = block.getHeader().getHeight();
-        LoggerUtil.commonLog.error("exec block : {}", lastHeight);
+        LoggerUtil.commonLog.info("exec block : {}", lastHeight);
     }
 
     private void saveActiveAccount(long endHeight) {
@@ -126,7 +130,7 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
         po.setDayIndex(currentDayIndex);
         po.setEndHeight(endHeight);
         this.dbService.insertOne(DBTableConstant.ACTIVE_ADDRESS_TABLE, DocumentTransferTool.toDocument(po, "date"));
-        LoggerUtil.commonLog.error("save aa data : {}", po.getDate());
+        LoggerUtil.commonLog.info("save aa data : {}", po.getDate());
     }
 
     private int getDayIndex(long blockTime) {
@@ -134,7 +138,7 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
     }
 
     private String getDate(long blockTime) {
-        return DateUtils.convertDate(new Date(blockTime*1000), "yyyy-MM-dd");
+        return DateUtils.convertDate(new Date(blockTime * 1000), "yyyy-MM-dd");
     }
 
 
@@ -192,7 +196,7 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
         if (result.isFailed()) {
             throw new JsonRpcException(result.getErrorCode());
         }
-        LoggerUtil.commonLog.error("download block : {}", height);
+        LoggerUtil.commonLog.info("download block : {}", height);
         return result.getData();
     }
 }
