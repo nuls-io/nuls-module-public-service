@@ -116,6 +116,7 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
             }
         }
         lastHeight = block.getHeader().getHeight();
+        LoggerUtil.commonLog.error("exec block : {}", lastHeight);
     }
 
     private void saveActiveAccount(long endHeight) {
@@ -125,6 +126,7 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
         po.setDayIndex(currentDayIndex);
         po.setEndHeight(endHeight);
         this.dbService.insertOne(DBTableConstant.ACTIVE_ADDRESS_TABLE, DocumentTransferTool.toDocument(po, "date"));
+        LoggerUtil.commonLog.error("save aa data : {}", po.getDate());
     }
 
     private int getDayIndex(long blockTime) {
@@ -141,9 +143,9 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
         //启动时检查1、历史数据，2、当前高度
         BlockHeaderInfo header = blockService.getBestBlockHeader(PublicServiceConstant.defaultChainId);
         Document doc = null;
-        try{
-            doc=dbService.findOne("active_address", Filters.eq("_id", bestKey));
-        }catch (Exception e){
+        try {
+            doc = dbService.findOne("active_address", Filters.eq("_id", bestKey));
+        } catch (Exception e) {
             LoggerUtil.commonLog.error(e);
         }
         long startHeight;
@@ -168,6 +170,7 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
         if (result.isFailed()) {
             throw new JsonRpcException(result.getErrorCode());
         }
+        LoggerUtil.commonLog.error("download block : {}", height);
         return result.getData();
     }
 }
