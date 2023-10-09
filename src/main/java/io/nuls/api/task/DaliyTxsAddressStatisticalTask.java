@@ -134,13 +134,19 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
     }
 
     private int getDayIndex(long blockTime) {
-        return (int) (blockTime / 24 * 3600);
+        return (int) (blockTime / (24 * 3600));
     }
 
     private String getDate(long blockTime) {
         return DateUtils.convertDate(new Date(blockTime * 1000), "yyyy-MM-dd");
     }
 
+    public static void main(String[] args) {
+        long blockTime = System.currentTimeMillis()/1000;
+        long blockTime1 = blockTime+10;
+        System.out.println(new DaliyTxsAddressStatisticalTask().getDayIndex(blockTime));
+        System.out.println(new DaliyTxsAddressStatisticalTask().getDayIndex(blockTime1));
+    }
 
     @Override
     public void afterPropertiesSet() throws NulsException {
