@@ -10,6 +10,7 @@ import io.nuls.api.db.*;
 import io.nuls.api.db.mongo.MongoAccountServiceImpl;
 import io.nuls.api.manager.CacheManager;
 import io.nuls.api.model.po.*;
+import io.nuls.api.task.DaliyTxsAddressStatisticalTask;
 import io.nuls.api.utils.DBUtil;
 import io.nuls.api.utils.LoggerUtil;
 import io.nuls.base.basic.AddressTool;
@@ -128,10 +129,7 @@ public class SyncService {
         apiCache.setBestHeader(blockInfo.getHeader());
         ApiContext.addAndRemoveLastBlockHeader(blockInfo.getHeader());
         time2 = System.currentTimeMillis();
-
-//        if (blockInfo.getHeader().getHeight() % 10000 == 0) {
-//
-//        }
+        DaliyTxsAddressStatisticalTask.offer(blockInfo);
         LoggerUtil.commonLog.info("-----height finish:" + blockInfo.getHeader().getHeight() + "-----txCount:" + blockInfo.getHeader().getTxCount() + "-----use:" + (time2 - time1) + "-----");
         return true;
     }
