@@ -90,7 +90,7 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
         } else if (blockDayIndex > currentDayIndex) {
             String date = getDate(blockTime - 11);
             long endHeight = block.getHeader().getHeight() - 1;
-            LoggerUtil.commonLog.info("To save : {}, {},{}",   block.getHeader().getHeight(), currentDayIndex,blockDayIndex);
+            LoggerUtil.commonLog.info("To save : {}, {}, {}-{}", date, block.getHeader().getHeight(), currentDayIndex, blockDayIndex);
             saveActiveAccount(date, endHeight);
             currentDayIndex = blockDayIndex;
             currentAddrSet.clear();
