@@ -185,7 +185,11 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
             }
 //        完成从endHeight到当前高度的统计
             for (long i = startHeight; i <= header.getHeight(); i++) {
-                execute(download(i));
+                try {
+                    execute(download(i));
+                }catch (Exception e){
+                    LoggerUtil.commonLog.error(e);
+                }
             }
         }
         new Thread(this).start();
