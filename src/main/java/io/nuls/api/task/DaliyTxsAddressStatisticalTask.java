@@ -139,8 +139,13 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
     @Override
     public void afterPropertiesSet() throws NulsException {
         //启动时检查1、历史数据，2、当前高度
-        Document doc = dbService.findOne("active_address", Filters.eq("_id", bestKey));
         BlockHeaderInfo header = blockService.getBestBlockHeader(PublicServiceConstant.defaultChainId);
+        Document doc = null;
+        try{
+            doc=dbService.findOne("active_address", Filters.eq("_id", bestKey));
+        }catch (Exception e){
+            LoggerUtil.commonLog.error(e);
+        }
         long startHeight;
         if (null != header) {
             if (null == doc) {
