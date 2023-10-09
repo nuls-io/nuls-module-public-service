@@ -137,18 +137,23 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
 
     private String getDate(long blockTime) {
         calendar.setTime(new Date(blockTime * 1000));
-        return calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH) + "-" + calendar.get(Calendar.DATE);
+        int m = calendar.get(Calendar.MONTH) + 1;
+        String month = m + "";
+        if (m < 10) {
+            month = 0 + month;
+        }
+        int d = calendar.get(Calendar.DATE);
+        String day = d + "";
+        if (d < 10) {
+            day = 0 + day;
+        }
+        return calendar.get(Calendar.YEAR) + "-" + month + "-" + day;
 //        return DateUtils.convertDate(calendar.getTime(), "yyyy-MM-dd");
     }
 
     public static void main(String[] args) {
-        DaliyTxsAddressStatisticalTask tast = new DaliyTxsAddressStatisticalTask();
-        long blockTime = 1695513610;
-        long blockTime1 = blockTime - 10;
-        System.out.println(new Date(blockTime * 1000) + " -- " + tast.getDayIndex(blockTime) + " -- " + tast.getDate(blockTime));
-        System.out.println(new Date(blockTime1 * 1000) + " -- " + tast.getDayIndex(blockTime1) + " -- " + tast.getDate(blockTime1));
+        System.out.println(new DaliyTxsAddressStatisticalTask().getDate(System.currentTimeMillis()/1000));
     }
-
     @Override
     public void afterPropertiesSet() throws NulsException {
         new Thread(new Runnable() {
