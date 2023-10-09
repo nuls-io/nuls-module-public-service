@@ -38,9 +38,7 @@ import io.nuls.core.exception.NulsException;
 import io.nuls.core.model.DateUtils;
 import org.bson.Document;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -90,7 +88,10 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
         if (0 == currentDayIndex) {
             currentDayIndex = blockDayIndex;
         } else if (blockDayIndex > currentDayIndex) {
-            saveActiveAccount(getDate(blockTime - 8 * 3600 - 1), block.getHeader().getHeight() - 1);
+            String date = getDate(blockTime - 11);
+            long endHeight = block.getHeader().getHeight() - 1;
+            LoggerUtil.commonLog.info("To save : {}, {},{}",   block.getHeader().getHeight(), currentAddrSet,blockDayIndex);
+            saveActiveAccount(date, endHeight);
             currentDayIndex = blockDayIndex;
             currentAddrSet.clear();
         } else if (blockDayIndex < currentDayIndex) {
@@ -109,7 +110,6 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
             }
         }
         lastHeight = block.getHeader().getHeight();
-        LoggerUtil.commonLog.info("exec block : {}", lastHeight);
     }
 
     private void saveActiveAccount(String date, long endHeight) {
@@ -126,22 +126,27 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
             this.dbService.insertOne(DBTableConstant.ACTIVE_ADDRESS_TABLE, DocumentTransferTool.toDocument(po, "date"));
             bestExist = true;
         }
-        LoggerUtil.commonLog.info("save aa data : {}", po.getDate());
+        LoggerUtil.commonLog.info("save aa data : {}", date);
     }
 
     private int getDayIndex(long blockTime) {
         return (int) (blockTime / (24 * 3600));
     }
 
+    private Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+
     private String getDate(long blockTime) {
-        return DateUtils.convertDate(new Date(blockTime * 1000), "yyyy-MM-dd");
+        calendar.setTime(new Date(blockTime * 1000));
+        return calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH) + "-" + calendar.get(Calendar.DATE);
+//        return DateUtils.convertDate(calendar.getTime(), "yyyy-MM-dd");
     }
 
     public static void main(String[] args) {
-        long blockTime = 1695513600;
-        long blockTime1 = blockTime - 8 * 3600 - 1;
-        System.out.println(new DaliyTxsAddressStatisticalTask().getDate(blockTime));
-        System.out.println(new DaliyTxsAddressStatisticalTask().getDate(blockTime1));
+        DaliyTxsAddressStatisticalTask tast = new DaliyTxsAddressStatisticalTask();
+        long blockTime = 1695513610;
+        long blockTime1 = blockTime - 10;
+        System.out.println(new Date(blockTime * 1000) + " -- " + tast.getDayIndex(blockTime) + " -- " + tast.getDate(blockTime));
+        System.out.println(new Date(blockTime1 * 1000) + " -- " + tast.getDayIndex(blockTime1) + " -- " + tast.getDate(blockTime1));
     }
 
     @Override
@@ -187,6 +192,7 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
                 bestExist = true;
             }
 //        完成从endHeight到当前高度的统计
+            LoggerUtil.commonLog.info("Start active address statistical: {}", startHeight);
             for (long i = startHeight; i <= header.getHeight(); i++) {
                 try {
                     execute(download(i));
@@ -203,7 +209,6 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
         if (result.isFailed()) {
             throw new JsonRpcException(result.getErrorCode());
         }
-        LoggerUtil.commonLog.info("download block : {}", height);
         return result.getData();
     }
 }
