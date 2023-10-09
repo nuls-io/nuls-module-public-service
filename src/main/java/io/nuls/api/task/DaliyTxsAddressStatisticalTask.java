@@ -137,7 +137,7 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
 
     private String getDate(long blockTime) {
         calendar.setTime(new Date(blockTime * 1000));
-        calendar.add(Calendar.DATE,-1);
+        calendar.add(Calendar.DATE, -1);
         int m = calendar.get(Calendar.MONTH) + 1;
         String month = m + "";
         if (m < 10) {
@@ -155,10 +155,11 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
     public static void main(String[] args) {
         DaliyTxsAddressStatisticalTask task = new DaliyTxsAddressStatisticalTask();
         long blockTime = 1695395320;
-        long blockTime1 = blockTime-10;
+        long blockTime1 = blockTime - 10;
         System.out.println(task.getDate(blockTime));
         System.out.println(task.getDate(blockTime1));
     }
+
     @Override
     public void afterPropertiesSet() throws NulsException {
         new Thread(new Runnable() {
@@ -215,15 +216,26 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
     }
 
     private BlockInfo download(long height) {
-        Result<BlockInfo> result = WalletRpcHandler.getBlockInfo(PublicServiceConstant.defaultChainId, height);
-        if (result.isFailed()) {
+        try {
+            Result<BlockInfo> result = WalletRpcHandler.getBlockInfo(PublicServiceConstant.defaultChainId, height);
+            if (result.isFailed()) {
+                LoggerUtil.commonLog.warn("download block failed:" + result.getErrorCode().getMsg());
+                try {
+                    Thread.sleep(2000L);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                return download(height);
+            }
+            return result.getData();
+        } catch (Exception e) {
+            LoggerUtil.commonLog.error(e);
             try {
                 Thread.sleep(2000L);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+            } catch (InterruptedException e1) {
+                throw new RuntimeException(e1);
             }
             return download(height);
         }
-        return result.getData();
     }
 }
