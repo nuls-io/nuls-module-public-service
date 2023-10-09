@@ -90,7 +90,7 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
         if (0 == currentDayIndex) {
             currentDayIndex = blockDayIndex;
         } else if (blockDayIndex > currentDayIndex) {
-            saveActiveAccount(getDate(blockTime - 11), block.getHeader().getHeight() - 1);
+            saveActiveAccount(getDate(blockTime - 8 * 3600 - 1), block.getHeader().getHeight() - 1);
             currentDayIndex = blockDayIndex;
             currentAddrSet.clear();
         } else if (blockDayIndex < currentDayIndex) {
@@ -138,10 +138,10 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
     }
 
     public static void main(String[] args) {
-        long blockTime = System.currentTimeMillis() / 1000;
-        long blockTime1 = blockTime + 10;
-        System.out.println(new DaliyTxsAddressStatisticalTask().getDayIndex(blockTime));
-        System.out.println(new DaliyTxsAddressStatisticalTask().getDayIndex(blockTime1));
+        long blockTime = 1695513600;
+        long blockTime1 = blockTime - 8 * 3600 - 1;
+        System.out.println(new DaliyTxsAddressStatisticalTask().getDate(blockTime));
+        System.out.println(new DaliyTxsAddressStatisticalTask().getDate(blockTime1));
     }
 
     @Override
