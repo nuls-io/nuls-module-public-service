@@ -68,8 +68,15 @@ public class AccountController {
 
     @RpcMethod("getActiveAddressData")
     public RpcResult getActiveAddressData(List<Object> params) {
+        VerifyUtils.verifyParams(params, 1);
+        int   pageSize;
+        try {
+            pageSize = (int) params.get(0);
+        } catch (Exception e) {
+            return RpcResult.paramError("[pageSize] is inValid");
+        }
         RpcResult result = new RpcResult();
-        result.setResult(this.accountService.getActiveAddressData());
+        result.setResult(this.accountService.getActiveAddressData(pageSize));
         return result;
     }
     @RpcMethod("getAccountList")

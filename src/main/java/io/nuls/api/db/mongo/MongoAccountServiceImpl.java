@@ -4,7 +4,6 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.client.model.*;
 import io.nuls.api.cache.ApiCache;
 import io.nuls.api.constant.ApiConstant;
-import io.nuls.api.constant.DBTableConstant;
 import io.nuls.api.db.AccountService;
 import io.nuls.api.manager.CacheManager;
 import io.nuls.api.model.po.AccountInfo;
@@ -17,13 +16,10 @@ import io.nuls.api.utils.DocumentTransferTool;
 import io.nuls.core.core.annotation.Autowired;
 import io.nuls.core.core.annotation.Component;
 import io.nuls.core.model.BigIntegerUtils;
-import io.nuls.core.model.DateUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.checkerframework.checker.units.qual.A;
 
 import java.math.BigInteger;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static io.nuls.api.constant.DBTableConstant.*;
@@ -392,8 +388,8 @@ public class MongoAccountServiceImpl implements AccountService {
     }
 
     @Override
-    public List<ActiveAddressVo> getActiveAddressData() {
-        List<Document> list = this.mongoDBService.limitQuery(ACTIVE_ADDRESS_TABLE, Filters.gte("endHeight", getDayIndex(System.currentTimeMillis() / 1000) - 31), Sorts.descending("dayIndex"), 1, 30);
+    public List<ActiveAddressVo> getActiveAddressData(int pageSize) {
+        List<Document> list = this.mongoDBService.limitQuery(ACTIVE_ADDRESS_TABLE, Filters.gte("endHeight", getDayIndex(System.currentTimeMillis() / 1000) - 31), Sorts.descending("dayIndex"), 1, pageSize);
         List<ActiveAddressVo> voList = new ArrayList<>();
         for(Document doc:list){
             voList.add(new ActiveAddressVo(doc.getString("_id"),doc.getInteger("count")));

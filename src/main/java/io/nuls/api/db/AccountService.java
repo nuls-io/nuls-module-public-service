@@ -33,5 +33,5 @@ public interface AccountService {
 
     void updateAllAccountLastReward(int chainId);
 
-    List<ActiveAddressVo> getActiveAddressData();
+    List<ActiveAddressVo> getActiveAddressData(int pageSize);
 }
