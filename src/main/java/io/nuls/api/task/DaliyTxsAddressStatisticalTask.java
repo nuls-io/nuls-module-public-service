@@ -68,7 +68,6 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
     private static final String bestKey = "latest";
 
     private static int currentDayIndex;
-    private static String currentDate;
     private static Set<String> currentAddrSet = new HashSet<>();
     @Autowired
     private MongoDBService dbService;
@@ -98,11 +97,9 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
         int blockDayIndex = getDayIndex(blockTime);
         if (0 == currentDayIndex) {
             currentDayIndex = blockDayIndex;
-            currentDate = date;
         } else if (blockDayIndex > currentDayIndex) {
             saveActiveAccount(block.getHeader().getHeight() - 1);
             currentDayIndex = blockDayIndex;
-            currentDate = date;
             currentAddrSet.clear();
         } else if (blockDayIndex < currentDayIndex) {
             throw new RuntimeException("Data error: statistical day index wrong.");
@@ -126,7 +123,7 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
     private void saveActiveAccount(long endHeight) {
         ActiveAddressPo po = new ActiveAddressPo();
         po.setCount(currentAddrSet.size());
-        po.setDate(currentDate);
+        po.setDate(getDate(currentDayIndex));
         po.setDayIndex(currentDayIndex);
         po.setEndHeight(endHeight);
         this.dbService.insertOne(DBTableConstant.ACTIVE_ADDRESS_TABLE, DocumentTransferTool.toDocument(po, "date"));
