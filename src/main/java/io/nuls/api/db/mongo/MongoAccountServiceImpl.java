@@ -398,6 +398,6 @@ public class MongoAccountServiceImpl implements AccountService {
     }
 
     private int getDayIndex(long blockTime) {
-        return (int) (blockTime / 24 * 3600);
+        return (int) (blockTime / (24 * 3600));
     }
 }
