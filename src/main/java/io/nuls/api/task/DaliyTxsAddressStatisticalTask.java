@@ -174,7 +174,7 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
         if (null != header) {
             if (null == doc) {
 //            扫描最近一个月的数据并插入数据库
-                long val = header.getHeight() - 32 * 43200;//多算两天
+                long val = header.getHeight() - 32 * 8640;//多算两天
                 startHeight = val <= 0 ? 0 : val;
             } else {
                 startHeight = doc.getLong("endHeight") + 1;
