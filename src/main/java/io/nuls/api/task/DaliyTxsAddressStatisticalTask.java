@@ -140,9 +140,29 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
 
     @Override
     public void afterPropertiesSet() throws NulsException {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    realAfterPropertiesSet();
+                } catch (NulsException e) {
+                    LoggerUtil.commonLog.error(e);
+                }
+            }
+        }).start();
+    }
+
+    public void realAfterPropertiesSet() throws NulsException {
         //启动时检查1、历史数据，2、当前高度
-        LoggerUtil.commonLog.info("chain id :{} ", PublicServiceConstant.defaultChainId);
         BlockHeaderInfo header = blockService.getBestBlockHeader(PublicServiceConstant.defaultChainId);
+        while (header == null) {
+            try {
+                Thread.sleep(10000L);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            header = blockService.getBestBlockHeader(PublicServiceConstant.defaultChainId);
+        }
         LoggerUtil.commonLog.info("Best block :{} -- {}", PublicServiceConstant.defaultChainId, header.getHeight());
         Document doc = null;
         try {
