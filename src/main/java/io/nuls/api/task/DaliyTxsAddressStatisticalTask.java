@@ -88,7 +88,7 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
         if (0 == currentDayIndex) {
             currentDayIndex = blockDayIndex;
         } else if (blockDayIndex > currentDayIndex) {
-            String date = getDate(blockTime - 11);
+            String date = getDate(blockTime);
             long endHeight = block.getHeader().getHeight() - 1;
             LoggerUtil.commonLog.info("To save : {}, {}, {}-{}", date, block.getHeader().getHeight(), currentDayIndex, blockDayIndex);
             saveActiveAccount(date, endHeight);
@@ -137,6 +137,7 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
 
     private String getDate(long blockTime) {
         calendar.setTime(new Date(blockTime * 1000));
+        calendar.add(Calendar.DATE,-1);
         int m = calendar.get(Calendar.MONTH) + 1;
         String month = m + "";
         if (m < 10) {
@@ -152,7 +153,11 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
     }
 
     public static void main(String[] args) {
-        System.out.println(new DaliyTxsAddressStatisticalTask().getDate(System.currentTimeMillis()/1000));
+        DaliyTxsAddressStatisticalTask task = new DaliyTxsAddressStatisticalTask();
+        long blockTime = 1695395320;
+        long blockTime1 = blockTime-10;
+        System.out.println(task.getDate(blockTime));
+        System.out.println(task.getDate(blockTime1));
     }
     @Override
     public void afterPropertiesSet() throws NulsException {
@@ -212,7 +217,12 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
     private BlockInfo download(long height) {
         Result<BlockInfo> result = WalletRpcHandler.getBlockInfo(PublicServiceConstant.defaultChainId, height);
         if (result.isFailed()) {
-            throw new JsonRpcException(result.getErrorCode());
+            try {
+                Thread.sleep(2000L);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            return download(height);
         }
         return result.getData();
     }
