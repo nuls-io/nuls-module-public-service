@@ -134,7 +134,7 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
     }
 
     private String getDate(long blockTime) {
-        return DateUtils.convertDate(new Date(blockTime), "yyyy-MM-dd");
+        return DateUtils.convertDate(new Date(blockTime*1000), "yyyy-MM-dd");
     }
 
 
