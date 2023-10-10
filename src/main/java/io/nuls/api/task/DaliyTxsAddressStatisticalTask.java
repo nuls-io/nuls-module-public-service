@@ -188,7 +188,7 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
         LoggerUtil.commonLog.info("Best block :{} -- {}", PublicServiceConstant.defaultChainId, header.getHeight());
         Document doc = null;
         try {
-            doc = dbService.findOne("active_address", Filters.eq("_id", bestKey));
+            doc = dbService.findOne(DBTableConstant.ACTIVE_ADDRESS_TABLE, Filters.eq("_id", bestKey));
         } catch (Exception e) {
             LoggerUtil.commonLog.error(e);
         }
