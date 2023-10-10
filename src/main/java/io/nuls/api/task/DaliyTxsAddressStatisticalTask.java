@@ -221,7 +221,7 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
             if (result.isFailed()) {
                 LoggerUtil.commonLog.warn("download block failed:" + result.getErrorCode().getMsg());
                 try {
-                    Thread.sleep(2000L);
+                    Thread.sleep(10000L);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -231,7 +231,7 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
         } catch (Exception e) {
             LoggerUtil.commonLog.error(e);
             try {
-                Thread.sleep(2000L);
+                Thread.sleep(10000L);
             } catch (InterruptedException e1) {
                 throw new RuntimeException(e1);
             }
