@@ -386,7 +386,7 @@ public class ContractController {
             try {
                 startHeight = (int) params.get(5);
             } catch (Exception e) {
-                return RpcResult.paramError("[startHeight] is invalid");
+
             }
         }
 
@@ -394,7 +394,7 @@ public class ContractController {
             try {
                 endHeight = (int) params.get(6);
             } catch (Exception e) {
-                return RpcResult.paramError("[endHeight] is invalid");
+
             }
         }
 
