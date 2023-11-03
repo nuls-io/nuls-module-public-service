@@ -14,7 +14,7 @@ public interface Token1155Service {
 
     void saveAccountTokens(int chainId, Map<String, AccountToken1155Info> accountTokenInfos);
 
-    PageInfo<AccountToken1155Info> getAccountTokens(int chainId, String address, int pageNumber, int pageSize);
+    PageInfo<AccountToken1155Info> getAccountTokens(int chainId, String address, String contractAddress, int pageNumber, int pageSize);
 
     PageInfo<AccountToken1155Info> getContractTokens(int chainId, String contractAddress, int pageNumber, int pageSize);
 

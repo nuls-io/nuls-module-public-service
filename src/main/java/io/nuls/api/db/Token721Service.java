@@ -12,7 +12,7 @@ public interface Token721Service {
 
     void saveAccountTokens(int chainId, Map<String, AccountToken721Info> accountTokenInfos);
 
-    PageInfo<AccountToken721Info> getAccountTokens(int chainId, String address, int pageNumber, int pageSize);
+    PageInfo<AccountToken721Info> getAccountTokens(int chainId, String address, String contractAddress, int pageNumber, int pageSize);
 
     PageInfo<AccountToken721Info> getContractTokens(int chainId, String contractAddress, int pageNumber, int pageSize);
 

@@ -56,8 +56,13 @@ public class MongoToken1155ServiceImpl implements Token1155Service {
         mongoDBService.bulkWrite(ACCOUNT_TOKEN1155_TABLE + chainId, modelList, options);
     }
 
-    public PageInfo<AccountToken1155Info> getAccountTokens(int chainId, String address, int pageNumber, int pageSize) {
-        Bson query = Filters.eq("address", address);
+    public PageInfo<AccountToken1155Info> getAccountTokens(int chainId, String address, String contractAddress, int pageNumber, int pageSize) {
+        Bson query;
+        if (StringUtils.isNotBlank(contractAddress)) {
+            query = Filters.and(Filters.eq("address", address), Filters.eq("contractAddress", contractAddress), Filters.ne("value", "0"));
+        } else {
+            query = Filters.and(Filters.eq("address", address), Filters.ne("value", "0"));
+        }
         Bson sort = Sorts.descending("tokenCount");
         List<Document> docsList = this.mongoDBService.pageQuery(ACCOUNT_TOKEN1155_TABLE + chainId, query, sort, pageNumber, pageSize);
         List<AccountToken1155Info> accountTokenList = new ArrayList<>();
@@ -75,7 +80,7 @@ public class MongoToken1155ServiceImpl implements Token1155Service {
     }
 
     public PageInfo<AccountToken1155Info> getContractTokens(int chainId, String contractAddress, int pageNumber, int pageSize) {
-        Bson query = Filters.eq("contractAddress", contractAddress);
+        Bson query = Filters.and(Filters.eq("contractAddress", contractAddress), Filters.ne("value", "0"));
         Bson sort = Sorts.descending("tokenId");
         List<Document> docsList = this.mongoDBService.pageQuery(ACCOUNT_TOKEN1155_TABLE + chainId, query, sort, pageNumber, pageSize);
         List<AccountToken1155Info> accountTokenList = new ArrayList<>();
