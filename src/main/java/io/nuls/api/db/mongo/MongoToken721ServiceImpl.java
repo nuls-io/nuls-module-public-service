@@ -52,8 +52,13 @@ public class MongoToken721ServiceImpl implements Token721Service {
         mongoDBService.bulkWrite(ACCOUNT_TOKEN721_TABLE + chainId, modelList, options);
     }
 
-    public PageInfo<AccountToken721Info> getAccountTokens(int chainId, String address, int pageNumber, int pageSize) {
-        Bson query = Filters.eq("address", address);
+    public PageInfo<AccountToken721Info> getAccountTokens(int chainId, String address, String contractAddress, int pageNumber, int pageSize) {
+        Bson query;
+        if (StringUtils.isNotBlank(contractAddress)) {
+            query = Filters.and(Filters.eq("address", address), Filters.eq("contractAddress", contractAddress));
+        } else {
+            query = Filters.eq("address", address);
+        }
         Bson sort = Sorts.descending("tokenCount");
         List<Document> docsList = this.mongoDBService.pageQuery(ACCOUNT_TOKEN721_TABLE + chainId, query, sort, pageNumber, pageSize);
         List<AccountToken721Info> accountTokenList = new ArrayList<>();
