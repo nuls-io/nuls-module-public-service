@@ -24,6 +24,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.model.Sorts;
 import io.nuls.api.analysis.WalletRpcHandler;
+import io.nuls.api.constant.PublicServiceConstant;
 import io.nuls.api.constant.config.ApiConfig;
 import io.nuls.api.db.mongo.*;
 import io.nuls.api.manager.CacheManager;
@@ -86,6 +87,8 @@ public class PublicServiceBootstrap extends RpcModule {
         configurationLoader.load();
         Provider.ProviderType providerType = Provider.ProviderType.valueOf(configurationLoader.getValue("providerType"));
         int defaultChainId = Integer.parseInt(configurationLoader.getValue("chainId"));
+        Log.info("defaultChainId : {}", defaultChainId);
+        PublicServiceConstant.defaultChainId = defaultChainId;
         ServiceManager.init(defaultChainId, providerType);
         NulsRpcModuleBootstrap.run(DEFAULT_SCAN_PACKAGE, args);
     }

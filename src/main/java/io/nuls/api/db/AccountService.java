@@ -1,11 +1,10 @@
 package io.nuls.api.db;
 
-import io.nuls.api.model.po.AccountInfo;
-import io.nuls.api.model.po.PageInfo;
-import io.nuls.api.model.po.TxRelationInfo;
+import io.nuls.api.model.po.*;
 import io.nuls.api.model.po.mini.MiniAccountInfo;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Map;
 
 public interface AccountService {
@@ -33,4 +32,6 @@ public interface AccountService {
     BigInteger getAccountTotalBalance(int chainId, String address);
 
     void updateAllAccountLastReward(int chainId);
+
+    List<ActiveAddressVo> getActiveAddressData(int pageSize);
 }

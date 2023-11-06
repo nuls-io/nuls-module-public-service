@@ -12,6 +12,7 @@ import io.nuls.api.manager.CacheManager;
 import io.nuls.api.model.po.*;
 import io.nuls.api.model.po.asset.ChainAssetInfo;
 import io.nuls.api.model.po.asset.ChainAssetTx;
+import io.nuls.api.task.DaliyTxsAddressStatisticalTask;
 import io.nuls.api.utils.DBUtil;
 import io.nuls.api.utils.LoggerUtil;
 import io.nuls.base.basic.AddressTool;
@@ -104,9 +105,6 @@ public class SyncService {
     private List<Nrc721TokenIdInfo> token721IdList = new ArrayList<>();
     //记录链信息
     private List<ChainInfo> chainInfoList = new ArrayList<>();
-    private List<ChainAssetInfo> chainAssetInfoList = new ArrayList<>();
-    private List<ChainAssetTx> chainAssetTxList = new ArrayList<>();
-    private Set<String> chainAssetCountList = new HashSet<>();
     //处理每个交易时，过滤交易中的重复地址
     Set<String> addressSet = new HashSet<>();
 
@@ -135,10 +133,7 @@ public class SyncService {
         apiCache.setBestHeader(blockInfo.getHeader());
         ApiContext.addAndRemoveLastBlockHeader(blockInfo.getHeader());
         time2 = System.currentTimeMillis();
-
-//        if (blockInfo.getHeader().getHeight() % 10000 == 0) {
-//
-//        }
+        DaliyTxsAddressStatisticalTask.offer(blockInfo);
         LoggerUtil.commonLog.info("-----height finish:" + blockInfo.getHeader().getHeight() + "-----txCount:" + blockInfo.getHeader().getTxCount() + "-----use:" + (time2 - time1) + "-----");
         return true;
     }
@@ -333,34 +328,6 @@ public class SyncService {
         for (String address : addressSet) {
             AccountInfo accountInfo = this.queryAccountInfo(chainId, address);
             accountInfo.setTxCount(accountInfo.getTxCount() + 1);
-        }
-
-        executeChainAssetTx(tx);
-    }
-
-    private void executeChainAssetTx(TransactionInfo tx) {
-        if (tx.getCoinTos() == null || tx.getCoinFroms().isEmpty()) {
-            return;
-        }
-        for (CoinToInfo output : tx.getCoinTos()) {
-            if (output.getAmount().compareTo(BigInteger.ZERO) <= 0) {
-                continue;
-            }
-            for (CoinFromInfo input : tx.getCoinFroms()) {
-                if (input.getChainId() == output.getChainId() && input.getAssetsId() == output.getAssetsId() && input.getAmount().compareTo(output.getAmount()) >= 0) {
-                    ChainAssetTx po = new ChainAssetTx();
-                    po.setHash(tx.getHash());
-                    po.setHeight(tx.getHeight());
-                    po.setAssetId(output.getAssetKey());
-                    po.setAmount(output.getAmount().toString());
-                    po.setFrom(input.getAddress());
-                    po.setTo(output.getAddress());
-                    po.setTxTime(tx.getCreateTime());
-                    po.setTxType(tx.getType());
-                    chainAssetTxList.add(po);
-                    chainAssetCountList.add(po.getAssetId());
-                }
-            }
         }
     }
 
@@ -958,18 +925,6 @@ public class SyncService {
         chainInfoList.add(chainInfo);
         CacheManager.getChainInfoMap().put(chainInfo.getChainId(), chainInfo);
         CacheManager.getAssetInfoMap().put(chainInfo.getDefaultAsset().getKey(), chainInfo.getDefaultAsset());
-        //存储资产信息到数据库中
-        ChainAssetInfo po = new ChainAssetInfo();
-        po.setAddresses(0);
-        po.setAssetType(1);
-        po.setDecimals(chainInfo.getDefaultAsset().getDecimals());
-        po.setId(chainInfo.getDefaultAsset().getKey());
-        po.setSourceChainId(chainInfo.getDefaultAsset().getChainId());
-        po.setInAmount(0);
-        po.setSymbol(chainInfo.getDefaultAsset().getSymbol());
-        po.setName(chainInfo.getDefaultAsset().getSymbol());
-        po.setTxCount(0);
-        chainAssetInfoList.add(po);
     }
 
     private void processDestroyChainTx(int chainId, TransactionInfo tx) {
@@ -989,20 +944,6 @@ public class SyncService {
         chainInfo.getDefaultAsset().setStatus(DISABLE);
         chainInfo.setNew(false);
         chainInfoList.add(chainInfo);
-        // 存储资产信息到数据库中
-        ChainAssetInfo po = new ChainAssetInfo();
-        po.setAddresses(0);
-        po.setAssetType(1);
-        po.setDecimals(chainInfo.getDefaultAsset().getDecimals());
-        po.setId(chainInfo.getDefaultAsset().getKey());
-        po.setSourceChainId(chainInfo.getDefaultAsset().getChainId());
-        po.setInAmount(0);
-        po.setSymbol(chainInfo.getDefaultAsset().getSymbol());
-        po.setName(chainInfo.getDefaultAsset().getSymbol());
-        po.setTxCount(0);
-        po.setStatus(1);//disable
-        po.setUpdate(true);
-        chainAssetInfoList.add(po);
     }
 
     private void processAddAssetTx(int chainId, TransactionInfo tx) {
@@ -1035,19 +976,6 @@ public class SyncService {
             chainInfoList.add(chainInfo);
         }
         CacheManager.getAssetInfoMap().put(assetInfo.getKey(), assetInfo);
-        // 存储资产信息到数据库中
-
-        ChainAssetInfo po = new ChainAssetInfo();
-        po.setAddresses(0);
-        po.setAssetType(1);
-        po.setDecimals(chainInfo.getDefaultAsset().getDecimals());
-        po.setId(chainInfo.getDefaultAsset().getKey());
-        po.setSourceChainId(chainInfo.getDefaultAsset().getChainId());
-        po.setInAmount(0);
-        po.setSymbol(chainInfo.getDefaultAsset().getSymbol());
-        po.setName(chainInfo.getDefaultAsset().getSymbol());
-        po.setTxCount(0);
-        chainAssetInfoList.add(po);
     }
 
     private void processCancelAssetTx(int chainId, TransactionInfo tx) {
@@ -1070,20 +998,6 @@ public class SyncService {
             chainInfo.getDefaultAsset().setStatus(DISABLE);
         }
         chainInfoList.add(chainInfo);
-        //更新资产信息到数据库中
-        ChainAssetInfo po = new ChainAssetInfo();
-        po.setAddresses(0);
-        po.setAssetType(1);
-        po.setDecimals(chainInfo.getDefaultAsset().getDecimals());
-        po.setId(chainInfo.getDefaultAsset().getKey());
-        po.setSourceChainId(chainInfo.getDefaultAsset().getChainId());
-        po.setInAmount(0);
-        po.setSymbol(chainInfo.getDefaultAsset().getSymbol());
-        po.setName(chainInfo.getDefaultAsset().getSymbol());
-        po.setTxCount(0);
-        po.setStatus(1);//disable
-        po.setUpdate(true);
-        chainAssetInfoList.add(po);
     }
 
     private void processTokenTransfers(int chainId, List<TokenTransfer> tokenTransfers, List<Token721Transfer> token721Transfers, List<Token1155Transfer> token1155Transfers, TransactionInfo tx) {
@@ -1517,11 +1431,6 @@ public class SyncService {
         syncInfo.setStep(90);
         chainService.updateStep(syncInfo);
         token1155Service.saveTokenIds(chainId, nrc1155TokenIdMap);
-
-        syncInfo.setStep(98);
-        chainAssetService.saveList(this.chainAssetInfoList);
-        chainAssetService.saveTxList(this.chainAssetTxList);
-        chainAssetService.updateCount(chainId, this.chainAssetCountList);
 
         //完成解析
         syncInfo.setStep(100);

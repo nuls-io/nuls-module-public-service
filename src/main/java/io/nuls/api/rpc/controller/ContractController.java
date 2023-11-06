@@ -449,7 +449,7 @@ public class ContractController {
     public RpcResult getAccountToken721s(List<Object> params) {
         VerifyUtils.verifyParams(params, 4);
         int chainId, pageNumber, pageSize;
-        String address;
+        String address, contractAddress = null;
         try {
             chainId = (int) params.get(0);
         } catch (Exception e) {
@@ -471,6 +471,10 @@ public class ContractController {
             return RpcResult.paramError("[address] is invalid");
         }
 
+        if (params.size() > 4) {
+            contractAddress = (String) params.get(4);
+        }
+
         if (!AddressTool.validAddress(chainId, address)) {
             return RpcResult.paramError("[address] is invalid");
         }
@@ -485,7 +489,7 @@ public class ContractController {
         if (!CacheManager.isChainExist(chainId)) {
             pageInfo = new PageInfo<>(pageNumber, pageSize);
         } else {
-            pageInfo = token721Service.getAccountTokens(chainId, address, pageNumber, pageSize);
+            pageInfo = token721Service.getAccountTokens(chainId, address, contractAddress, pageNumber, pageSize);
         }
         RpcResult result = new RpcResult();
         result.setResult(pageInfo);
@@ -1570,7 +1574,7 @@ public class ContractController {
     public RpcResult getAccountToken1155s(List<Object> params) {
         VerifyUtils.verifyParams(params, 4);
         int chainId, pageNumber, pageSize;
-        String address;
+        String address, contractAddress = null;
         try {
             chainId = (int) params.get(0);
         } catch (Exception e) {
@@ -1592,6 +1596,10 @@ public class ContractController {
             return RpcResult.paramError("[address] is invalid");
         }
 
+        if (params.size() > 4) {
+            contractAddress = (String) params.get(4);
+        }
+
         if (!AddressTool.validAddress(chainId, address)) {
             return RpcResult.paramError("[address] is invalid");
         }
@@ -1606,7 +1614,7 @@ public class ContractController {
         if (!CacheManager.isChainExist(chainId)) {
             pageInfo = new PageInfo<>(pageNumber, pageSize);
         } else {
-            pageInfo = token1155Service.getAccountTokens(chainId, address, pageNumber, pageSize);
+            pageInfo = token1155Service.getAccountTokens(chainId, address, contractAddress, pageNumber, pageSize);
         }
         RpcResult result = new RpcResult();
         result.setResult(pageInfo);
