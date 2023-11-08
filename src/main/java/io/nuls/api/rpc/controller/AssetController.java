@@ -13,6 +13,7 @@ import io.nuls.core.core.annotation.Autowired;
 import io.nuls.core.core.annotation.Controller;
 import io.nuls.core.core.annotation.RpcMethod;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -63,6 +64,16 @@ public class AssetController {
         }
         PageInfo<ChainAssetHolderInfo> pageInfo = this.assetService.getHoldersByAssetKey(chainId, assetKey, pageNumber, pageSize);
         return new RpcResult().setResult(pageInfo);
+    }
+
+    @RpcMethod("getTopAssets")
+    public RpcResult getTopAssets(List<Object> params) {
+        List<ChainAssetInfo> list = this.assetService.getList();
+        List<ChainAssetInfoVo> voList = new ArrayList<>();
+        for(ChainAssetInfo info:list){
+            voList.add(new ChainAssetInfoVo(info));
+        }
+        return new RpcResult().setResult(voList);
     }
 
     @RpcMethod("getTxsByAssetKey")
