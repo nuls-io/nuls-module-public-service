@@ -4,10 +4,12 @@ package io.nuls.api.task;
 import io.nuls.api.ApiContext;
 import io.nuls.api.analysis.WalletRpcHandler;
 import io.nuls.api.cache.ApiCache;
+import io.nuls.api.cache.AssetSystemCache;
 import io.nuls.api.db.AccountService;
 import io.nuls.api.db.AgentService;
 import io.nuls.api.db.ChainService;
 import io.nuls.api.manager.CacheManager;
+import io.nuls.api.model.dto.AssetsSystemTokenInfoVo;
 import io.nuls.api.model.po.AssetInfo;
 import io.nuls.api.model.po.CoinContextInfo;
 import io.nuls.api.model.po.DestroyInfo;
@@ -155,13 +157,17 @@ public class StatisticalNulsTask implements Runnable {
         if (null != assetInfo) {
             total = assetInfo.getLocalTotalCoins();
         }
+        AssetsSystemTokenInfoVo token = AssetSystemCache.getAssetCache(chainId + "-" + 1);
+        if (null != token) {
+            total = new BigInteger(token.getTotalSupply());
+        }
 
         String destroyAddress = AddressTool.getStringAddressByBytes(address);
         BigInteger destroyNuls = accountService.getAccountTotalBalance(chainId, destroyAddress);
         String reason = "account set alias destroy nuls";
         String type = "NULL Address";
         String aproportion = null;
-        if (total != null) {
+        if (total != null && total.compareTo(BigInteger.ZERO) != 0) {
             double _proportion = new BigDecimal(destroyNuls).divide(new BigDecimal(total), 6, RoundingMode.HALF_UP).doubleValue() * 100;
             aproportion = _proportion + "%";
         }
