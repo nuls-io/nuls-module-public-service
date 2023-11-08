@@ -3,11 +3,13 @@ package io.nuls.api.rpc.controller;
 import io.nuls.api.ApiContext;
 import io.nuls.api.analysis.WalletRpcHandler;
 import io.nuls.api.cache.ApiCache;
+import io.nuls.api.cache.ChainAssetCache;
 import io.nuls.api.constant.AddressType;
 import io.nuls.api.db.*;
 import io.nuls.api.exception.JsonRpcException;
 import io.nuls.api.manager.CacheManager;
 import io.nuls.api.model.po.*;
+import io.nuls.api.model.po.asset.ChainAssetInfo;
 import io.nuls.api.model.rpc.RpcErrorCode;
 import io.nuls.api.model.rpc.RpcResult;
 import io.nuls.api.model.rpc.RpcResultError;
@@ -206,7 +208,14 @@ public class ChainController {
                     }
                 }
             } else {
-                //todo niels 2023 资产查询
+                result = new SearchResultDTO();
+                List<ChainAssetInfo> list = ChainAssetCache.search(text);
+                if(null!=list && !list.isEmpty()) {
+                    result.setData(list);
+                    result.setType("asset");
+                }else {
+                    return RpcResult.dataNotFound();
+                }
             }
         } else {
             result = getResultByHash(chainId, text);
@@ -354,7 +363,9 @@ public class ChainController {
             count = agentService.agentsCount(chainId, apiCache.getBestHeader().getHeight());
         }
         map.put("totalNodes", count);
-
+        map.put("blockRewardAfterDeflation",coinContextInfo.getBlockRewardAfterDeflation());
+        map.put("blockRewardBeforeDeflation",coinContextInfo.getBlockRewardBeforeDeflation());
+        map.put("nextDeflationTime",coinContextInfo.getNextDeflationTime());
         return RpcResult.success(map);
     }
 

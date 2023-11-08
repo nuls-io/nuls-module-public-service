@@ -1,6 +1,7 @@
 package io.nuls.api.model.po.asset;
 
 public class ChainAssetTx {
+    private String id;
     private String hash;
 
     private String assetId;
@@ -19,6 +20,15 @@ public class ChainAssetTx {
     public void setUpdate(boolean update) {
         this.update = update;
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getHash() {
         return hash;
     }

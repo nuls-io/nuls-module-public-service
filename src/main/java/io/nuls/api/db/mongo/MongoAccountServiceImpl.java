@@ -32,7 +32,7 @@ public class MongoAccountServiceImpl implements AccountService {
 
     private static List<String> addressList = Collections.synchronizedList(new ArrayList<>());
 
-    public static int cacheSize = 5000;
+    public static final int cacheSize = 5000;
 
     public void initCache() {
         for (ApiCache apiCache : CacheManager.getApiCaches().values()) {
@@ -399,5 +399,9 @@ public class MongoAccountServiceImpl implements AccountService {
 
     private int getDayIndex(long blockTime) {
         return (int) (blockTime / (24 * 3600));
+    }
+
+    public void println(){
+        System.out.println("shit it .");
     }
 }

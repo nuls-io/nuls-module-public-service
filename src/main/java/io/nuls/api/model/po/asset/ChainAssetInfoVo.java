@@ -1,24 +1,45 @@
 package io.nuls.api.model.po.asset;
 
-public class ChainAssetInfo {
+import io.nuls.api.cache.AssetSystemCache;
+import io.nuls.api.model.dto.AssetsSystemTokenInfoVo;
+
+public class ChainAssetInfoVo {
     private String id;//9-1
 
-    private int assetType;// 本链资产-0，跨链资产-1
-    private int status;//0=enable，1=disable
-
     private String totalSupply;//总量
+    private String nulsChainSupply;//总量
     private String name, symbol;
     private int decimals;
     private int addresses;
     private long txCount = 0;
-    private long crossTxCount = 0;
-    private String inAmount = "0";
-    private String outAmount = "0";
     private int sourceChainId;
     private String contract;
     private String website, community;
 
-    private boolean update;
+    public ChainAssetInfoVo(ChainAssetInfo info) {
+        //todo nulsChainAmount
+        this(info.getId(), info.getTotalSupply(), "0", info.getName(), info.getSymbol(), info.getDecimals(), info.getAddresses(), info.getTxCount(), info.getSourceChainId(), info.getContract(), info.getWebsite(), info.getCommunity());
+    }
+
+    public ChainAssetInfoVo(String id, String totalSupply, String nulsChainSupply, String name, String symbol, int decimals, int addresses, long txCount, int sourceChainId, String contract, String website, String community) {
+        AssetsSystemTokenInfoVo vo = AssetSystemCache.getAssetCache(id);
+        if (null == vo) {
+            vo = new AssetsSystemTokenInfoVo();
+            vo.setSourceChainId((long) sourceChainId);
+        }
+        this.id = id;
+        this.totalSupply = totalSupply;
+        this.nulsChainSupply = nulsChainSupply;
+        this.name = name;
+        this.symbol = symbol;
+        this.decimals = decimals;
+        this.addresses = addresses;
+        this.txCount = txCount;
+        this.sourceChainId = Math.toIntExact(vo.getSourceChainId());
+        this.contract = contract;
+        this.website = website;
+        this.community = community;
+    }
 
     public String getId() {
         return id;
@@ -28,28 +49,20 @@ public class ChainAssetInfo {
         this.id = id;
     }
 
-    public int getAssetType() {
-        return assetType;
-    }
-
-    public void setAssetType(int assetType) {
-        this.assetType = assetType;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
     public String getTotalSupply() {
         return totalSupply;
     }
 
     public void setTotalSupply(String totalSupply) {
         this.totalSupply = totalSupply;
+    }
+
+    public String getNulsChainSupply() {
+        return nulsChainSupply;
+    }
+
+    public void setNulsChainSupply(String nulsChainSupply) {
+        this.nulsChainSupply = nulsChainSupply;
     }
 
     public String getName() {
@@ -92,30 +105,6 @@ public class ChainAssetInfo {
         this.txCount = txCount;
     }
 
-    public long getCrossTxCount() {
-        return crossTxCount;
-    }
-
-    public void setCrossTxCount(long crossTxCount) {
-        this.crossTxCount = crossTxCount;
-    }
-
-    public String getInAmount() {
-        return inAmount;
-    }
-
-    public void setInAmount(String inAmount) {
-        this.inAmount = inAmount;
-    }
-
-    public String getOutAmount() {
-        return outAmount;
-    }
-
-    public void setOutAmount(String outAmount) {
-        this.outAmount = outAmount;
-    }
-
     public int getSourceChainId() {
         return sourceChainId;
     }
@@ -146,13 +135,5 @@ public class ChainAssetInfo {
 
     public void setCommunity(String community) {
         this.community = community;
-    }
-
-    public boolean isUpdate() {
-        return update;
-    }
-
-    public void setUpdate(boolean update) {
-        this.update = update;
     }
 }

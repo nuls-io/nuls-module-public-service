@@ -100,6 +100,7 @@ public interface CommandConstant {
      * 获取合约资产ID
      */
     String CMD_CHAIN_ASSET_CONTRACT_ASSETID = "getAssetContractAssetId";
+    String CMD_CHAIN_LG_GET_ALL_ASSET = "lg_get_all_asset";
 
     /**
      * 获取跨链资产注册信息

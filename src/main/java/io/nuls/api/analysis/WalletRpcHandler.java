@@ -4,6 +4,7 @@ import io.nuls.api.ApiContext;
 import io.nuls.api.constant.ApiConstant;
 import io.nuls.api.constant.ApiErrorCode;
 import io.nuls.api.constant.CommandConstant;
+import io.nuls.api.model.dto.NulsChainAssetInfo;
 import io.nuls.api.model.po.*;
 import io.nuls.api.model.rpc.BalanceInfo;
 import io.nuls.api.model.rpc.FreezeInfo;
@@ -830,4 +831,25 @@ public class WalletRpcHandler {
             return false;
         }
     }
+
+    public static List<NulsChainAssetInfo> getAllAssetList(int chainId){
+        try {
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("chainId", chainId);
+            Map result = (Map) RpcCall.request(ModuleE.LG.abbr, CommandConstant.CMD_CHAIN_LG_GET_ALL_ASSET, parameters);
+            List<Map<String, Object>> resultList = (List<Map<String, Object>>) result.get("list");
+            List<NulsChainAssetInfo> list = new ArrayList<>();
+            for(Map<String,Object> map:resultList){
+                NulsChainAssetInfo info = new NulsChainAssetInfo();
+                info.fromMap(map);
+                list.add(info);
+            }
+            return list;
+        } catch (NulsException e) {
+            LoggerUtil.commonLog.error("", e);
+            Log.warn("查询NRC20资产ID异常, msg: {}", e.format());
+            return null;
+        }
+    }
+
 }

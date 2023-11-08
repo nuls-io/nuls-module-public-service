@@ -1,23 +1,27 @@
 package io.nuls.api.db;
 
 import io.nuls.api.model.po.PageInfo;
+import io.nuls.api.model.po.asset.ChainAssetHolderInfo;
 import io.nuls.api.model.po.asset.ChainAssetInfo;
 import io.nuls.api.model.po.asset.ChainAssetTx;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface ChainAssetService {
 
-    void initCache();
+    List<ChainAssetInfo> getList();
 
-    PageInfo<ChainAssetInfo> getList(int pageNumber, int pageSize);
+    PageInfo<ChainAssetTx> getTxList(String assetKey, int pageNumber, int pageSize, Integer type, String from, String to);
 
-    PageInfo<ChainAssetTx> getTxList(String assetKey, int pageNumber, int pageSize);
+    void updateAssetInfo(ChainAssetInfo info);
 
-    void saveList(List<ChainAssetInfo> list);
+    ChainAssetInfo get(String assetKey);
 
-    void saveTxList(List<ChainAssetTx> list);
+    PageInfo<ChainAssetHolderInfo> getHoldersByAssetKey(Integer chainId, String assetKey, Integer pageNumber, Integer pageSize);
 
-    void updateCount(int chainId,Set<String> chainAssetCountList);
+    void save(int chainId, Map<String, ChainAssetTx> chainAssetTxMap, Set<String> chainAssetCountList);
+
+    void rollback(int chainId, Map<String, ChainAssetTx> chainAssetTxMap, Set<String> chainAssetCountList);
 }

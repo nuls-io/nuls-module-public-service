@@ -7,10 +7,8 @@ import io.nuls.api.cache.ApiCache;
 import io.nuls.api.constant.ApiConstant;
 import io.nuls.api.constant.ApiErrorCode;
 import io.nuls.api.db.*;
-import io.nuls.api.db.mongo.MongoAccountServiceImpl;
 import io.nuls.api.manager.CacheManager;
 import io.nuls.api.model.po.*;
-import io.nuls.api.model.po.asset.ChainAssetInfo;
 import io.nuls.api.model.po.asset.ChainAssetTx;
 import io.nuls.api.task.DaliyTxsAddressStatisticalTask;
 import io.nuls.api.utils.DBUtil;
@@ -105,6 +103,8 @@ public class SyncService {
     private List<Nrc721TokenIdInfo> token721IdList = new ArrayList<>();
     //记录链信息
     private List<ChainInfo> chainInfoList = new ArrayList<>();
+    private Map<String, ChainAssetTx> chainAssetTxMap = new HashMap<>();
+    private Set<String> chainAssetCountList = new HashSet<>();
     //处理每个交易时，过滤交易中的重复地址
     Set<String> addressSet = new HashSet<>();
 
@@ -258,6 +258,45 @@ public class SyncService {
             } else if (tx.getType() == TxType.LEDGER_ASSET_REG_TRANSFER) {
                 processLedgerAssetRegTransferTx(chainId, tx);
             }
+            processChainAsset(chainId, tx);
+        }
+    }
+
+    private void processChainAsset(int chainId, TransactionInfo tx) {
+        if (tx.getCoinTos() == null) {
+            return;
+        }
+        for (CoinToInfo output : tx.getCoinTos()) {
+            if (output.getAmount().compareTo(BigInteger.ZERO) <= 0) {
+                continue;
+            }
+            String fromAddress = null;
+            if (null != tx.getCoinFroms()) {
+                for (CoinFromInfo input : tx.getCoinFroms()) {
+                    if (input.getChainId() == output.getChainId() && input.getAssetsId() == output.getAssetsId() && input.getAmount().compareTo(output.getAmount()) >= 0) {
+                        fromAddress = input.getAddress();
+                        break;
+                    }
+                }
+            }
+            String id = tx.getHash() + "-" + output.getAssetKey();
+            ChainAssetTx po = this.chainAssetTxMap.get(id);
+            if (null == po) {
+                po = new ChainAssetTx();
+                po.setId(id);
+                po.setHash(tx.getHash());
+                po.setHeight(tx.getHeight());
+                po.setAssetId(output.getAssetKey());
+                po.setAmount(output.getAmount().toString());
+                po.setFrom(fromAddress);
+                po.setTo(output.getAddress());
+                po.setTxTime(tx.getCreateTime());
+                po.setTxType(tx.getType());
+            } else {
+                po.setAmount(new BigInteger(po.getAmount()).add(output.getAmount()).toString());
+            }
+            chainAssetTxMap.put(id, po);
+            chainAssetCountList.add(po.getAssetId());
         }
     }
 
@@ -1432,6 +1471,10 @@ public class SyncService {
         chainService.updateStep(syncInfo);
         token1155Service.saveTokenIds(chainId, nrc1155TokenIdMap);
 
+        syncInfo.setStep(91);
+        chainService.updateStep(syncInfo);
+        this.chainAssetService.save(chainId,this.chainAssetTxMap,this.chainAssetCountList);
+
         //完成解析
         syncInfo.setStep(100);
         chainService.updateStep(syncInfo);
@@ -1565,15 +1608,16 @@ public class SyncService {
         nrc1155TokenIdMap.clear();
         token1155TransferList.clear();
         chainInfoList.clear();
-
+        chainAssetTxMap.clear();
+        chainAssetCountList.clear();
         ApiCache apiCache = CacheManager.getCache(chainId);
-        if (apiCache.getAccountMap().size() > MongoAccountServiceImpl.cacheSize * 2) {
+        if (apiCache.getAccountMap().size() > cacheSize * 2) {
             Set<String> keySet = apiCache.getAccountMap().keySet();
             int i = 0;
             for (String key : keySet) {
                 apiCache.getAccountMap().remove(key);
                 i++;
-                if (i >= MongoAccountServiceImpl.cacheSize) {
+                if (i >= cacheSize) {
                     break;
                 }
             }
