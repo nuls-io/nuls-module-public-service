@@ -15,7 +15,7 @@ public class ChainAssetInfoVo {
     private long txCount = 0;
     private int sourceChainId;
     private String contract;
-    private String website, community;
+    private String website, community,price;
 
     public ChainAssetInfoVo(ChainAssetInfo info) {
         //todo nulsChainAmount
@@ -27,6 +27,8 @@ public class ChainAssetInfoVo {
         if (null == vo) {
             vo = new AssetsSystemTokenInfoVo();
             vo.setSourceChainId((long) sourceChainId);
+        }else {
+            this.price = vo.getPrice();
         }
         this.id = id;
         this.totalSupply = totalSupply;
@@ -139,5 +141,13 @@ public class ChainAssetInfoVo {
 
     public void setCommunity(String community) {
         this.community = community;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
     }
 }
