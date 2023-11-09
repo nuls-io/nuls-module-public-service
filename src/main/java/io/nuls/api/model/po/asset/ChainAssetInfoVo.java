@@ -2,6 +2,7 @@ package io.nuls.api.model.po.asset;
 
 import io.nuls.api.cache.AssetSystemCache;
 import io.nuls.api.model.dto.AssetsSystemTokenInfoVo;
+import io.nuls.core.model.StringUtils;
 
 public class ChainAssetInfoVo {
     private String id;//9-1
@@ -39,6 +40,9 @@ public class ChainAssetInfoVo {
         this.contract = contract;
         this.website = website;
         this.community = community;
+        if (vo != null && StringUtils.isBlank(contract)) {
+            this.contract = vo.getContractAddress();
+        }
     }
 
     public String getId() {
