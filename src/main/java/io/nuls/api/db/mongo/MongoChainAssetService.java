@@ -2,6 +2,7 @@ package io.nuls.api.db.mongo;
 
 import com.mongodb.client.model.*;
 import io.nuls.api.cache.AssetSystemCache;
+import io.nuls.api.db.AccountLedgerService;
 import io.nuls.api.db.ChainAssetService;
 import io.nuls.api.manager.CacheManager;
 import io.nuls.api.model.dto.AssetsSystemTokenInfoVo;
@@ -10,13 +11,16 @@ import io.nuls.api.model.po.PageInfo;
 import io.nuls.api.model.po.asset.ChainAssetHolderInfo;
 import io.nuls.api.model.po.asset.ChainAssetInfo;
 import io.nuls.api.model.po.asset.ChainAssetTx;
+import io.nuls.api.model.po.mini.MiniAccountInfo;
 import io.nuls.api.utils.DocumentTransferTool;
 import io.nuls.core.core.annotation.Autowired;
 import io.nuls.core.core.annotation.Component;
 import io.nuls.core.log.Log;
+import io.nuls.core.model.DoubleUtils;
 import io.nuls.core.model.StringUtils;
 import org.bson.Document;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +30,8 @@ import static io.nuls.api.constant.DBTableConstant.*;
 
 @Component
 public class MongoChainAssetService implements ChainAssetService {
+    @Autowired
+    private AccountLedgerService accountLedgerService;
     @Autowired
     private MongoDBService mongoDBService;
 
@@ -68,8 +74,27 @@ public class MongoChainAssetService implements ChainAssetService {
     @Override
     public PageInfo<ChainAssetHolderInfo> getHoldersByAssetKey(Integer chainId, String assetKey, Integer pageNumber, Integer pageSize) {
         String arr[] = assetKey.split("-");
-
-        return null;
+        PageInfo<MiniAccountInfo> list = accountLedgerService.getAssetRanking(chainId,Integer.parseInt(arr[0]),Integer.parseInt(arr[1]),pageNumber,pageSize);
+        List<ChainAssetHolderInfo> infoList = new ArrayList<>();
+        for (MiniAccountInfo accountInfo : list.getList()) {
+            ChainAssetHolderInfo vo = new ChainAssetHolderInfo();
+            vo.setAddress(accountInfo.getAddress());
+            vo.setBalance(accountInfo.getTotalBalance().toString());
+            AssetsSystemTokenInfoVo info = AssetSystemCache.getAssetCache(assetKey);
+            BigDecimal balance = new BigDecimal(accountInfo.getTotalBalance());
+            if (null != info && StringUtils.isNotBlank(info.getTotalSupply())) {
+                BigDecimal total = new BigDecimal(info.getTotalSupply());
+                BigDecimal rate = DoubleUtils.div(balance, total);
+                vo.setRate(DoubleUtils.getRoundStr(rate.doubleValue() * 100, 4));
+            }
+            if (null != info && StringUtils.isNotBlank(info.getPrice())) {
+                double price = Double.parseDouble(info.getPrice());
+                vo.setValue(DoubleUtils.getRoundStr(DoubleUtils.mul(price, balance.divide(BigDecimal.TEN.pow(Math.toIntExact(info.getDecimals())))), 2));
+            }
+            infoList.add(vo);
+        }
+        PageInfo<ChainAssetHolderInfo> pageInfo = new PageInfo<>(pageNumber, pageSize, list.getTotalCount(), infoList);
+        return pageInfo;
     }
 
     @Override
