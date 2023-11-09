@@ -10,6 +10,7 @@ import io.nuls.api.exception.JsonRpcException;
 import io.nuls.api.manager.CacheManager;
 import io.nuls.api.model.po.*;
 import io.nuls.api.model.po.asset.ChainAssetInfo;
+import io.nuls.api.model.po.asset.ChainAssetInfoVo;
 import io.nuls.api.model.rpc.RpcErrorCode;
 import io.nuls.api.model.rpc.RpcResult;
 import io.nuls.api.model.rpc.RpcResultError;
@@ -24,6 +25,7 @@ import io.nuls.core.core.annotation.Controller;
 import io.nuls.core.core.annotation.RpcMethod;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -210,10 +212,12 @@ public class ChainController {
             } else {
                 result = new SearchResultDTO();
                 List<ChainAssetInfo> list = ChainAssetCache.search(text);
-                if(null!=list && !list.isEmpty()) {
-                    result.setData(list);
+                if (null != list && !list.isEmpty()) {
+                    List<ChainAssetInfoVo> voList = new ArrayList<>();
+                    list.forEach(info -> voList.add(new ChainAssetInfoVo(info)));
+                    result.setData(voList);
                     result.setType("asset");
-                }else {
+                } else {
                     return RpcResult.dataNotFound();
                 }
             }
@@ -363,9 +367,9 @@ public class ChainController {
             count = agentService.agentsCount(chainId, apiCache.getBestHeader().getHeight());
         }
         map.put("totalNodes", count);
-        map.put("blockRewardAfterDeflation",coinContextInfo.getBlockRewardAfterDeflation());
-        map.put("blockRewardBeforeDeflation",coinContextInfo.getBlockRewardBeforeDeflation());
-        map.put("nextDeflationTime",coinContextInfo.getNextDeflationTime());
+        map.put("blockRewardAfterDeflation", coinContextInfo.getBlockRewardAfterDeflation());
+        map.put("blockRewardBeforeDeflation", coinContextInfo.getBlockRewardBeforeDeflation());
+        map.put("nextDeflationTime", coinContextInfo.getNextDeflationTime());
         return RpcResult.success(map);
     }
 
