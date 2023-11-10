@@ -19,6 +19,7 @@ import io.nuls.core.log.Log;
 import io.nuls.core.model.DoubleUtils;
 import io.nuls.core.model.StringUtils;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -47,13 +48,24 @@ public class MongoChainAssetService implements ChainAssetService {
 
     @Override
     public PageInfo<ChainAssetTx> getTxList(String assetKey, int pageNumber, int pageSize, Integer type, String from, String to) {
-        List<Document> docsList = this.mongoDBService.pageQuery(CHAIN_ASSET_TX_TABLE, Filters.eq("assetId", assetKey), Sorts.descending("createTime"), pageNumber, pageSize);
+        Bson filter = Filters.eq("assetId", assetKey);
+        if (null != type) {
+            filter = Filters.and(filter, Filters.eq("txType", type));
+        }
+        if (StringUtils.isNotBlank(from)) {
+            filter = Filters.and(filter, Filters.eq("from", from));
+        }
+        if (StringUtils.isNotBlank(to)) {
+            filter = Filters.and(filter, Filters.eq("to", to));
+        }
+
+        List<Document> docsList = this.mongoDBService.pageQuery(CHAIN_ASSET_TX_TABLE, filter, Sorts.descending("createTime"), pageNumber, pageSize);
         List<ChainAssetTx> infoList = new ArrayList<>();
-        long totalCount = mongoDBService.getCount(CHAIN_ASSET_TX_TABLE, Filters.eq("assetId", assetKey));
+//        long totalCount = mongoDBService.getCount(CHAIN_ASSET_TX_TABLE, Filters.eq("assetId", assetKey));
         for (Document document : docsList) {
             infoList.add(DocumentTransferTool.toInfo(document, "id", ChainAssetTx.class));
         }
-        PageInfo<ChainAssetTx> pageInfo = new PageInfo<>(pageNumber, pageSize, totalCount, infoList);
+        PageInfo<ChainAssetTx> pageInfo = new PageInfo<>(pageNumber, pageSize, 0, infoList);
         return pageInfo;
     }
 
@@ -74,7 +86,7 @@ public class MongoChainAssetService implements ChainAssetService {
     @Override
     public PageInfo<ChainAssetHolderInfo> getHoldersByAssetKey(Integer chainId, String assetKey, Integer pageNumber, Integer pageSize) {
         String arr[] = assetKey.split("-");
-        PageInfo<MiniAccountInfo> list = accountLedgerService.getAssetRanking(chainId,Integer.parseInt(arr[0]),Integer.parseInt(arr[1]),pageNumber,pageSize);
+        PageInfo<MiniAccountInfo> list = accountLedgerService.getAssetRanking(chainId, Integer.parseInt(arr[0]), Integer.parseInt(arr[1]), pageNumber, pageSize);
         List<ChainAssetHolderInfo> infoList = new ArrayList<>();
         for (MiniAccountInfo accountInfo : list.getList()) {
             ChainAssetHolderInfo vo = new ChainAssetHolderInfo();
@@ -169,7 +181,7 @@ public class MongoChainAssetService implements ChainAssetService {
             if (null == document) {
                 //如果不存在，则
                 AssetInfo info = getAssetRegInfo(chainId, assetKey);
-                if(null==info){
+                if (null == info) {
                     System.out.println();
                 }
                 ChainAssetInfo po = new ChainAssetInfo();
@@ -177,7 +189,7 @@ public class MongoChainAssetService implements ChainAssetService {
                 po.setDecimals(info.getDecimals());
                 po.setId(assetKey);
                 AssetsSystemTokenInfoVo assetVo = AssetSystemCache.getAssetCache(assetKey);
-                if(null!=assetVo){
+                if (null != assetVo) {
                     Integer registerChainId = Math.toIntExact(assetVo.getSourceChainId());
                     if (null == registerChainId) {
                         registerChainId = info.getChainId();
@@ -185,7 +197,7 @@ public class MongoChainAssetService implements ChainAssetService {
                     po.setSourceChainId(registerChainId);
                     po.setName(assetVo.getName());
                     po.setAssetType(registerChainId != chainId ? 1 : 0);
-                }else {
+                } else {
                     po.setName(info.getSymbol());
                 }
                 po.setInAmount("0");
@@ -228,6 +240,19 @@ public class MongoChainAssetService implements ChainAssetService {
         }
         if (modelList.size() > 0) {
             mongoDBService.bulkWrite(CHAIN_ASSET_TX_TABLE, modelList, options);
+        }
+    }
+
+    @Override
+    public void updateHolderCount(int chainId) {
+        List<ChainAssetInfo> list = this.getList();
+        for (ChainAssetInfo assetInfo : list) {
+            long txCount = mongoDBService.getCount(CHAIN_ASSET_TX_TABLE, Filters.eq("assetId", assetInfo.getId()));
+            assetInfo.setTxCount(txCount);
+            String[] arr = assetInfo.getId().split("-");
+            long holderCount = mongoDBService.getCount(ACCOUNT_LEDGER_TABLE + chainId, Filters.and(Filters.eq("chainId", Integer.parseInt(arr[0])), Filters.eq("assetId", Integer.parseInt(arr[1]))));
+            assetInfo.setAddresses((int) holderCount);
+            this.mongoDBService.updateOne(CHAIN_ASSET_TABLE, Filters.eq("_id", assetInfo.getId()), DocumentTransferTool.toDocument(assetInfo, "id"));
         }
     }
 }

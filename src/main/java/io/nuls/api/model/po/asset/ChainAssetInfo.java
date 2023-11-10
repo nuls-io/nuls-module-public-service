@@ -10,6 +10,8 @@ public class ChainAssetInfo {
     private String name, symbol;
     private int decimals;
     private int addresses;
+    private int addressesYesterday;
+    private int addressesBeforeYesterday;
     private long txCount = 0;
     private long crossTxCount = 0;
     private String inAmount = "0";
@@ -154,5 +156,21 @@ public class ChainAssetInfo {
 
     public void setUpdate(boolean update) {
         this.update = update;
+    }
+
+    public int getAddressesYesterday() {
+        return addressesYesterday;
+    }
+
+    public void setAddressesYesterday(int addressesYesterday) {
+        this.addressesYesterday = addressesYesterday;
+    }
+
+    public int getAddressesBeforeYesterday() {
+        return addressesBeforeYesterday;
+    }
+
+    public void setAddressesBeforeYesterday(int addressesBeforeYesterday) {
+        this.addressesBeforeYesterday = addressesBeforeYesterday;
     }
 }

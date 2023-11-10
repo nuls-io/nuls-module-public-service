@@ -24,4 +24,6 @@ public interface ChainAssetService {
     void save(int chainId, Map<String, ChainAssetTx> chainAssetTxMap, Set<String> chainAssetCountList);
 
     void rollback(int chainId, Map<String, ChainAssetTx> chainAssetTxMap, Set<String> chainAssetCountList);
+
+    void updateHolderCount(int chainId);
 }
