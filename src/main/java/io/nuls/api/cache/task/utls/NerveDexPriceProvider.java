@@ -1,5 +1,6 @@
 package io.nuls.api.cache.task.utls;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import io.nuls.api.model.dto.AssetsSystemTokenInfoVo;
 import io.nuls.api.model.dto.NerveChainVo;
 import io.nuls.api.utils.LoggerUtil;
@@ -62,8 +63,9 @@ public class NerveDexPriceProvider extends BasePriceProvider {
         }
         List<NerveChainVo> list = null;
         try {
+            JSONUtils.getInstance().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
             list = JSONUtils.json2list(response, NerveChainVo.class);
-        } catch (IOException e) {
+        } catch (Exception e) {
             LoggerUtil.commonLog.error("", e);
         }
         return list;

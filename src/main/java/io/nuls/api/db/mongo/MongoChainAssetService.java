@@ -50,7 +50,7 @@ public class MongoChainAssetService implements ChainAssetService {
     @Override
     public PageInfo<ChainAssetInfoVo> getList(int pageNumber, int pageSize) {
         List<Document> docsList = this.mongoDBService.pageQuery(CHAIN_ASSET_TABLE, Sorts.descending("addresses"), pageNumber, pageSize);
-        long totalCount = mongoDBService.getCount(CHAIN_ASSET_TX_TABLE);
+        long totalCount = mongoDBService.getCount(CHAIN_ASSET_TABLE);
         List<ChainAssetInfoVo> infoList = new ArrayList<>();
         for (Document document : docsList) {
             ChainAssetInfo info = DocumentTransferTool.toInfo(document, "id", ChainAssetInfo.class);

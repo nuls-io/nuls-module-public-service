@@ -22,9 +22,11 @@ public class AssetSystemCache {
     public static void putChainList(List<NerveChainVo> voList) {
         voList.forEach(vo -> chainMap.put(vo.getId(),vo));
         chainMap.put(1L,new NerveChainVo("NULS"));
-        chainMap.put(2L,new NerveChainVo("NULS"));
-        chainMap.put(5L,new NerveChainVo("NULS"));
-        chainMap.put(9L,new NerveChainVo("NULS"));
+        chainMap.put(9L,new NerveChainVo("Nerve"));
+        chainMap.put(-1L,new NerveChainVo("NULS"));
+        chainMap.put(-2L,new NerveChainVo("Nerve"));
+        chainMap.put(2L,new NerveChainVo("NULS-Testnet"));
+        chainMap.put(5L,new NerveChainVo("NERVE-Testnet"));
         chainMap.put(108L,new NerveChainVo("Tron"));
     }
     public static AssetsSystemTokenInfoVo getAssetCache(String assetKey) {
