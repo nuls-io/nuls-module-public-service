@@ -13,7 +13,6 @@ public class AssetHoldersRefreshTask implements Runnable {
         this.chainId = chainId;
     }
 
-
     @Override
     public void run() {
         try {

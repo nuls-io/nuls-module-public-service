@@ -23,6 +23,7 @@ public class AssetSystemCacheTask implements Runnable {
                 priceProvider.setURL("https://beta.assets.nabox.io/api/");
             }
             AssetSystemCache.putCacheList(priceProvider.getAllTokenList());
+            AssetSystemCache.putChainList(priceProvider.getChainList());
         } catch (Exception e) {
             Log.error("", e);
         }

@@ -10,6 +10,7 @@ import io.nuls.api.model.po.AssetInfo;
 import io.nuls.api.model.po.PageInfo;
 import io.nuls.api.model.po.asset.ChainAssetHolderInfo;
 import io.nuls.api.model.po.asset.ChainAssetInfo;
+import io.nuls.api.model.po.asset.ChainAssetInfoVo;
 import io.nuls.api.model.po.asset.ChainAssetTx;
 import io.nuls.api.model.po.mini.MiniAccountInfo;
 import io.nuls.api.utils.DocumentTransferTool;
@@ -44,6 +45,19 @@ public class MongoChainAssetService implements ChainAssetService {
             infoList.add(DocumentTransferTool.toInfo(document, "id", ChainAssetInfo.class));
         }
         return infoList;
+    }
+
+    @Override
+    public PageInfo<ChainAssetInfoVo> getList(int pageNumber, int pageSize) {
+        List<Document> docsList = this.mongoDBService.pageQuery(CHAIN_ASSET_TABLE, Sorts.descending("addresses"), pageNumber, pageSize);
+        long totalCount = mongoDBService.getCount(CHAIN_ASSET_TX_TABLE);
+        List<ChainAssetInfoVo> infoList = new ArrayList<>();
+        for (Document document : docsList) {
+            ChainAssetInfo info = DocumentTransferTool.toInfo(document, "id", ChainAssetInfo.class);
+            infoList.add(new ChainAssetInfoVo(info));
+        }
+        PageInfo<ChainAssetInfoVo> pageInfo = new PageInfo<>(pageNumber, pageSize, totalCount, infoList);
+        return pageInfo;
     }
 
     @Override
@@ -251,8 +265,24 @@ public class MongoChainAssetService implements ChainAssetService {
             assetInfo.setTxCount(txCount);
             String[] arr = assetInfo.getId().split("-");
             long holderCount = mongoDBService.getCount(ACCOUNT_LEDGER_TABLE + chainId, Filters.and(Filters.eq("chainId", Integer.parseInt(arr[0])), Filters.eq("assetId", Integer.parseInt(arr[1]))));
+
+            long nowTime = System.currentTimeMillis();
+            if (changeDay(assetInfo.getAddressesTime(), nowTime)) {
+                //如果和上次不是同一天，则记录上次的数量为昨天数量
+                assetInfo.setAddressesYesterday(assetInfo.getAddresses());
+            }
             assetInfo.setAddresses((int) holderCount);
+            assetInfo.setAddressesTime(nowTime);
             this.mongoDBService.updateOne(CHAIN_ASSET_TABLE, Filters.eq("_id", assetInfo.getId()), DocumentTransferTool.toDocument(assetInfo, "id"));
         }
     }
+
+    private static final long dayTime = 24*3600000;
+    private static  boolean changeDay(Long addressesTime, long nowTime) {
+        if (null == addressesTime) {
+            return true;
+        }
+        return addressesTime/dayTime != nowTime/dayTime;
+    }
+
 }

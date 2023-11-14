@@ -11,7 +11,7 @@ public class ChainAssetInfo {
     private int decimals;
     private int addresses;
     private int addressesYesterday;
-    private int addressesBeforeYesterday;
+    private Long addressesTime;
     private long txCount = 0;
     private long crossTxCount = 0;
     private String inAmount = "0";
@@ -166,11 +166,11 @@ public class ChainAssetInfo {
         this.addressesYesterday = addressesYesterday;
     }
 
-    public int getAddressesBeforeYesterday() {
-        return addressesBeforeYesterday;
+    public Long getAddressesTime() {
+        return addressesTime;
     }
 
-    public void setAddressesBeforeYesterday(int addressesBeforeYesterday) {
-        this.addressesBeforeYesterday = addressesBeforeYesterday;
+    public void setAddressesTime(Long addressesTime) {
+        this.addressesTime = addressesTime;
     }
 }

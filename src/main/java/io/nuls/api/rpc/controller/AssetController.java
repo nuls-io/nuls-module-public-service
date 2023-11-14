@@ -68,12 +68,20 @@ public class AssetController {
 
     @RpcMethod("getTopAssets")
     public RpcResult getTopAssets(List<Object> params) {
-        List<ChainAssetInfo> list = this.assetService.getList();
-        List<ChainAssetInfoVo> voList = new ArrayList<>();
-        for(ChainAssetInfo info:list){
-            voList.add(new ChainAssetInfoVo(info));
+        VerifyUtils.verifyParams(params, 2);
+        Integer pageNumber, pageSize;
+        try {
+            pageNumber = (int) params.get(0);
+        } catch (Exception e) {
+            return RpcResult.paramError("[pageNumber] is inValid");
         }
-        return new RpcResult().setResult(voList);
+        try {
+            pageSize = (int) params.get(1);
+        } catch (Exception e) {
+            return RpcResult.paramError("[pageSize] is inValid");
+        }
+        PageInfo<ChainAssetInfoVo> list = this.assetService.getList(pageNumber,pageSize);
+        return new RpcResult().setResult(list);
     }
 
     @RpcMethod("getTxsByAssetKey")

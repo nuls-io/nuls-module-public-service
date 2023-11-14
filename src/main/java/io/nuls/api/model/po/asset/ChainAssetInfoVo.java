@@ -2,6 +2,8 @@ package io.nuls.api.model.po.asset;
 
 import io.nuls.api.cache.AssetSystemCache;
 import io.nuls.api.model.dto.AssetsSystemTokenInfoVo;
+import io.nuls.api.model.dto.NerveChainVo;
+import io.nuls.core.model.DoubleUtils;
 import io.nuls.core.model.StringUtils;
 
 public class ChainAssetInfoVo {
@@ -12,23 +14,27 @@ public class ChainAssetInfoVo {
     private String name, symbol;
     private int decimals;
     private int addresses;
+    private double addressesChangeRate;
     private long txCount = 0;
     private int sourceChainId;
+
+    private String sourceChainName, iconUrl;
     private String contract;
-    private String website, community,price;
+    private String website, community, price;
 
     public ChainAssetInfoVo(ChainAssetInfo info) {
         //todo nulsChainAmount
-        this(info.getId(), info.getTotalSupply(), "0", info.getName(), info.getSymbol(), info.getDecimals(), info.getAddresses(), info.getTxCount(), info.getSourceChainId(), info.getContract(), info.getWebsite(), info.getCommunity());
+        this(info.getId(), info.getTotalSupply(), "0", info.getName(), info.getSymbol(), info.getDecimals(), info.getAddresses(), info.getAddressesYesterday(), info.getTxCount(), info.getSourceChainId(), info.getContract(), info.getWebsite(), info.getCommunity());
     }
 
-    public ChainAssetInfoVo(String id, String totalSupply, String nulsChainSupply, String name, String symbol, int decimals, int addresses, long txCount, int sourceChainId, String contract, String website, String community) {
+    public ChainAssetInfoVo(String id, String totalSupply, String nulsChainSupply, String name, String symbol, int decimals, int addresses, int addressesYesterday, long txCount, int sourceChainId, String contract, String website, String community) {
         AssetsSystemTokenInfoVo vo = AssetSystemCache.getAssetCache(id);
         if (null == vo) {
             vo = new AssetsSystemTokenInfoVo();
             vo.setSourceChainId((long) sourceChainId);
-        }else {
+        } else {
             this.price = vo.getPrice();
+            this.iconUrl = vo.getImageUrl();
         }
         this.id = id;
         this.totalSupply = totalSupply;
@@ -44,6 +50,16 @@ public class ChainAssetInfoVo {
         this.community = community;
         if (vo != null && StringUtils.isBlank(contract)) {
             this.contract = vo.getContractAddress();
+        }
+        NerveChainVo chainVo = AssetSystemCache.getChain((long) this.sourceChainId);
+        if (null != chainVo) {
+            this.sourceChainName = chainVo.getName();
+        }
+        if (addressesYesterday == 0) {
+            this.addressesChangeRate = 0d;
+        } else {
+            int add = addresses - addressesYesterday;
+            addressesChangeRate = DoubleUtils.div(add * 100, addressesYesterday, 4);
         }
     }
 
@@ -149,5 +165,29 @@ public class ChainAssetInfoVo {
 
     public void setPrice(String price) {
         this.price = price;
+    }
+
+    public String getSourceChainName() {
+        return sourceChainName;
+    }
+
+    public void setSourceChainName(String sourceChainName) {
+        this.sourceChainName = sourceChainName;
+    }
+
+    public String getIconUrl() {
+        return iconUrl;
+    }
+
+    public void setIconUrl(String iconUrl) {
+        this.iconUrl = iconUrl;
+    }
+
+    public double getAddressesChangeRate() {
+        return addressesChangeRate;
+    }
+
+    public void setAddressesChangeRate(double addressesChangeRate) {
+        this.addressesChangeRate = addressesChangeRate;
     }
 }

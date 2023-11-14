@@ -3,6 +3,7 @@ package io.nuls.api.db;
 import io.nuls.api.model.po.PageInfo;
 import io.nuls.api.model.po.asset.ChainAssetHolderInfo;
 import io.nuls.api.model.po.asset.ChainAssetInfo;
+import io.nuls.api.model.po.asset.ChainAssetInfoVo;
 import io.nuls.api.model.po.asset.ChainAssetTx;
 
 import java.util.List;
@@ -26,4 +27,6 @@ public interface ChainAssetService {
     void rollback(int chainId, Map<String, ChainAssetTx> chainAssetTxMap, Set<String> chainAssetCountList);
 
     void updateHolderCount(int chainId);
+
+    PageInfo<ChainAssetInfoVo> getList(int pageNumber, int pageSize);
 }
