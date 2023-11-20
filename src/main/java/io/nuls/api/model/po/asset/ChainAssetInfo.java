@@ -1,5 +1,7 @@
 package io.nuls.api.model.po.asset;
 
+import java.math.BigInteger;
+
 public class ChainAssetInfo {
     private String id;//9-1
 
@@ -21,6 +23,7 @@ public class ChainAssetInfo {
     private String website, community;
 
     private boolean update;
+    private String nulsChainSupply = "0";
 
     public String getId() {
         return id;
@@ -172,5 +175,13 @@ public class ChainAssetInfo {
 
     public void setAddressesTime(Long addressesTime) {
         this.addressesTime = addressesTime;
+    }
+
+    public void setNulsChainSupply(String nulsChainSupply) {
+        this.nulsChainSupply = nulsChainSupply;
+    }
+
+    public String getNulsChainSupply() {
+        return nulsChainSupply;
     }
 }

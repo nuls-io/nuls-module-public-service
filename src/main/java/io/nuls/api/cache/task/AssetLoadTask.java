@@ -10,7 +10,7 @@ import io.nuls.core.log.Log;
 
 import java.util.Collection;
 
-public class ChainAssetLoadTask implements Runnable {
+public class AssetLoadTask implements Runnable {
 
     private ChainAssetService service;
 
@@ -21,13 +21,10 @@ public class ChainAssetLoadTask implements Runnable {
                 service = SpringLiteContext.getBean(ChainAssetService.class);
             }
             ChainAssetCache.initCache(service.getList());
-
             while (!AssetSystemCache.isCached()) {
                 Thread.sleep(5000L);
             }
-
             updateAssetsInfo();
-
         } catch (Exception e) {
             Log.error("", e);
         }
@@ -36,9 +33,9 @@ public class ChainAssetLoadTask implements Runnable {
     private void updateAssetsInfo() {
 
         Collection<ChainAssetInfo> collection = ChainAssetCache.getAssetInfoList();
-        for(ChainAssetInfo info : collection){
+        for (ChainAssetInfo info : collection) {
             AssetsSystemTokenInfoVo vo = AssetSystemCache.getAssetCache(info.getId());
-            if(null==vo){
+            if (null == vo) {
                 continue;
             }
             info.setTotalSupply(vo.getTotalSupply());

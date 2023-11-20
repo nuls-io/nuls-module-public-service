@@ -24,7 +24,7 @@ public class ChainAssetInfoVo {
 
     public ChainAssetInfoVo(ChainAssetInfo info) {
         //todo nulsChainAmount
-        this(info.getId(), info.getTotalSupply(), "0", info.getName(), info.getSymbol(), info.getDecimals(), info.getAddresses(), info.getAddressesYesterday(), info.getTxCount(), info.getSourceChainId(), info.getContract(), info.getWebsite(), info.getCommunity());
+        this(info.getId(), info.getTotalSupply(), info.getNulsChainSupply(), info.getName(), info.getSymbol(), info.getDecimals(), info.getAddresses(), info.getAddressesYesterday(), info.getTxCount(), info.getSourceChainId(), info.getContract(), info.getWebsite(), info.getCommunity());
     }
 
     public ChainAssetInfoVo(String id, String totalSupply, String nulsChainSupply, String name, String symbol, int decimals, int addresses, int addressesYesterday, long txCount, int sourceChainId, String contract, String website, String community) {

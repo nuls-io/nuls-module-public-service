@@ -1,5 +1,6 @@
 package io.nuls.api.db.mongo;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.model.*;
 import io.nuls.api.cache.AssetSystemCache;
 import io.nuls.api.db.AccountLedgerService;
@@ -23,6 +24,7 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -264,25 +266,33 @@ public class MongoChainAssetService implements ChainAssetService {
             long txCount = mongoDBService.getCount(CHAIN_ASSET_TX_TABLE, Filters.eq("assetId", assetInfo.getId()));
             assetInfo.setTxCount(txCount);
             String[] arr = assetInfo.getId().split("-");
-            long holderCount = mongoDBService.getCount(ACCOUNT_LEDGER_TABLE + chainId, Filters.and(Filters.eq("chainId", Integer.parseInt(arr[0])), Filters.eq("assetId", Integer.parseInt(arr[1]))));
-
+            Bson filter = Filters.and(Filters.eq("chainId", Integer.parseInt(arr[0])), Filters.eq("assetId", Integer.parseInt(arr[1])));
+            BasicDBObject fields = new BasicDBObject();
+            fields.append("_id", 1).append("totalBalance", 1);
+            List<Document> docList = mongoDBService.query(ACCOUNT_LEDGER_TABLE + chainId, filter, fields);
+            BigInteger nulsChainSupply = BigInteger.ZERO;
+            for (Document doc : docList) {
+                nulsChainSupply = nulsChainSupply.add(new BigInteger(doc.getString("totalBalance")));
+            }
+            assetInfo.setNulsChainSupply(nulsChainSupply.toString());
             long nowTime = System.currentTimeMillis();
             if (changeDay(assetInfo.getAddressesTime(), nowTime)) {
                 //如果和上次不是同一天，则记录上次的数量为昨天数量
                 assetInfo.setAddressesYesterday(assetInfo.getAddresses());
             }
-            assetInfo.setAddresses((int) holderCount);
+            assetInfo.setAddresses(docList.size());
             assetInfo.setAddressesTime(nowTime);
             this.mongoDBService.updateOne(CHAIN_ASSET_TABLE, Filters.eq("_id", assetInfo.getId()), DocumentTransferTool.toDocument(assetInfo, "id"));
         }
     }
 
-    private static final long dayTime = 24*3600000;
-    private static  boolean changeDay(Long addressesTime, long nowTime) {
+    private static final long dayTime = 24 * 3600000;
+
+    private static boolean changeDay(Long addressesTime, long nowTime) {
         if (null == addressesTime) {
             return true;
         }
-        return addressesTime/dayTime != nowTime/dayTime;
+        return addressesTime / dayTime != nowTime / dayTime;
     }
 
 }

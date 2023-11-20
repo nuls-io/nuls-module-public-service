@@ -2,7 +2,6 @@ package io.nuls.api.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-@JsonIgnoreProperties(allowSetters = true)
 public class NerveChainVo {
 
     /**
