@@ -523,7 +523,7 @@ public class WalletRpcHandler {
         try {
             map = (Map) RpcCall.request(ModuleE.SC.abbr, CommandConstant.CONTRACT_RESULT, params);
         } catch (NulsException e) {
-            LoggerUtil.commonLog.error("", e);
+//            LoggerUtil.commonLog.error("", e);
             return Result.getFailed(CommonCodeConstanst.DATA_NOT_FOUND);
         }
         map = (Map) RpcCall.request(ModuleE.SC.abbr, CommandConstant.CONTRACT_RESULT, params);
