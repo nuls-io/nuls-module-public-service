@@ -24,6 +24,8 @@ public class CacheManager {
      */
     private static Map<String, AssetInfo> assetInfoMap = new ConcurrentHashMap<>();
 
+    private static boolean inited = false;
+
 
     public static void addApiCache(int chainID, ApiCache apiCache) {
         apiCacheMap.put(chainID, apiCache);
@@ -43,6 +45,11 @@ public class CacheManager {
         CoinContextInfo contextInfo = new CoinContextInfo();
         apiCache.setCoinContextInfo(contextInfo);
         apiCacheMap.put(chainInfo.getChainId(), apiCache);
+        inited = true;
+    }
+
+    public static boolean isInited() {
+        return inited;
     }
 
     public static void removeApiCache(int chainId) {

@@ -177,6 +177,9 @@ public class StatisticalNulsTask implements Runnable {
         reason = "stolen blacklist";
         type = "Permanent lock";
         for (String blackAddress : AddressTool.BLOCK_HOLE_ADDRESS_SET) {
+            if (chainId != 1 && blackAddress.startsWith("NULS")) {
+                continue;
+            }
             BigInteger blackNuls = accountService.getAccountTotalBalance(chainId, blackAddress);
             destroyNuls = destroyNuls.add(blackNuls);
             String proportion = null;
@@ -190,6 +193,9 @@ public class StatisticalNulsTask implements Runnable {
         // add by pierre at 2020-04-02 协议升级黑洞地址
         if (ApiContext.protocolVersion >= 5) {
             for (String blackAddress : AddressTool.BLOCK_HOLE_ADDRESS_SET_5) {
+                if (chainId != 1 && blackAddress.startsWith("NULS")) {
+                    continue;
+                }
                 BigInteger blackNuls = accountService.getAccountTotalBalance(chainId, blackAddress);
                 destroyNuls = destroyNuls.add(blackNuls);
                 String proportion = null;
