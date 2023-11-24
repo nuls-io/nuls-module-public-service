@@ -3,11 +3,14 @@ package io.nuls.api.rpc.controller;
 import io.nuls.api.ApiContext;
 import io.nuls.api.analysis.WalletRpcHandler;
 import io.nuls.api.cache.ApiCache;
+import io.nuls.api.cache.ChainAssetCache;
 import io.nuls.api.constant.AddressType;
 import io.nuls.api.db.*;
 import io.nuls.api.exception.JsonRpcException;
 import io.nuls.api.manager.CacheManager;
 import io.nuls.api.model.po.*;
+import io.nuls.api.model.po.asset.ChainAssetInfo;
+import io.nuls.api.model.po.asset.ChainAssetInfoVo;
 import io.nuls.api.model.rpc.RpcErrorCode;
 import io.nuls.api.model.rpc.RpcResult;
 import io.nuls.api.model.rpc.RpcResultError;
@@ -26,10 +29,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Controller
 public class ChainController {
+
+    private static Pattern pattern = Pattern.compile("^[-\\+]?[\\d]*$");
 
     @Autowired
     private BlockService blockService;
@@ -190,16 +196,29 @@ public class ChainController {
         }
         int length = text.length();
         SearchResultDTO result = null;
-        if (length < 20) {
+        if (length <= 10 && isNumber(text)) {
             result = getBlockByHeight(chainId, text);
         } else if (length < 40) {
-            boolean isAddress = AddressTool.validAddress(chainId, text);
-            if (isAddress) {
-                byte[] address = AddressTool.getAddress(text);
-                if (address[2] == AddressType.CONTRACT_ADDRESS_TYPE) {
-                    result = getContractByAddress(chainId, text);
+            if (text.startsWith("NULSd") || text.startsWith("tNULSe")) {
+                boolean isAddress = AddressTool.validAddress(chainId, text);
+                if (isAddress) {
+                    byte[] address = AddressTool.getAddress(text);
+                    if (address[2] == AddressType.CONTRACT_ADDRESS_TYPE) {
+                        result = getContractByAddress(chainId, text);
+                    } else {
+                        result = getAccountByAddress(chainId, text);
+                    }
+                }
+            } else {
+                result = new SearchResultDTO();
+                List<ChainAssetInfo> list = ChainAssetCache.search(text);
+                if (null != list && !list.isEmpty()) {
+                    List<ChainAssetInfoVo> voList = new ArrayList<>();
+                    list.forEach(info -> voList.add(new ChainAssetInfoVo(info)));
+                    result.setData(voList);
+                    result.setType("asset");
                 } else {
-                    result = getAccountByAddress(chainId, text);
+                    return RpcResult.dataNotFound();
                 }
             }
         } else {
@@ -209,6 +228,10 @@ public class ChainController {
             return RpcResult.dataNotFound();
         }
         return new RpcResult().setResult(result);
+    }
+
+    private boolean isNumber(String text) {
+        return pattern.matcher(text).matches();
     }
 
     private SearchResultDTO getContractByAddress(int chainId, String text) {
@@ -344,7 +367,9 @@ public class ChainController {
             count = agentService.agentsCount(chainId, apiCache.getBestHeader().getHeight());
         }
         map.put("totalNodes", count);
-
+        map.put("blockRewardAfterDeflation", coinContextInfo.getBlockRewardAfterDeflation());
+        map.put("blockRewardBeforeDeflation", coinContextInfo.getBlockRewardBeforeDeflation());
+        map.put("nextDeflationTime", coinContextInfo.getNextDeflationTime());
         return RpcResult.success(map);
     }
 

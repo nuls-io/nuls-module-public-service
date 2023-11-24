@@ -8,6 +8,7 @@ import io.nuls.api.constant.ApiErrorCode;
 import io.nuls.api.db.*;
 import io.nuls.api.manager.CacheManager;
 import io.nuls.api.model.po.*;
+import io.nuls.api.model.po.asset.ChainAssetTx;
 import io.nuls.api.utils.DBUtil;
 import io.nuls.api.utils.LoggerUtil;
 import io.nuls.base.basic.AddressTool;
@@ -52,6 +53,8 @@ public class RollbackService {
     private ChainService chainService;
     @Autowired
     private AccountLedgerService ledgerService;
+    @Autowired
+    private ChainAssetService chainAssetService;
 
     //记录每个区块打包交易涉及到的账户的余额变动
     private Map<String, AccountInfo> accountInfoMap = new HashMap<>();
@@ -93,6 +96,8 @@ public class RollbackService {
     private Map<String, Nrc1155TokenIdInfo> nrc1155TokenIdMap = new HashMap<>();
     //记录合约nrc721转账信息
     private List<String> token1155TransferHashList = new ArrayList<>();
+    private Map<String, ChainAssetTx> chainAssetTxMap = new HashMap<>();
+    private Set<String> chainAssetCountList = new HashSet<>();
 
     public boolean rollbackBlock(int chainId, long blockHeight) {
         clear();
@@ -190,7 +195,7 @@ public class RollbackService {
     }
 
     private void processTxs(int chainId, List<TransactionInfo> txs) {
-        for (int i = txs.size() - 1; i >=0 ; i--) {
+        for (int i = txs.size() - 1; i >= 0; i--) {
             TransactionInfo tx = txs.get(i);
             if (tx.getType() == TxType.COIN_BASE) {
                 processCoinBaseTx(chainId, tx);
@@ -236,6 +241,45 @@ public class RollbackService {
             } else if (tx.getType() == TxType.LEDGER_ASSET_REG_TRANSFER) {
                 processLedgerAssetRegTransferTx(chainId, tx);
             }
+            processChainAssetData(chainId, tx);
+        }
+    }
+
+    private void processChainAssetData(int chainId, TransactionInfo tx) {
+        if (tx.getCoinTos() == null) {
+            return;
+        }
+        for (CoinToInfo output : tx.getCoinTos()) {
+            if (output.getAmount().compareTo(BigInteger.ZERO) <= 0) {
+                continue;
+            }
+            String fromAddress = null;
+            if (null != tx.getCoinFroms()) {
+                for (CoinFromInfo input : tx.getCoinFroms()) {
+                    if (input.getChainId() == output.getChainId() && input.getAssetsId() == output.getAssetsId() && input.getAmount().compareTo(output.getAmount()) >= 0) {
+                        fromAddress = input.getAddress();
+                        break;
+                    }
+                }
+            }
+            String id = tx.getHash() + "-" + output.getAssetKey();
+            ChainAssetTx po = this.chainAssetTxMap.get(id);
+            if (null == po) {
+                po = new ChainAssetTx();
+                po.setId(id);
+                po.setHash(tx.getHash());
+                po.setHeight(tx.getHeight());
+                po.setAssetId(output.getAssetKey());
+                po.setAmount(output.getAmount().toString());
+                po.setFrom(fromAddress);
+                po.setTo(output.getAddress());
+                po.setTxTime(tx.getCreateTime());
+                po.setTxType(tx.getType());
+            } else {
+                po.setAmount(new BigInteger(po.getAmount()).add(output.getAmount()).toString());
+            }
+            chainAssetTxMap.put(id, po);
+            chainAssetCountList.add(po.getAssetId());
         }
     }
 
@@ -1020,6 +1064,11 @@ public class RollbackService {
         }
 
         if (syncInfo.isFinish()) {
+            syncInfo.setStep(91);
+            chainService.updateStep(syncInfo);
+            this.chainAssetService.rollback(chainId, chainAssetTxMap, chainAssetCountList);
+        }
+        if (syncInfo.getStep() == 91) {
             token1155Service.rollbackTokenIds(chainId, nrc1155TokenIdMap);
             syncInfo.setStep(90);
             chainService.updateStep(syncInfo);

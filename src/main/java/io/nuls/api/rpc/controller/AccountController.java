@@ -36,10 +36,11 @@ import io.nuls.core.basic.Result;
 import io.nuls.core.core.annotation.Autowired;
 import io.nuls.core.core.annotation.Controller;
 import io.nuls.core.core.annotation.RpcMethod;
+import io.nuls.core.crypto.HexUtil;
 import io.nuls.core.model.StringUtils;
 import io.nuls.core.parse.MapUtils;
 
-import java.util.ArrayList;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +51,7 @@ import java.util.stream.Collectors;
  */
 @Controller
 public class AccountController {
+    private static String BlockHoleAddress;
     @Autowired
     private ApiConfig apiConfig;
     @Autowired
@@ -408,6 +410,17 @@ public class AccountController {
             accountInfo.setTimeLock(balanceInfo.getTimeLock());
         }
         accountInfo.setSymbol(ApiContext.defaultSymbol);
+        if(StringUtils.isBlank(BlockHoleAddress)){
+            BlockHoleAddress =  AddressTool.getAddressString(HexUtil.decode("000000000000000000000000000000000000000000000000000000000000000000"),chainId);
+        }
+        if(address.equals(BlockHoleAddress)){
+            //黑洞地址特殊处理
+            accountInfo.setAlias("BlockHoleAddress");
+            accountInfo.setBalance(BigInteger.ZERO);
+            accountInfo.setTotalBalance(BigInteger.ZERO);
+            accountInfo.setTotalIn(BigInteger.ZERO);
+            accountInfo.setType(9);
+        }
         return result.setResult(accountInfo);
     }
 

@@ -7,6 +7,8 @@ public interface DBTableConstant {
     String TEST_TABLE = "test-table";
 
     String CHAIN_INFO_TABLE = "chain_info_table";
+    String CHAIN_ASSET_TABLE = "chain_asset_table";
+    String CHAIN_ASSET_TX_TABLE = "chain_asset_tx_table";
     String ACTIVE_ADDRESS_TABLE = "active_address_table";
 
     String CHAIN_CONFIG_TABLE = "chain_config_table";

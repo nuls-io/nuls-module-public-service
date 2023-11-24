@@ -25,6 +25,13 @@ public class CoinContextInfo {
 
     private long txCount;
 
+//    当前平均区块奖励
+    private long blockRewardBeforeDeflation;
+    //减产后平均区块奖励
+    private long blockRewardAfterDeflation;
+//    next deflation time下次检查时间
+    private long nextDeflationTime;
+
     private List<DestroyInfo> destroyInfoList;
 
     public CoinContextInfo() {
@@ -125,5 +132,29 @@ public class CoinContextInfo {
 
     public void setDestroyInfoList(List<DestroyInfo> destroyInfoList) {
         this.destroyInfoList = destroyInfoList;
+    }
+
+    public long getBlockRewardBeforeDeflation() {
+        return blockRewardBeforeDeflation;
+    }
+
+    public void setBlockRewardBeforeDeflation(long blockRewardBeforeDeflation) {
+        this.blockRewardBeforeDeflation = blockRewardBeforeDeflation;
+    }
+
+    public long getBlockRewardAfterDeflation() {
+        return blockRewardAfterDeflation;
+    }
+
+    public void setBlockRewardAfterDeflation(long blockRewardAfterDeflation) {
+        this.blockRewardAfterDeflation = blockRewardAfterDeflation;
+    }
+
+    public long getNextDeflationTime() {
+        return nextDeflationTime;
+    }
+
+    public void setNextDeflationTime(long nextDeflationTime) {
+        this.nextDeflationTime = nextDeflationTime;
     }
 }

@@ -6,7 +6,6 @@ import io.nuls.api.model.po.AccountTokenInfo;
 import io.nuls.api.model.po.PageInfo;
 import io.nuls.api.model.po.TokenTransfer;
 import io.nuls.api.utils.DocumentTransferTool;
-import io.nuls.api.utils.LoggerUtil;
 import io.nuls.core.core.annotation.Autowired;
 import io.nuls.core.core.annotation.Component;
 import io.nuls.core.model.BigIntegerUtils;

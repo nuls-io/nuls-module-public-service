@@ -1,6 +1,8 @@
 package io.nuls.api.db;
 
-import io.nuls.api.model.po.*;
+import io.nuls.api.model.po.Nrc721TokenIdInfo;
+import io.nuls.api.model.po.PageInfo;
+import io.nuls.api.model.po.Token721Transfer;
 import io.nuls.api.model.po.AccountToken721Info;
 
 import java.util.List;

@@ -3,9 +3,13 @@ package io.nuls.api.rpc.controller;
 import io.nuls.api.ApiContext;
 import io.nuls.api.analysis.AnalysisHandler;
 import io.nuls.api.analysis.WalletRpcHandler;
+import io.nuls.api.cache.ApiCache;
+import io.nuls.api.constant.AssetTypeEnum;
 import io.nuls.api.db.*;
 import io.nuls.api.exception.JsonRpcException;
 import io.nuls.api.manager.CacheManager;
+import io.nuls.api.model.dto.TransactionInfoVo;
+import io.nuls.api.model.dto.TransferItemVo;
 import io.nuls.api.model.entity.CallContractData;
 import io.nuls.api.model.entity.CreateContractData;
 import io.nuls.api.model.entity.DeleteContractData;
@@ -22,7 +26,6 @@ import io.nuls.base.basic.NulsByteBuffer;
 import io.nuls.base.data.Transaction;
 import io.nuls.core.basic.Result;
 import io.nuls.core.constant.CommonCodeConstanst;
-import io.nuls.core.constant.ErrorCode;
 import io.nuls.core.constant.TxType;
 import io.nuls.core.core.annotation.Autowired;
 import io.nuls.core.core.annotation.Controller;
@@ -53,6 +56,135 @@ public class TransactionController {
     private BlockService blockService;
     @Autowired
     private StatisticalService statisticalService;
+
+    @RpcMethod("getTxV2")
+    public RpcResult getTxV2(List<Object> params) {
+        VerifyUtils.verifyParams(params, 2);
+        int chainId;
+        String hash;
+        try {
+            chainId = (int) params.get(0);
+        } catch (Exception e) {
+            return RpcResult.paramError("[chainId] is inValid");
+        }
+        try {
+            hash = "" + params.get(1);
+        } catch (Exception e) {
+            return RpcResult.paramError("[hash] is inValid");
+        }
+        if (StringUtils.isBlank(hash)) {
+            return RpcResult.paramError("[hash] is required");
+        }
+        if (!CacheManager.isChainExist(chainId)) {
+            return RpcResult.dataNotFound();
+        }
+
+        Result<TransactionInfo> result = WalletRpcHandler.getTx(chainId, hash);
+        if (result == null) {
+            return RpcResult.dataNotFound();
+        }
+        if (result.isFailed()) {
+            throw new JsonRpcException(result.getErrorCode());
+        }
+        TransactionInfo tx = result.getData();
+        if (tx == null) {
+            return RpcResult.dataNotFound();
+        }
+        try {
+            RpcResult rpcResult = new RpcResult();
+            List<TransferItemVo> fromList = new ArrayList<>();
+            List<TransferItemVo> toList = new ArrayList<>();
+            if (tx.getType() == TxType.COIN_BASE) {
+                BlockHeaderInfo headerInfo = blockService.getBlockHeader(chainId, tx.getHeight());
+                MiniCoinBaseInfo coinBaseInfo = new MiniCoinBaseInfo(headerInfo.getRoundIndex(), headerInfo.getPackingIndexOfRound(), tx.getHash());
+                tx.setTxData(coinBaseInfo);
+            } else if (tx.getType() == TxType.DEPOSIT || tx.getType() == TxType.CONTRACT_DEPOSIT) {
+                DepositInfo depositInfo = (DepositInfo) tx.getTxData();
+                AgentInfo agentInfo = agentService.getAgentByHash(chainId, depositInfo.getAgentHash());
+                tx.setTxData(agentInfo);
+            } else if (tx.getType() == TxType.CANCEL_DEPOSIT || tx.getType() == TxType.CONTRACT_CANCEL_DEPOSIT) {
+                DepositInfo depositInfo = (DepositInfo) tx.getTxData();
+                depositInfo = depositService.getDepositInfoByHash(chainId, depositInfo.getTxHash());
+                AgentInfo agentInfo = agentService.getAgentByHash(chainId, depositInfo.getAgentHash());
+                tx.setTxData(agentInfo);
+            } else if (tx.getType() == TxType.STOP_AGENT || tx.getType() == TxType.CONTRACT_STOP_AGENT) {
+                AgentInfo agentInfo = (AgentInfo) tx.getTxData();
+                agentInfo = agentService.getAgentByHash(chainId, agentInfo.getTxHash());
+                tx.setTxData(agentInfo);
+            } else if (tx.getType() == TxType.YELLOW_PUNISH) {
+                List<TxDataInfo> punishLogs = punishService.getYellowPunishLog(chainId, tx.getHash());
+                tx.setTxDataList(punishLogs);
+            } else if (tx.getType() == TxType.RED_PUNISH) {
+                PunishLogInfo punishLog = punishService.getRedPunishLog(chainId, tx.getHash());
+                tx.setTxData(punishLog);
+            } else if (tx.getType() == TxType.CALL_CONTRACT) {
+                ContractCallInfo txData = (ContractCallInfo) tx.getTxData();
+                do {
+                    if (txData.getResultInfo() == null) {
+                        continue;
+                    }
+                    if (txData.getResultInfo().getTokenTransfers() != null && !txData.getResultInfo().getTokenTransfers().isEmpty()) {
+                        for (TokenTransfer transfer : txData.getResultInfo().getTokenTransfers()) {
+                            TransferItemVo from = new TransferItemVo(transfer.getFromAddress(), AssetTypeEnum.NRC20, transfer.getValue(), null, transfer.getDecimals(), transfer.getSymbol(), null, null,transfer.getContractAddress());
+                            fromList.add(from);
+                            TransferItemVo to = new TransferItemVo(transfer.getToAddress(), AssetTypeEnum.NRC20, transfer.getValue(), null, transfer.getDecimals(), transfer.getSymbol(), null, null,transfer.getContractAddress());
+                            toList.add(to);
+                        }
+                        txData.getResultInfo().setTokenTransfers(null);
+                    }
+                    if (txData.getResultInfo().getToken721Transfers() != null && !txData.getResultInfo().getToken721Transfers().isEmpty()) {
+                        for (Token721Transfer transfer : txData.getResultInfo().getToken721Transfers()) {
+                            TransferItemVo from = new TransferItemVo(transfer.getFromAddress(), AssetTypeEnum.NRC721, "1", null, 0, transfer.getSymbol(), null, transfer.getTokenId(),transfer.getContractAddress());
+                            fromList.add(from);
+                            TransferItemVo to = new TransferItemVo(transfer.getToAddress(), AssetTypeEnum.NRC721, "1", null, 0, transfer.getSymbol(), null, transfer.getTokenId(),transfer.getContractAddress());
+                            toList.add(to);
+                        }
+                        txData.getResultInfo().setToken721Transfers(null);
+                    }
+                    if (txData.getResultInfo().getToken1155Transfers() != null && !txData.getResultInfo().getToken1155Transfers().isEmpty()) {
+                        for (Token1155Transfer transfer : txData.getResultInfo().getToken1155Transfers()) {
+                            TransferItemVo from = new TransferItemVo(transfer.getFromAddress(), AssetTypeEnum.NRC1155, transfer.getValue(), null, 0, transfer.getSymbol(), null, transfer.getTokenId(),transfer.getContractAddress());
+                            fromList.add(from);
+                            TransferItemVo to = new TransferItemVo(transfer.getToAddress(), AssetTypeEnum.NRC1155, transfer.getValue(), null, 0, transfer.getSymbol(), null, transfer.getTokenId(),transfer.getContractAddress());
+                            toList.add(to);
+                        }
+                        txData.getResultInfo().setToken1155Transfers(null);
+                    }
+                } while (false);
+
+            }
+            List<CoinFromInfo> froms = tx.getCoinFroms();
+            for (CoinFromInfo from : froms) {
+                String assetType = AssetTypeEnum.CHAIN_ASSET;
+                fromList.add(new TransferItemVo(from.getAddress(), assetType, from.getAmount().toString(), from.getAssetKey(), from.getDecimal(), from.getSymbol(), null, null, null));
+            }
+            List<CoinToInfo> tos = tx.getCoinTos();
+            for (CoinToInfo to : tos) {
+                String assetType = AssetTypeEnum.CHAIN_ASSET;
+                boolean locked = false;
+                if (to.getLockTime() < 0) {
+                    locked = true;
+                } else if (to.getLockTime() > 1000000000) {
+                    //时间锁定
+                    locked = to.getLockTime() > System.currentTimeMillis() / 1000;
+                } else if (to.getLockTime() > 0) {
+                    //高度锁定
+                    ApiCache apiCache = CacheManager.getCache(chainId);
+                    if (null != apiCache && null != apiCache.getBestHeader()) {
+                        locked = to.getLockTime() > apiCache.getBestHeader().getHeight();
+                    }
+                }
+                toList.add(new TransferItemVo(to.getAddress(), assetType, to.getAmount().toString(), to.getAssetKey(), to.getDecimal(), to.getSymbol(), locked, null, null));
+            }
+            tx.setCoinFroms(null);
+            tx.setCoinTos(null);
+            rpcResult.setResult(new TransactionInfoVo(tx, fromList, toList));
+            return rpcResult;
+        } catch (Exception e) {
+            LoggerUtil.commonLog.error(e);
+            return RpcResult.failed(RpcErrorCode.TX_PARSE_ERROR);
+        }
+    }
 
     @RpcMethod("getTx")
     public RpcResult getTx(List<Object> params) {
@@ -398,7 +530,6 @@ public class TransactionController {
     }
 
 
-
     private RpcResult validateContractArgs(String[][] args) {
         if (args == null || args.length == 0) {
             return RpcResult.success(null);
@@ -484,7 +615,7 @@ public class TransactionController {
             return RpcResult.chainNotReady();
         }
         //if(true){
-         //   return RpcResult.failed(CommonCodeConstanst.PARAMETER_ERROR,"Cross-chain tx pause support");
+        //   return RpcResult.failed(CommonCodeConstanst.PARAMETER_ERROR,"Cross-chain tx pause support");
         //}
         VerifyUtils.verifyParams(params, 2);
         int chainId;

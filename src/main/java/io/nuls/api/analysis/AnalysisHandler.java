@@ -10,7 +10,6 @@ import io.nuls.api.model.entity.*;
 import io.nuls.api.model.po.*;
 import io.nuls.api.model.po.mini.DelayStopAgent;
 import io.nuls.api.rpc.RpcCall;
-import io.nuls.api.utils.LoggerUtil;
 import io.nuls.base.RPCUtil;
 import io.nuls.base.basic.AddressTool;
 import io.nuls.base.basic.NulsByteBuffer;

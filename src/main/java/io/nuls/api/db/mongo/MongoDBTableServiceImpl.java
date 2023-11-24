@@ -8,7 +8,6 @@ import io.nuls.api.db.*;
 import io.nuls.api.model.po.AssetInfo;
 import io.nuls.api.model.po.ChainConfigInfo;
 import io.nuls.api.model.po.ChainInfo;
-import io.nuls.api.utils.LoggerUtil;
 import io.nuls.core.basic.Result;
 import io.nuls.core.core.annotation.Autowired;
 import io.nuls.core.core.annotation.Component;

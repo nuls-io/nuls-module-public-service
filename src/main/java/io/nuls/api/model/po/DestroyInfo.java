@@ -2,19 +2,21 @@ package io.nuls.api.model.po;
 
 public class DestroyInfo {
 
+    private String type;
     private String address;
 
     private String reason;
 
     private String value;
 
-    public DestroyInfo() {
-    }
+    private String proportion;
 
-    public DestroyInfo(String address, String reason, String value) {
+    public DestroyInfo(String address, String type, String reason, String value, String proportion) {
         this.address = address;
         this.reason = reason;
         this.value = value;
+        this.type = type;
+        this.proportion = proportion;
     }
 
     public String getAddress() {
@@ -39,5 +41,21 @@ public class DestroyInfo {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getProportion() {
+        return proportion;
+    }
+
+    public void setProportion(String proportion) {
+        this.proportion = proportion;
     }
 }

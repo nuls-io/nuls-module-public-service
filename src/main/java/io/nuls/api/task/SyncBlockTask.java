@@ -2,6 +2,8 @@ package io.nuls.api.task;
 
 import io.nuls.api.ApiContext;
 import io.nuls.api.analysis.WalletRpcHandler;
+import io.nuls.api.cache.AssetSystemCache;
+import io.nuls.api.manager.CacheManager;
 import io.nuls.api.model.po.BlockHeaderInfo;
 import io.nuls.api.model.po.BlockInfo;
 import io.nuls.api.model.po.SyncInfo;
@@ -109,6 +111,11 @@ public class SyncBlockTask implements Runnable {
     }
 
     private boolean process(BlockHeaderInfo localBestBlockHeader) throws Exception {
+
+        while (!AssetSystemCache.isCached() || !CacheManager.isInited()) {
+            Thread.sleep(1000L);
+        }
+
         long nextHeight = 0;
         if (localBestBlockHeader != null) {
             nextHeight = localBestBlockHeader.getHeight() + 1;
