@@ -165,7 +165,7 @@ public class StatisticalNulsTask implements Runnable {
         String destroyAddress = AddressTool.getStringAddressByBytes(address);
         BigInteger destroyNuls = accountService.getAccountTotalBalance(chainId, destroyAddress);
         String reason = "account set alias destroy nuls";
-        String type = "NULL Address";
+        String type = "Null Address";
         String aproportion = null;
         if (total != null && total.compareTo(BigInteger.ZERO) != 0) {
             double _proportion = new BigDecimal(destroyNuls).divide(new BigDecimal(total), 6, RoundingMode.HALF_UP).doubleValue() * 100;
