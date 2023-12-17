@@ -120,9 +120,13 @@ public class RollbackService {
         Map<String, ContractResultInfo> resultInfoMap = null;
         if (blockHexInfo.getContractHashList() != null && !blockHexInfo.getContractHashList().isEmpty()) {
             resultInfoMap = new HashMap<>();
-            for (String hash : blockHexInfo.getContractHashList()) {
-                ContractResultInfo resultInfo = contractService.getContractResultInfo(chainId, hash);
-                resultInfoMap.put(resultInfo.getTxHash(), resultInfo);
+            try {
+                for (String hash : blockHexInfo.getContractHashList()) {
+                    ContractResultInfo resultInfo = contractService.getContractResultInfo(chainId, hash);
+                    resultInfoMap.put(resultInfo.getTxHash(), resultInfo);
+                }
+            }catch (Exception e){
+                LoggerUtil.commonLog.error(e);
             }
         }
         BlockInfo blockInfo;
