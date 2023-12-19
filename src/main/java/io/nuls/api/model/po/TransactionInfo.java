@@ -50,11 +50,15 @@ public class TransactionInfo {
             if (calc) {
                 for (CoinToInfo output : coinTos) {
                     value = value.add(output.getAmount());
+                    this.symbol = output.getSymbol();
+                    this.decimal = output.getDecimal();
                 }
             } else {
                 for (CoinToInfo output : coinTos) {
                     if (output.getChainId() == chainId && output.getAssetsId() == 1) {
                         value = value.add(output.getAmount());
+                        this.symbol = output.getSymbol();
+                        this.decimal = output.getDecimal();
                     }
                 }
             }
