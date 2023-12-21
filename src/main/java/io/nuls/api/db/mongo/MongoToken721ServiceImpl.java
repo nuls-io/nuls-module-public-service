@@ -1,6 +1,7 @@
 package io.nuls.api.db.mongo;
 
 import com.mongodb.client.model.*;
+import io.nuls.api.cache.AssetSystemCache;
 import io.nuls.api.db.Token721Service;
 import io.nuls.api.model.po.AccountToken721Info;
 import io.nuls.api.model.po.Nrc721TokenIdInfo;
@@ -31,6 +32,7 @@ public class MongoToken721ServiceImpl implements Token721Service {
             return null;
         }
         AccountToken721Info tokenInfo = DocumentTransferTool.toInfo(document, "key", AccountToken721Info.class);
+        tokenInfo.setTag(AssetSystemCache.getAddressTag(tokenInfo.getAddress()));
         return tokenInfo;
     }
 
@@ -69,6 +71,7 @@ public class MongoToken721ServiceImpl implements Token721Service {
             accountTokenList.add(tokenInfo);
             document = mongoDBService.findOne(CONTRACT_TABLE + chainId, Filters.eq("_id", tokenInfo.getContractAddress()));
             tokenInfo.setStatus(document.getInteger("status"));
+            tokenInfo.setTag(AssetSystemCache.getAddressTag(tokenInfo.getAddress()));
         }
 
         PageInfo<AccountToken721Info> pageInfo = new PageInfo<>(pageNumber, pageSize, totalCount, accountTokenList);
@@ -82,7 +85,9 @@ public class MongoToken721ServiceImpl implements Token721Service {
         List<AccountToken721Info> accountTokenList = new ArrayList<>();
         long totalCount = mongoDBService.getCount(ACCOUNT_TOKEN721_TABLE + chainId, query);
         for (Document document : docsList) {
-            accountTokenList.add(DocumentTransferTool.toInfo(document, "key", AccountToken721Info.class));
+            AccountToken721Info tokenInfo = DocumentTransferTool.toInfo(document, "key", AccountToken721Info.class);
+            tokenInfo.setTag(AssetSystemCache.getAddressTag(tokenInfo.getAddress()));
+            accountTokenList.add(tokenInfo);
         }
         PageInfo<AccountToken721Info> pageInfo = new PageInfo<>(pageNumber, pageSize, totalCount, accountTokenList);
         return pageInfo;
@@ -165,7 +170,7 @@ public class MongoToken721ServiceImpl implements Token721Service {
                 if (currentDocument != null) {
                     currentDocument.put("owner", tokenIdInfo.getOwner());
                     modelList.add(new ReplaceOneModel<>(Filters.eq("_id", tokenKey), currentDocument));
-                } else if (insertKeys.contains(tokenKey)){
+                } else if (insertKeys.contains(tokenKey)) {
                     Document document = insertDocuments.get(tokenKey);
                     document.put("owner", tokenIdInfo.getOwner());
                 }
@@ -218,7 +223,7 @@ public class MongoToken721ServiceImpl implements Token721Service {
                 if (currentDocument != null) {
                     currentDocument.put("owner", tokenIdInfo.getOwner());
                     modelList.add(new ReplaceOneModel<>(Filters.eq("_id", tokenKey), currentDocument));
-                } else if (insertKeys.contains(tokenKey)){
+                } else if (insertKeys.contains(tokenKey)) {
                     Document document = insertDocuments.get(tokenKey);
                     document.put("owner", tokenIdInfo.getOwner());
                 }

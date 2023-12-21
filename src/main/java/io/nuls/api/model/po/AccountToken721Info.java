@@ -26,6 +26,7 @@ public class AccountToken721Info {
     private boolean isNew;
 
     private int tokenCount;
+    private String tag;
 
     public AccountToken721Info() {
 
@@ -125,5 +126,13 @@ public class AccountToken721Info {
         if (remove) {
             tokenCount--;
         }
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public String getTag() {
+        return tag;
     }
 }

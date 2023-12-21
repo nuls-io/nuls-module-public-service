@@ -24,6 +24,7 @@ public class AssetSystemCacheTask implements Runnable {
             }
             AssetSystemCache.putCacheList(priceProvider.getAllTokenList());
             AssetSystemCache.putChainList(priceProvider.getChainList());
+            AssetSystemCache.putAddressTag(priceProvider.getDictionary());
         } catch (Exception e) {
             Log.error("", e);
         }

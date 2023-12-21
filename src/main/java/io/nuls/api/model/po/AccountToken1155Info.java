@@ -25,6 +25,7 @@ public class AccountToken1155Info {
 
     @JsonIgnore
     private boolean isNew;
+    private String tag;
 
     public AccountToken1155Info() {
     }
@@ -126,5 +127,13 @@ public class AccountToken1155Info {
             throw new RuntimeException("Insufficient balance");
         }
         this.value = thisValueBig.subtract(valueBig).toString();
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public String getTag() {
+        return tag;
     }
 }

@@ -3,6 +3,7 @@ package io.nuls.api.db.mongo;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.model.*;
 import io.nuls.api.cache.ApiCache;
+import io.nuls.api.cache.AssetSystemCache;
 import io.nuls.api.constant.ApiConstant;
 import io.nuls.api.db.AccountService;
 import io.nuls.api.manager.CacheManager;
@@ -70,6 +71,7 @@ public class MongoAccountServiceImpl implements AccountService {
             apiCache.addAccountInfo(accountInfo);
             addressList.add(accountInfo.getAddress());
         }
+        accountInfo.setTag(AssetSystemCache.getAddressTag(accountInfo.getAddress()));
         return accountInfo.copy();
     }
 
@@ -96,7 +98,7 @@ public class MongoAccountServiceImpl implements AccountService {
             apiCache.addAccountInfo(accountInfo);
             addressList.add(accountInfo.getAddress());
         }
-
+        accountInfo.setTag(AssetSystemCache.getAddressTag(accountInfo.getAddress()));
         return new MiniAccountInfo(accountInfo);
     }
 
@@ -152,7 +154,9 @@ public class MongoAccountServiceImpl implements AccountService {
         List<AccountInfo> accountInfoList = new ArrayList<>();
         long totalCount = mongoDBService.getEstimateCount(ACCOUNT_TABLE + chainId);
         for (Document document : docsList) {
-            accountInfoList.add(DocumentTransferTool.toInfo(document, "address", AccountInfo.class));
+            AccountInfo accountInfo = DocumentTransferTool.toInfo(document, "address", AccountInfo.class);
+            accountInfo.setTag(AssetSystemCache.getAddressTag(accountInfo.getAddress()));
+            accountInfoList.add(accountInfo);
         }
         PageInfo<AccountInfo> pageInfo = new PageInfo<>(pageNumber, pageSize, totalCount, accountInfoList);
         return pageInfo;
@@ -311,6 +315,7 @@ public class MongoAccountServiceImpl implements AccountService {
             MiniAccountInfo accountInfo = DocumentTransferTool.toInfo(document, "address", MiniAccountInfo.class);
 //            List<Output> outputs = utxoService.getAccountUtxos(accountInfo.getAddress());
 //            CalcUtil.calcBalance(accountInfo, outputs, blockHeaderService.getBestBlockHeight());
+            accountInfo.setTag(AssetSystemCache.getAddressTag(accountInfo.getAddress()));
             accountInfoList.add(accountInfo);
         }
         PageInfo<MiniAccountInfo> pageInfo = new PageInfo<>(pageIndex, pageSize, totalCount, accountInfoList);

@@ -5,6 +5,7 @@ public class ChainAssetHolderInfo {
     private String balance;
     private String rate;
     private String value;
+    private String tag;
 
     public String getAddress() {
         return address;
@@ -36,5 +37,13 @@ public class ChainAssetHolderInfo {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public String getTag() {
+        return tag;
     }
 }

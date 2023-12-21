@@ -119,6 +119,7 @@ public class MongoChainAssetService implements ChainAssetService {
                 double price = Double.parseDouble(info.getPrice());
                 vo.setValue(DoubleUtils.getRoundStr(DoubleUtils.mul(price, balance.divide(BigDecimal.TEN.pow(Math.toIntExact(info.getDecimals())))), 2));
             }
+            vo.setTag(AssetSystemCache.getAddressTag(accountInfo.getAddress()));
             infoList.add(vo);
         }
         PageInfo<ChainAssetHolderInfo> pageInfo = new PageInfo<>(pageNumber, pageSize, list.getTotalCount(), infoList);

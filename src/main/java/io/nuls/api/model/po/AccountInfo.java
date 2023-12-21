@@ -49,6 +49,7 @@ public class AccountInfo {
     //是否是根据最新区块的交易新创建的账户，只为业务使用，不存储该字段
     @JsonIgnore
     private boolean isNew;
+    private String tag;
 
     public AccountInfo() {
     }
@@ -253,7 +254,15 @@ public class AccountInfo {
             this.token1155s = new ArrayList<>();
         }
         accountInfo.token1155s = new ArrayList<>(this.token1155s);
+        accountInfo.tag = this.getTag();
         return accountInfo;
     }
 
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public String getTag() {
+        return tag;
+    }
 }

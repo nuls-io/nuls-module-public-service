@@ -1,6 +1,7 @@
 package io.nuls.api.db.mongo;
 
 import com.mongodb.client.model.*;
+import io.nuls.api.cache.AssetSystemCache;
 import io.nuls.api.db.Token1155Service;
 import io.nuls.api.model.po.AccountToken1155Info;
 import io.nuls.api.model.po.Nrc1155TokenIdInfo;
@@ -32,6 +33,7 @@ public class MongoToken1155ServiceImpl implements Token1155Service {
             return null;
         }
         AccountToken1155Info tokenInfo = DocumentTransferTool.toInfo(document, "key", AccountToken1155Info.class);
+        tokenInfo.setTag(AssetSystemCache.getAddressTag(tokenInfo.getAddress()));
         return tokenInfo;
     }
 
@@ -70,6 +72,7 @@ public class MongoToken1155ServiceImpl implements Token1155Service {
             accountTokenList.add(tokenInfo);
             document = mongoDBService.findOne(CONTRACT_TABLE + chainId, Filters.eq("_id", tokenInfo.getContractAddress()));
             tokenInfo.setStatus(document.getInteger("status"));
+            tokenInfo.setTag(AssetSystemCache.getAddressTag(tokenInfo.getAddress()));
         }
 
         PageInfo<AccountToken1155Info> pageInfo = new PageInfo<>(pageNumber, pageSize, totalCount, accountTokenList);
@@ -83,7 +86,9 @@ public class MongoToken1155ServiceImpl implements Token1155Service {
         List<AccountToken1155Info> accountTokenList = new ArrayList<>();
         long totalCount = mongoDBService.getCount(ACCOUNT_TOKEN1155_TABLE + chainId, query);
         for (Document document : docsList) {
-            accountTokenList.add(DocumentTransferTool.toInfo(document, "key", AccountToken1155Info.class));
+            AccountToken1155Info tokenInfo = DocumentTransferTool.toInfo(document, "key", AccountToken1155Info.class);
+            tokenInfo.setTag(AssetSystemCache.getAddressTag(tokenInfo.getAddress()));
+            accountTokenList.add(tokenInfo);
         }
         PageInfo<AccountToken1155Info> pageInfo = new PageInfo<>(pageNumber, pageSize, totalCount, accountTokenList);
         return pageInfo;

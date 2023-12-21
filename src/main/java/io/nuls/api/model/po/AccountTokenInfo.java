@@ -25,6 +25,7 @@ public class AccountTokenInfo {
     private int decimals;
     @JsonIgnore
     private boolean isNew;
+    private String tag;
 
     public AccountTokenInfo() {
 
@@ -119,5 +120,13 @@ public class AccountTokenInfo {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public String getTag() {
+        return tag;
     }
 }
