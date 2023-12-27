@@ -29,4 +29,6 @@ public interface ChainAssetService {
     void updateHolderCount(int chainId);
 
     PageInfo<ChainAssetInfoVo> getList(int pageNumber, int pageSize);
+
+    ChainAssetHolderInfo getOneHolderByAssetKey(Integer chainId, String assetKey, String address);
 }
