@@ -32,7 +32,7 @@ public class AssetSystemCacheTask implements Runnable {
 
     public static void main(String[] args) {
         NerveDexPriceProvider priceProvider = new NerveDexPriceProvider();
-        priceProvider.setURL("https://assets.nabox.io/api/");
-        System.out.println(priceProvider.getAllTokenList().size());
+        priceProvider.setURL("https://beta.assets.nabox.io/api/");
+        System.out.println(priceProvider.getDictionary().size());
     }
 }

@@ -68,10 +68,11 @@ public class MongoChainAssetService implements ChainAssetService {
         if (null != type) {
             filter = Filters.and(filter, Filters.eq("txType", type));
         }
-        if (StringUtils.isNotBlank(from)) {
+        if (StringUtils.isNotBlank(from) && StringUtils.isNotBlank(to)) {
+            filter = Filters.and(filter,Filters.or( Filters.eq("from", from), Filters.eq("to", to)));
+        } else if (StringUtils.isNotBlank(from)) {
             filter = Filters.and(filter, Filters.eq("from", from));
-        }
-        if (StringUtils.isNotBlank(to)) {
+        } else if (StringUtils.isNotBlank(to)) {
             filter = Filters.and(filter, Filters.eq("to", to));
         }
 
