@@ -135,6 +135,9 @@ public class MongoChainAssetService implements ChainAssetService {
         String arr[] = assetKey.split("-");
         String key = DBUtil.getAccountAssetKey(address, Integer.parseInt(arr[0]), Integer.parseInt(arr[1]));
         AccountLedgerInfo accountInfo = accountLedgerService.getAccountLedgerInfo(chainId, key);
+        if (null == accountInfo) {
+            return null;
+        }
         ChainAssetHolderInfo vo = new ChainAssetHolderInfo();
         vo.setAddress(accountInfo.getAddress());
         vo.setBalance(accountInfo.getTotalBalance().toString());
