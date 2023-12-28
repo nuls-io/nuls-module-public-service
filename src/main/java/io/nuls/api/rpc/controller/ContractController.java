@@ -1781,9 +1781,9 @@ public class ContractController {
             return RpcResult.paramError("[address] is invalid");
         }
         try {
-            AccountToken1155Info info = null;
+            List<AccountToken1155Info> info = null;
             if (CacheManager.isChainExist(chainId)) {
-                info = token1155Service.getAccountTokenInfo(chainId, address + contractAddress);
+                info = token1155Service.getAccountTokens(chainId, address, contractAddress);
             }
             RpcResult result = new RpcResult();
             result.setResult(info);

@@ -78,6 +78,28 @@ public class MongoToken1155ServiceImpl implements Token1155Service {
         PageInfo<AccountToken1155Info> pageInfo = new PageInfo<>(pageNumber, pageSize, totalCount, accountTokenList);
         return pageInfo;
     }
+    @Override
+    public List<AccountToken1155Info> getAccountTokens(int chainId, String address, String contractAddress) {
+        Bson query;
+        if (StringUtils.isNotBlank(contractAddress)) {
+            query = Filters.and(Filters.eq("address", address), Filters.eq("contractAddress", contractAddress), Filters.ne("value", "0"));
+        } else {
+            query = Filters.and(Filters.eq("address", address), Filters.ne("value", "0"));
+        }
+        Bson sort = Sorts.descending("tokenCount");
+        List<Document> docsList = this.mongoDBService.query(ACCOUNT_TOKEN1155_TABLE + chainId, query, sort);
+        List<AccountToken1155Info> accountTokenList = new ArrayList<>();
+
+        for (Document document : docsList) {
+            AccountToken1155Info tokenInfo = DocumentTransferTool.toInfo(document, "key", AccountToken1155Info.class);
+            accountTokenList.add(tokenInfo);
+            document = mongoDBService.findOne(CONTRACT_TABLE + chainId, Filters.eq("_id", tokenInfo.getContractAddress()));
+            tokenInfo.setStatus(document.getInteger("status"));
+            tokenInfo.setTag(AssetSystemCache.getAddressTag(tokenInfo.getAddress()));
+        }
+
+        return accountTokenList;
+    }
 
     public PageInfo<AccountToken1155Info> getContractTokens(int chainId, String contractAddress, int pageNumber, int pageSize) {
         Bson query = Filters.and(Filters.eq("contractAddress", contractAddress), Filters.ne("value", "0"));
