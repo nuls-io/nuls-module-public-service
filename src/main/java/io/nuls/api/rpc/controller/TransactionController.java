@@ -125,27 +125,27 @@ public class TransactionController {
                     }
                     if (txData.getResultInfo().getTokenTransfers() != null && !txData.getResultInfo().getTokenTransfers().isEmpty()) {
                         for (TokenTransfer transfer : txData.getResultInfo().getTokenTransfers()) {
-                            TransferItemVo from = new TransferItemVo(transfer.getFromAddress(), AssetTypeEnum.NRC20, transfer.getValue(), null, transfer.getDecimals(), transfer.getSymbol(), null, null, transfer.getContractAddress());
+                            TransferItemVo from = new TransferItemVo(transfer.getFromAddress(), AssetTypeEnum.NRC20, transfer.getValue(), null, transfer.getDecimals(), transfer.getSymbol(), null, 0,null, transfer.getContractAddress());
                             fromList.add(from);
-                            TransferItemVo to = new TransferItemVo(transfer.getToAddress(), AssetTypeEnum.NRC20, transfer.getValue(), null, transfer.getDecimals(), transfer.getSymbol(), null, null, transfer.getContractAddress());
+                            TransferItemVo to = new TransferItemVo(transfer.getToAddress(), AssetTypeEnum.NRC20, transfer.getValue(), null, transfer.getDecimals(), transfer.getSymbol(), null,0, null, transfer.getContractAddress());
                             toList.add(to);
                         }
                         txData.getResultInfo().setTokenTransfers(null);
                     }
                     if (txData.getResultInfo().getToken721Transfers() != null && !txData.getResultInfo().getToken721Transfers().isEmpty()) {
                         for (Token721Transfer transfer : txData.getResultInfo().getToken721Transfers()) {
-                            TransferItemVo from = new TransferItemVo(transfer.getFromAddress(), AssetTypeEnum.NRC721, "1", null, 0, transfer.getSymbol(), null, transfer.getTokenId(), transfer.getContractAddress());
+                            TransferItemVo from = new TransferItemVo(transfer.getFromAddress(), AssetTypeEnum.NRC721, "1", null, 0, transfer.getSymbol(), null,0, transfer.getTokenId(), transfer.getContractAddress());
                             fromList.add(from);
-                            TransferItemVo to = new TransferItemVo(transfer.getToAddress(), AssetTypeEnum.NRC721, "1", null, 0, transfer.getSymbol(), null, transfer.getTokenId(), transfer.getContractAddress());
+                            TransferItemVo to = new TransferItemVo(transfer.getToAddress(), AssetTypeEnum.NRC721, "1", null, 0, transfer.getSymbol(), null,0, transfer.getTokenId(), transfer.getContractAddress());
                             toList.add(to);
                         }
                         txData.getResultInfo().setToken721Transfers(null);
                     }
                     if (txData.getResultInfo().getToken1155Transfers() != null && !txData.getResultInfo().getToken1155Transfers().isEmpty()) {
                         for (Token1155Transfer transfer : txData.getResultInfo().getToken1155Transfers()) {
-                            TransferItemVo from = new TransferItemVo(transfer.getFromAddress(), AssetTypeEnum.NRC1155, transfer.getValue(), null, 0, transfer.getSymbol(), null, transfer.getTokenId(), transfer.getContractAddress());
+                            TransferItemVo from = new TransferItemVo(transfer.getFromAddress(), AssetTypeEnum.NRC1155, transfer.getValue(), null, 0, transfer.getSymbol(), null, 0,transfer.getTokenId(), transfer.getContractAddress());
                             fromList.add(from);
-                            TransferItemVo to = new TransferItemVo(transfer.getToAddress(), AssetTypeEnum.NRC1155, transfer.getValue(), null, 0, transfer.getSymbol(), null, transfer.getTokenId(), transfer.getContractAddress());
+                            TransferItemVo to = new TransferItemVo(transfer.getToAddress(), AssetTypeEnum.NRC1155, transfer.getValue(), null, 0, transfer.getSymbol(), null,0, transfer.getTokenId(), transfer.getContractAddress());
                             toList.add(to);
                         }
                         txData.getResultInfo().setToken1155Transfers(null);
