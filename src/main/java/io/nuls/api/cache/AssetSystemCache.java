@@ -54,4 +54,13 @@ public class AssetSystemCache {
     public static String getAddressTag(String address) {
         return addressTagMap.get(address);
     }
+
+    public static AssetsSystemTokenInfoVo getAssetCacheByContract(String contractAddress) {
+        for (AssetsSystemTokenInfoVo vo : assetMap.values()) {
+            if (contractAddress.equals(vo.getContractAddress())) {
+                return vo;
+            }
+        }
+        return null;
+    }
 }

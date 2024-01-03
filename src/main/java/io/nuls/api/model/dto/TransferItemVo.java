@@ -12,11 +12,12 @@ public class TransferItemVo {
     private String tokenId;
 
     private String contract;
+    private long lockTime;
 
     public TransferItemVo() {
     }
 
-    public TransferItemVo(String address, String assetType, String amount, String assetKey,int decimals, String symbol, Boolean locked, String tokenId,String contract) {
+    public TransferItemVo(String address, String assetType, String amount, String assetKey,int decimals, String symbol, Boolean locked,long lockTime, String tokenId,String contract) {
         this.address = address;
         this.assetType = assetType;
         this.amount = amount;
@@ -26,6 +27,7 @@ public class TransferItemVo {
         this.locked = locked;
         this.tokenId = tokenId;
         this.contract = contract;
+        this.lockTime = lockTime;
     }
 
     public String getContract() {
@@ -98,5 +100,13 @@ public class TransferItemVo {
 
     public Boolean getLocked() {
         return locked;
+    }
+
+    public long getLockTime() {
+        return lockTime;
+    }
+
+    public void setLockTime(long lockTime) {
+        this.lockTime = lockTime;
     }
 }
