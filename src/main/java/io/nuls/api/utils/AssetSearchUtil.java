@@ -24,9 +24,9 @@ public class AssetSearchUtil {
         Set<String> set = new HashSet<>();
         if (null != chainAssetList && !chainAssetList.isEmpty()) {
             chainAssetList.forEach(v -> {
-                resultList.add(new SearchAssetInfo(v));
-                set.add(v.getContract());
-                LoggerUtil.commonLog.info("Search asset - {}", v.getContract());
+                SearchAssetInfo info = new SearchAssetInfo(v);
+                resultList.add(info);
+                set.add(info.getContract());
             });
         }
         //搜索其他类型资产
@@ -36,7 +36,6 @@ public class AssetSearchUtil {
         if (null != nrc20List && !nrc20List.isEmpty()) {
             nrc20List.forEach(v -> {
                 if (!set.contains(v.getContractAddress())) {
-                    LoggerUtil.commonLog.info("Search nrc20 - {}", v.getContractAddress());
                     resultList.add(new SearchAssetInfo(v));
                 }
             });
