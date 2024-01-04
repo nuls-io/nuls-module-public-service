@@ -47,6 +47,7 @@ public class AssetSearchUtil {
         if (StringUtils.isBlank(text)) {
             return null;
         }
+        LoggerUtil.commonLog.info("Search nrc20 list size : {}", nrc20InfoList.size());
         List<Nrc20Info> infoList = new ArrayList<>();
         for (Nrc20Info info : nrc20InfoList) {
             if (info.getSymbol().toUpperCase().startsWith(text.toUpperCase())) {
@@ -60,6 +61,7 @@ public class AssetSearchUtil {
         if (StringUtils.isBlank(text)) {
             return null;
         }
+        LoggerUtil.commonLog.info("Search nrc721 list size : {}", tokenInfoList.size());
         List<Nrc721Info> infoList = new ArrayList<>();
         for (Nrc721Info info : tokenInfoList) {
             if (info.getSymbol().toUpperCase().startsWith(text.toUpperCase())) {
@@ -73,6 +75,7 @@ public class AssetSearchUtil {
         if (StringUtils.isBlank(text)) {
             return null;
         }
+        LoggerUtil.commonLog.info("Search nrc1155 list size : {}", tokenInfoList.size());
         List<Nrc1155Info> infoList = new ArrayList<>();
         for (Nrc1155Info info : tokenInfoList) {
             if (info.getSymbol().toUpperCase().startsWith(text.toUpperCase())) {

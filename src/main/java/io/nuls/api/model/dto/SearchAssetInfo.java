@@ -75,6 +75,14 @@ public class SearchAssetInfo {
         this.id = id;
     }
 
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
     public String getIconUrl() {
         return iconUrl;
     }

@@ -53,6 +53,13 @@ public class MongoContractServiceImpl implements ContractService {
                     nrc721Info.setSymbol(document.getString("symbol"));
                     nrc721Info.setName(document.getString("tokenName"));
                     apiCache.addNrc721Info(nrc721Info);
+                } else if (ApiConstant.TOKEN_TYPE_NRC1155 == document.getInteger("tokenType")) {
+                    Nrc1155Info nrc1155Info = new Nrc1155Info();
+                    nrc1155Info.setContractAddress(document.getString("_id"));
+                    nrc1155Info.setSymbol(document.getString("symbol"));
+                    nrc1155Info.setName(document.getString("tokenName"));
+                    nrc1155Info.setTokenURI(document.getString("tokenUri"));
+                    apiCache.addNrc1155Info(nrc1155Info);
                 }
             }
 //            LoggerUtil.commonLog.info("contract cache 4 , {}", documentList.size());
