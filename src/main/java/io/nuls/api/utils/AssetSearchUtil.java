@@ -26,6 +26,7 @@ public class AssetSearchUtil {
             chainAssetList.forEach(v -> {
                 resultList.add(new SearchAssetInfo(v));
                 set.add(v.getContract());
+                LoggerUtil.commonLog.info("Search asset - {}", v.getContract());
             });
         }
         //搜索其他类型资产
@@ -35,6 +36,7 @@ public class AssetSearchUtil {
         if (null != nrc20List && !nrc20List.isEmpty()) {
             nrc20List.forEach(v -> {
                 if (!set.contains(v.getContractAddress())) {
+                    LoggerUtil.commonLog.info("Search nrc20 - {}", v.getContractAddress());
                     resultList.add(new SearchAssetInfo(v));
                 }
             });
