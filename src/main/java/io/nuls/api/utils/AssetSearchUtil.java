@@ -12,22 +12,32 @@ import io.nuls.api.model.po.asset.ChainAssetInfoVo;
 import io.nuls.core.model.StringUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class AssetSearchUtil {
 
     public static final List<SearchAssetInfo> search(int chainId, String text) {
         List<SearchAssetInfo> resultList = new ArrayList<>();
         List<ChainAssetInfo> chainAssetList = ChainAssetCache.search(text);
+        Set<String> set = new HashSet<>();
         if (null != chainAssetList && !chainAssetList.isEmpty()) {
-            chainAssetList.forEach(v -> resultList.add(new SearchAssetInfo(v)));
+            chainAssetList.forEach(v -> {
+                resultList.add(new SearchAssetInfo(v));
+                set.add(v.getContract());
+            });
         }
         //搜索其他类型资产
         ApiCache apiCache = CacheManager.getCache(chainId);
 
         List<Nrc20Info> nrc20List = searchNRC20(apiCache.getNrc20InfoList(), text);
         if (null != nrc20List && !nrc20List.isEmpty()) {
-            nrc20List.forEach(v -> resultList.add(new SearchAssetInfo(v)));
+            nrc20List.forEach(v -> {
+                if (!set.contains(v.getContractAddress())) {
+                    resultList.add(new SearchAssetInfo(v));
+                }
+            });
         }
         List<Nrc721Info> nrc721List = searchNRC721(apiCache.getNrc721InfoList(), text);
         if (null != nrc721List && !nrc721List.isEmpty()) {
