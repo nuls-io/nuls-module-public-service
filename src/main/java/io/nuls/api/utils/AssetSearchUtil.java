@@ -35,7 +35,6 @@ public class AssetSearchUtil {
         if (null != nrc20List && !nrc20List.isEmpty()) {
             nrc20List.forEach(v -> {
                 if (!set.contains(v.getContractAddress())) {
-                    LoggerUtil.commonLog.info("Search nrc20 - {}", v.getContractAddress());
                     resultList.add(new SearchAssetInfo(v));
                 }
             });
