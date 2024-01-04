@@ -155,7 +155,12 @@ public class MongoChainAssetService implements ChainAssetService {
         }
         if (null != info && StringUtils.isNotBlank(info.getPrice())) {
             double price = Double.parseDouble(info.getPrice());
-            vo.setValue(DoubleUtils.getRoundStr(DoubleUtils.mul(price, balance.divide(BigDecimal.TEN.pow(Math.toIntExact(info.getDecimals())), RoundingMode.DOWN)), 2));
+            double val = DoubleUtils.mul(price, balance.divide(BigDecimal.TEN.pow(Math.toIntExact(info.getDecimals())), RoundingMode.DOWN));
+            vo.setValue(DoubleUtils.getRoundStr(val, 2));
+            AssetsSystemTokenInfoVo nulsInfo = AssetSystemCache.getAssetCache(chainId + "-1");
+            if (null != nulsInfo && StringUtils.isNotBlank(nulsInfo.getPrice())) {
+                vo.setNulsValue(DoubleUtils.getRoundStr(DoubleUtils.div(val, Double.parseDouble(nulsInfo.getPrice()))));
+            }
         }
         vo.setTag(AssetSystemCache.getAddressTag(accountInfo.getAddress()));
         return vo;
