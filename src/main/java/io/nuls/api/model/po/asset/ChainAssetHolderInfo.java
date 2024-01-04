@@ -7,6 +7,8 @@ public class ChainAssetHolderInfo {
     private String value;
     private String tag;
 
+    private String nulsValue;
+
     public String getAddress() {
         return address;
     }
@@ -45,5 +47,13 @@ public class ChainAssetHolderInfo {
 
     public String getTag() {
         return tag;
+    }
+
+    public String getNulsValue() {
+        return nulsValue;
+    }
+
+    public void setNulsValue(String nulsValue) {
+        this.nulsValue = nulsValue;
     }
 }
