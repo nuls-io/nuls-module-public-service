@@ -62,7 +62,7 @@ public class SearchAssetInfo {
         this.contract = info.getContractAddress();
     }
     public SearchAssetInfo(Nrc1155Info info) {
-        this.type = 721;
+        this.type = 1155;
         this.symbol = info.getSymbol();
         this.decimals = 0;
         this.contract = info.getContractAddress();
