@@ -16,6 +16,8 @@ public interface Token1155Service {
 
     PageInfo<AccountToken1155Info> getAccountTokens(int chainId, String address, String contractAddress, int pageNumber, int pageSize);
 
+    List<AccountToken1155Info> getAccountTokens(int chainId, String address, String contractAddress);
+
     PageInfo<AccountToken1155Info> getContractTokens(int chainId, String contractAddress, int pageNumber, int pageSize);
 
     void saveTokenTransfers(int chainId, List<Token1155Transfer> tokenTransfers);

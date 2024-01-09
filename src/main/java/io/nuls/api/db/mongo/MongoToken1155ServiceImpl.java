@@ -1,6 +1,7 @@
 package io.nuls.api.db.mongo;
 
 import com.mongodb.client.model.*;
+import io.nuls.api.cache.AssetSystemCache;
 import io.nuls.api.db.Token1155Service;
 import io.nuls.api.model.po.AccountToken1155Info;
 import io.nuls.api.model.po.Nrc1155TokenIdInfo;
@@ -32,6 +33,7 @@ public class MongoToken1155ServiceImpl implements Token1155Service {
             return null;
         }
         AccountToken1155Info tokenInfo = DocumentTransferTool.toInfo(document, "key", AccountToken1155Info.class);
+        tokenInfo.setTag(AssetSystemCache.getAddressTag(tokenInfo.getAddress()));
         return tokenInfo;
     }
 
@@ -70,10 +72,33 @@ public class MongoToken1155ServiceImpl implements Token1155Service {
             accountTokenList.add(tokenInfo);
             document = mongoDBService.findOne(CONTRACT_TABLE + chainId, Filters.eq("_id", tokenInfo.getContractAddress()));
             tokenInfo.setStatus(document.getInteger("status"));
+            tokenInfo.setTag(AssetSystemCache.getAddressTag(tokenInfo.getAddress()));
         }
 
         PageInfo<AccountToken1155Info> pageInfo = new PageInfo<>(pageNumber, pageSize, totalCount, accountTokenList);
         return pageInfo;
+    }
+    @Override
+    public List<AccountToken1155Info> getAccountTokens(int chainId, String address, String contractAddress) {
+        Bson query;
+        if (StringUtils.isNotBlank(contractAddress)) {
+            query = Filters.and(Filters.eq("address", address), Filters.eq("contractAddress", contractAddress), Filters.ne("value", "0"));
+        } else {
+            query = Filters.and(Filters.eq("address", address), Filters.ne("value", "0"));
+        }
+        Bson sort = Sorts.descending("tokenCount");
+        List<Document> docsList = this.mongoDBService.query(ACCOUNT_TOKEN1155_TABLE + chainId, query, sort);
+        List<AccountToken1155Info> accountTokenList = new ArrayList<>();
+
+        for (Document document : docsList) {
+            AccountToken1155Info tokenInfo = DocumentTransferTool.toInfo(document, "key", AccountToken1155Info.class);
+            accountTokenList.add(tokenInfo);
+            document = mongoDBService.findOne(CONTRACT_TABLE + chainId, Filters.eq("_id", tokenInfo.getContractAddress()));
+            tokenInfo.setStatus(document.getInteger("status"));
+            tokenInfo.setTag(AssetSystemCache.getAddressTag(tokenInfo.getAddress()));
+        }
+
+        return accountTokenList;
     }
 
     public PageInfo<AccountToken1155Info> getContractTokens(int chainId, String contractAddress, int pageNumber, int pageSize) {
@@ -83,7 +108,9 @@ public class MongoToken1155ServiceImpl implements Token1155Service {
         List<AccountToken1155Info> accountTokenList = new ArrayList<>();
         long totalCount = mongoDBService.getCount(ACCOUNT_TOKEN1155_TABLE + chainId, query);
         for (Document document : docsList) {
-            accountTokenList.add(DocumentTransferTool.toInfo(document, "key", AccountToken1155Info.class));
+            AccountToken1155Info tokenInfo = DocumentTransferTool.toInfo(document, "key", AccountToken1155Info.class);
+            tokenInfo.setTag(AssetSystemCache.getAddressTag(tokenInfo.getAddress()));
+            accountTokenList.add(tokenInfo);
         }
         PageInfo<AccountToken1155Info> pageInfo = new PageInfo<>(pageNumber, pageSize, totalCount, accountTokenList);
         return pageInfo;

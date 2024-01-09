@@ -299,6 +299,48 @@ public class ContractController {
         return result;
     }
 
+    @RpcMethod("getTokenHolderInfo")
+    public RpcResult getTokenHolderInfo(List<Object> params) {
+        VerifyUtils.verifyParams(params, 3);
+        int chainId;
+        String contractAddress, address;
+        try {
+            chainId = (int) params.get(0);
+        } catch (Exception e) {
+            return RpcResult.paramError("[chainId] is invalid");
+        }
+        try {
+            contractAddress = (String) params.get(1);
+        } catch (Exception e) {
+            return RpcResult.paramError("[contractAddress] is invalid");
+        }
+        if (!AddressTool.validAddress(chainId, contractAddress)) {
+            return RpcResult.paramError("[contractAddress] is invalid");
+        }
+
+        try {
+            address = (String) params.get(2);
+        } catch (Exception e) {
+            return RpcResult.paramError("[address] is invalid");
+        }
+        if (!AddressTool.validAddress(chainId, address)) {
+            return RpcResult.paramError("[address] is invalid");
+        }
+
+        try {
+            AccountTokenInfo info = null;
+            if (CacheManager.isChainExist(chainId)) {
+                info = tokenService.getAccountTokenInfo(chainId, address + contractAddress);
+            }
+            RpcResult result = new RpcResult();
+            result.setResult(info);
+            return result;
+        } catch (Exception e) {
+            LoggerUtil.commonLog.error(e);
+            return RpcResult.failed(RpcErrorCode.SYS_UNKNOWN_EXCEPTION);
+        }
+    }
+
     @RpcMethod("getContractTokens")
     public RpcResult getContractTokens(List<Object> params) {
         VerifyUtils.verifyParams(params, 4);
@@ -354,7 +396,7 @@ public class ContractController {
     public RpcResult getTokenTransfers(List<Object> params) {
         VerifyUtils.verifyParams(params, 5);
         int chainId, pageNumber, pageSize;
-        long startHeight = 0,endHeight = 0;
+        long startHeight = 0, endHeight = 0;
         String address, contractAddress;
         try {
             chainId = (int) params.get(0);
@@ -382,7 +424,7 @@ public class ContractController {
             return RpcResult.paramError("[contractAddress] is invalid");
         }
 
-        if(params.size() > 5){
+        if (params.size() > 5) {
             try {
                 startHeight = (int) params.get(5);
             } catch (Exception e) {
@@ -390,7 +432,7 @@ public class ContractController {
             }
         }
 
-        if(params.size() > 6){
+        if (params.size() > 6) {
             try {
                 endHeight = (int) params.get(6);
             } catch (Exception e) {
@@ -418,7 +460,7 @@ public class ContractController {
             if (!CacheManager.isChainExist(chainId)) {
                 pageInfo = new PageInfo<>(pageNumber, pageSize);
             } else {
-                pageInfo = tokenService.getTokenTransfers(chainId, address, contractAddress, pageNumber, pageSize,startHeight,endHeight);
+                pageInfo = tokenService.getTokenTransfers(chainId, address, contractAddress, pageNumber, pageSize, startHeight, endHeight);
             }
             RpcResult result = new RpcResult();
             result.setResult(pageInfo);
@@ -531,6 +573,50 @@ public class ContractController {
         result.setResult(tokenInfo);
         return result;
     }
+
+
+    @RpcMethod("getToken721HolderInfo")
+    public RpcResult getToken721HolderInfo(List<Object> params) {
+        VerifyUtils.verifyParams(params, 3);
+        int chainId;
+        String contractAddress, address;
+        try {
+            chainId = (int) params.get(0);
+        } catch (Exception e) {
+            return RpcResult.paramError("[chainId] is invalid");
+        }
+        try {
+            contractAddress = (String) params.get(1);
+        } catch (Exception e) {
+            return RpcResult.paramError("[contractAddress] is invalid");
+        }
+        if (!AddressTool.validAddress(chainId, contractAddress)) {
+            return RpcResult.paramError("[contractAddress] is invalid");
+        }
+
+        try {
+            address = (String) params.get(2);
+        } catch (Exception e) {
+            return RpcResult.paramError("[address] is invalid");
+        }
+        if (!AddressTool.validAddress(chainId, address)) {
+            return RpcResult.paramError("[address] is invalid");
+        }
+
+        try {
+            AccountToken721Info info = null;
+            if (CacheManager.isChainExist(chainId)) {
+                info = token721Service.getAccountTokenInfo(chainId, address + contractAddress);
+            }
+            RpcResult result = new RpcResult();
+            result.setResult(info);
+            return result;
+        } catch (Exception e) {
+            LoggerUtil.commonLog.error(e);
+            return RpcResult.failed(RpcErrorCode.SYS_UNKNOWN_EXCEPTION);
+        }
+    }
+
 
     @RpcMethod("getContractToken721s")
     public RpcResult getContractToken721s(List<Object> params) {
@@ -1546,7 +1632,6 @@ public class ContractController {
      * chainId
      * pageNumber
      * pageSize
-     *
      */
     @RpcMethod("getNrc1155List")
     public RpcResult getNrc1155List(List<Object> params) {
@@ -1667,6 +1752,48 @@ public class ContractController {
         result.setResult(tokenInfo);
         return result;
     }
+
+    @RpcMethod("getToken1155HolderInfo")
+    public RpcResult getToken1155HolderInfo(List<Object> params) {
+        VerifyUtils.verifyParams(params, 3);
+        int chainId;
+        String contractAddress, address;
+        try {
+            chainId = (int) params.get(0);
+        } catch (Exception e) {
+            return RpcResult.paramError("[chainId] is invalid");
+        }
+        try {
+            contractAddress = (String) params.get(1);
+        } catch (Exception e) {
+            return RpcResult.paramError("[contractAddress] is invalid");
+        }
+        if (!AddressTool.validAddress(chainId, contractAddress)) {
+            return RpcResult.paramError("[contractAddress] is invalid");
+        }
+
+        try {
+            address = (String) params.get(2);
+        } catch (Exception e) {
+            return RpcResult.paramError("[address] is invalid");
+        }
+        if (!AddressTool.validAddress(chainId, address)) {
+            return RpcResult.paramError("[address] is invalid");
+        }
+        try {
+            List<AccountToken1155Info> info = null;
+            if (CacheManager.isChainExist(chainId)) {
+                info = token1155Service.getAccountTokens(chainId, address, contractAddress);
+            }
+            RpcResult result = new RpcResult();
+            result.setResult(info);
+            return result;
+        } catch (Exception e) {
+            LoggerUtil.commonLog.error(e);
+            return RpcResult.failed(RpcErrorCode.SYS_UNKNOWN_EXCEPTION);
+        }
+    }
+
 
     /**
      * chainId

@@ -125,27 +125,27 @@ public class TransactionController {
                     }
                     if (txData.getResultInfo().getTokenTransfers() != null && !txData.getResultInfo().getTokenTransfers().isEmpty()) {
                         for (TokenTransfer transfer : txData.getResultInfo().getTokenTransfers()) {
-                            TransferItemVo from = new TransferItemVo(transfer.getFromAddress(), AssetTypeEnum.NRC20, transfer.getValue(), null, transfer.getDecimals(), transfer.getSymbol(), null, null,transfer.getContractAddress());
+                            TransferItemVo from = new TransferItemVo(transfer.getFromAddress(), AssetTypeEnum.NRC20, transfer.getValue(), null, transfer.getDecimals(), transfer.getSymbol(), null, 0,null, transfer.getContractAddress());
                             fromList.add(from);
-                            TransferItemVo to = new TransferItemVo(transfer.getToAddress(), AssetTypeEnum.NRC20, transfer.getValue(), null, transfer.getDecimals(), transfer.getSymbol(), null, null,transfer.getContractAddress());
+                            TransferItemVo to = new TransferItemVo(transfer.getToAddress(), AssetTypeEnum.NRC20, transfer.getValue(), null, transfer.getDecimals(), transfer.getSymbol(), null,0, null, transfer.getContractAddress());
                             toList.add(to);
                         }
                         txData.getResultInfo().setTokenTransfers(null);
                     }
                     if (txData.getResultInfo().getToken721Transfers() != null && !txData.getResultInfo().getToken721Transfers().isEmpty()) {
                         for (Token721Transfer transfer : txData.getResultInfo().getToken721Transfers()) {
-                            TransferItemVo from = new TransferItemVo(transfer.getFromAddress(), AssetTypeEnum.NRC721, "1", null, 0, transfer.getSymbol(), null, transfer.getTokenId(),transfer.getContractAddress());
+                            TransferItemVo from = new TransferItemVo(transfer.getFromAddress(), AssetTypeEnum.NRC721, "1", null, 0, transfer.getSymbol(), null,0, transfer.getTokenId(), transfer.getContractAddress());
                             fromList.add(from);
-                            TransferItemVo to = new TransferItemVo(transfer.getToAddress(), AssetTypeEnum.NRC721, "1", null, 0, transfer.getSymbol(), null, transfer.getTokenId(),transfer.getContractAddress());
+                            TransferItemVo to = new TransferItemVo(transfer.getToAddress(), AssetTypeEnum.NRC721, "1", null, 0, transfer.getSymbol(), null,0, transfer.getTokenId(), transfer.getContractAddress());
                             toList.add(to);
                         }
                         txData.getResultInfo().setToken721Transfers(null);
                     }
                     if (txData.getResultInfo().getToken1155Transfers() != null && !txData.getResultInfo().getToken1155Transfers().isEmpty()) {
                         for (Token1155Transfer transfer : txData.getResultInfo().getToken1155Transfers()) {
-                            TransferItemVo from = new TransferItemVo(transfer.getFromAddress(), AssetTypeEnum.NRC1155, transfer.getValue(), null, 0, transfer.getSymbol(), null, transfer.getTokenId(),transfer.getContractAddress());
+                            TransferItemVo from = new TransferItemVo(transfer.getFromAddress(), AssetTypeEnum.NRC1155, transfer.getValue(), null, 0, transfer.getSymbol(), null, 0,transfer.getTokenId(), transfer.getContractAddress());
                             fromList.add(from);
-                            TransferItemVo to = new TransferItemVo(transfer.getToAddress(), AssetTypeEnum.NRC1155, transfer.getValue(), null, 0, transfer.getSymbol(), null, transfer.getTokenId(),transfer.getContractAddress());
+                            TransferItemVo to = new TransferItemVo(transfer.getToAddress(), AssetTypeEnum.NRC1155, transfer.getValue(), null, 0, transfer.getSymbol(), null,0, transfer.getTokenId(), transfer.getContractAddress());
                             toList.add(to);
                         }
                         txData.getResultInfo().setToken1155Transfers(null);
@@ -156,25 +156,31 @@ public class TransactionController {
             List<CoinFromInfo> froms = tx.getCoinFroms();
             for (CoinFromInfo from : froms) {
                 String assetType = AssetTypeEnum.CHAIN_ASSET;
-                fromList.add(new TransferItemVo(from.getAddress(), assetType, from.getAmount().toString(), from.getAssetKey(), from.getDecimal(), from.getSymbol(), null, null, null));
+                fromList.add(new TransferItemVo(from.getAddress(), assetType, from.getAmount().toString(), from.getAssetKey(), from.getDecimal(), from.getSymbol(), null, 0, null, null));
             }
             List<CoinToInfo> tos = tx.getCoinTos();
             for (CoinToInfo to : tos) {
                 String assetType = AssetTypeEnum.CHAIN_ASSET;
                 boolean locked = false;
+                long lockTime = 0;
                 if (to.getLockTime() < 0) {
                     locked = true;
                 } else if (to.getLockTime() > 1000000000) {
                     //时间锁定
                     locked = to.getLockTime() > System.currentTimeMillis() / 1000;
+                    lockTime = to.getLockTime();
                 } else if (to.getLockTime() > 0) {
                     //高度锁定
                     ApiCache apiCache = CacheManager.getCache(chainId);
                     if (null != apiCache && null != apiCache.getBestHeader()) {
                         locked = to.getLockTime() > apiCache.getBestHeader().getHeight();
+                        if(locked){
+                            lockTime = apiCache.getBestHeader().getCreateTime()+10*(to.getLockTime()-apiCache.getBestHeader().getHeight());
+                        }
                     }
+
                 }
-                toList.add(new TransferItemVo(to.getAddress(), assetType, to.getAmount().toString(), to.getAssetKey(), to.getDecimal(), to.getSymbol(), locked, null, null));
+                toList.add(new TransferItemVo(to.getAddress(), assetType, to.getAmount().toString(), to.getAssetKey(), to.getDecimal(), to.getSymbol(), locked, lockTime, null, null));
             }
             tx.setCoinFroms(null);
             tx.setCoinTos(null);

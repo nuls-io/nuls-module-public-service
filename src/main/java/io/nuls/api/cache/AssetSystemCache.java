@@ -1,5 +1,6 @@
 package io.nuls.api.cache;
 
+import io.nuls.api.model.dto.AssetSystemDictItem;
 import io.nuls.api.model.dto.AssetsSystemTokenInfoVo;
 import io.nuls.api.model.dto.NerveChainVo;
 
@@ -11,6 +12,7 @@ public class AssetSystemCache {
 
     private static final Map<String, AssetsSystemTokenInfoVo> assetMap = new HashMap();
     private static final Map<Long, NerveChainVo> chainMap = new HashMap();
+    private static final Map<String, String> addressTagMap = new HashMap();
 
     public static void putCache(String assetKey, AssetsSystemTokenInfoVo vo) {
         assetMap.put(assetKey, vo);
@@ -19,25 +21,46 @@ public class AssetSystemCache {
     public static void putCacheList(List<AssetsSystemTokenInfoVo> voList) {
         voList.forEach(vo -> putCache(vo.getAssetKey(), vo));
     }
+
     public static void putChainList(List<NerveChainVo> voList) {
-        voList.forEach(vo -> chainMap.put(vo.getId(),vo));
-        chainMap.put(1L,new NerveChainVo("NULS"));
-        chainMap.put(9L,new NerveChainVo("Nerve"));
-        chainMap.put(-1L,new NerveChainVo("NULS"));
-        chainMap.put(-2L,new NerveChainVo("Nerve"));
-        chainMap.put(2L,new NerveChainVo("NULS-Testnet"));
-        chainMap.put(5L,new NerveChainVo("NERVE-Testnet"));
-        chainMap.put(108L,new NerveChainVo("Tron"));
+        voList.forEach(vo -> chainMap.put(vo.getId(), vo));
+        chainMap.put(1L, new NerveChainVo("NULS"));
+        chainMap.put(9L, new NerveChainVo("Nerve"));
+        chainMap.put(-1L, new NerveChainVo("NULS"));
+        chainMap.put(-2L, new NerveChainVo("Nerve"));
+        chainMap.put(2L, new NerveChainVo("NULS-Testnet"));
+        chainMap.put(5L, new NerveChainVo("NERVE-Testnet"));
+        chainMap.put(108L, new NerveChainVo("Tron"));
     }
+
     public static AssetsSystemTokenInfoVo getAssetCache(String assetKey) {
         return assetMap.get(assetKey);
     }
 
-    public static boolean isCached(){
+    public static boolean isCached() {
         return !assetMap.isEmpty();
     }
 
-    public static NerveChainVo getChain(Long id){
+    public static NerveChainVo getChain(Long id) {
         return chainMap.get(id);
+    }
+
+    public static void putAddressTag(List<AssetSystemDictItem> dictionary) {
+        dictionary.forEach(v -> {
+            addressTagMap.put(v.getDictLabel(), v.getDictValue());
+        });
+    }
+
+    public static String getAddressTag(String address) {
+        return addressTagMap.get(address);
+    }
+
+    public static AssetsSystemTokenInfoVo getAssetCacheByContract(String contractAddress) {
+        for (AssetsSystemTokenInfoVo vo : assetMap.values()) {
+            if (contractAddress.equals(vo.getContractAddress())) {
+                return vo;
+            }
+        }
+        return null;
     }
 }

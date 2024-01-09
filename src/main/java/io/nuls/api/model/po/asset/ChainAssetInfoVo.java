@@ -3,6 +3,7 @@ package io.nuls.api.model.po.asset;
 import io.nuls.api.cache.AssetSystemCache;
 import io.nuls.api.model.dto.AssetsSystemTokenInfoVo;
 import io.nuls.api.model.dto.NerveChainVo;
+import io.nuls.api.model.po.Nrc20Info;
 import io.nuls.core.model.DoubleUtils;
 import io.nuls.core.model.StringUtils;
 
@@ -23,7 +24,6 @@ public class ChainAssetInfoVo {
     private String website, community, price;
 
     public ChainAssetInfoVo(ChainAssetInfo info) {
-        //todo nulsChainAmount
         this(info.getId(), info.getTotalSupply(), info.getNulsChainSupply(), info.getName(), info.getSymbol(), info.getDecimals(), info.getAddresses(), info.getAddressesYesterday(), info.getTxCount(), info.getSourceChainId(), info.getContract(), info.getWebsite(), info.getCommunity());
     }
 

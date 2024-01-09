@@ -7,6 +7,7 @@ import io.nuls.api.db.AccountLedgerService;
 import io.nuls.api.db.ChainAssetService;
 import io.nuls.api.manager.CacheManager;
 import io.nuls.api.model.dto.AssetsSystemTokenInfoVo;
+import io.nuls.api.model.po.AccountLedgerInfo;
 import io.nuls.api.model.po.AssetInfo;
 import io.nuls.api.model.po.PageInfo;
 import io.nuls.api.model.po.asset.ChainAssetHolderInfo;
@@ -14,6 +15,7 @@ import io.nuls.api.model.po.asset.ChainAssetInfo;
 import io.nuls.api.model.po.asset.ChainAssetInfoVo;
 import io.nuls.api.model.po.asset.ChainAssetTx;
 import io.nuls.api.model.po.mini.MiniAccountInfo;
+import io.nuls.api.utils.DBUtil;
 import io.nuls.api.utils.DocumentTransferTool;
 import io.nuls.core.core.annotation.Autowired;
 import io.nuls.core.core.annotation.Component;
@@ -25,6 +27,7 @@ import org.bson.conversions.Bson;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -68,10 +71,11 @@ public class MongoChainAssetService implements ChainAssetService {
         if (null != type) {
             filter = Filters.and(filter, Filters.eq("txType", type));
         }
-        if (StringUtils.isNotBlank(from)) {
+        if (StringUtils.isNotBlank(from) && StringUtils.isNotBlank(to)) {
+            filter = Filters.and(filter, Filters.or(Filters.eq("from", from), Filters.eq("to", to)));
+        } else if (StringUtils.isNotBlank(from)) {
             filter = Filters.and(filter, Filters.eq("from", from));
-        }
-        if (StringUtils.isNotBlank(to)) {
+        } else if (StringUtils.isNotBlank(to)) {
             filter = Filters.and(filter, Filters.eq("to", to));
         }
 
@@ -117,12 +121,49 @@ public class MongoChainAssetService implements ChainAssetService {
             }
             if (null != info && StringUtils.isNotBlank(info.getPrice())) {
                 double price = Double.parseDouble(info.getPrice());
-                vo.setValue(DoubleUtils.getRoundStr(DoubleUtils.mul(price, balance.divide(BigDecimal.TEN.pow(Math.toIntExact(info.getDecimals())))), 2));
+                double val = DoubleUtils.mul(price, balance.divide(BigDecimal.TEN.pow(Math.toIntExact(info.getDecimals()))));
+                vo.setValue(DoubleUtils.getRoundStr(val, 2));
+                AssetsSystemTokenInfoVo nulsInfo = AssetSystemCache.getAssetCache(chainId + "-1");
+                if (null != nulsInfo && StringUtils.isNotBlank(nulsInfo.getPrice())) {
+                    vo.setNulsValue(DoubleUtils.getRoundStr(DoubleUtils.div(val, Double.parseDouble(nulsInfo.getPrice()))));
+                }
             }
+            vo.setTag(AssetSystemCache.getAddressTag(accountInfo.getAddress()));
             infoList.add(vo);
         }
         PageInfo<ChainAssetHolderInfo> pageInfo = new PageInfo<>(pageNumber, pageSize, list.getTotalCount(), infoList);
         return pageInfo;
+    }
+
+    @Override
+    public ChainAssetHolderInfo getOneHolderByAssetKey(Integer chainId, String assetKey, String address) {
+        String arr[] = assetKey.split("-");
+        String key = DBUtil.getAccountAssetKey(address, Integer.parseInt(arr[0]), Integer.parseInt(arr[1]));
+        AccountLedgerInfo accountInfo = accountLedgerService.getAccountLedgerInfo(chainId, key);
+        if (null == accountInfo) {
+            return null;
+        }
+        ChainAssetHolderInfo vo = new ChainAssetHolderInfo();
+        vo.setAddress(accountInfo.getAddress());
+        vo.setBalance(accountInfo.getTotalBalance().toString());
+        AssetsSystemTokenInfoVo info = AssetSystemCache.getAssetCache(assetKey);
+        BigDecimal balance = new BigDecimal(accountInfo.getTotalBalance());
+        if (null != info && StringUtils.isNotBlank(info.getTotalSupply())) {
+            BigDecimal total = new BigDecimal(info.getTotalSupply());
+            BigDecimal rate = DoubleUtils.div(balance, total);
+            vo.setRate(DoubleUtils.getRoundStr(rate.doubleValue() * 100, 4));
+        }
+        if (null != info && StringUtils.isNotBlank(info.getPrice())) {
+            double price = Double.parseDouble(info.getPrice());
+            double val = DoubleUtils.mul(price, balance.divide(BigDecimal.TEN.pow(Math.toIntExact(info.getDecimals())), RoundingMode.DOWN));
+            vo.setValue(DoubleUtils.getRoundStr(val, 2));
+            AssetsSystemTokenInfoVo nulsInfo = AssetSystemCache.getAssetCache(chainId + "-1");
+            if (null != nulsInfo && StringUtils.isNotBlank(nulsInfo.getPrice())) {
+                vo.setNulsValue(DoubleUtils.getRoundStr(DoubleUtils.div(val, Double.parseDouble(nulsInfo.getPrice()))));
+            }
+        }
+        vo.setTag(AssetSystemCache.getAddressTag(accountInfo.getAddress()));
+        return vo;
     }
 
     @Override

@@ -37,6 +37,31 @@ public class AssetController {
         return new RpcResult().setResult(new ChainAssetInfoVo(info));
     }
 
+
+    @RpcMethod("getOneHolderByAssetKey")
+    public RpcResult getOneHolderByAssetKey(List<Object> params) {
+        VerifyUtils.verifyParams(params, 3);
+        Integer chainId;
+        String assetKey, address;
+        try {
+            chainId = (int) params.get(0);
+        } catch (Exception e) {
+            return RpcResult.paramError("[chainId] is inValid");
+        }
+        try {
+            assetKey = (String) params.get(1);
+        } catch (Exception e) {
+            return RpcResult.paramError("[assetKey] is inValid");
+        }
+        try {
+            address = (String) params.get(2);
+        } catch (Exception e) {
+            return RpcResult.paramError("[address] is inValid");
+        }
+        ChainAssetHolderInfo info = this.assetService.getOneHolderByAssetKey(chainId, assetKey, address);
+        return new RpcResult().setResult(info);
+    }
+
     @RpcMethod("getHoldersByAssetKey")
     public RpcResult getHoldersByAssetKey(List<Object> params) {
         VerifyUtils.verifyParams(params, 4);
@@ -80,7 +105,7 @@ public class AssetController {
         } catch (Exception e) {
             return RpcResult.paramError("[pageSize] is inValid");
         }
-        PageInfo<ChainAssetInfoVo> list = this.assetService.getList(pageNumber,pageSize);
+        PageInfo<ChainAssetInfoVo> list = this.assetService.getList(pageNumber, pageSize);
         return new RpcResult().setResult(list);
     }
 

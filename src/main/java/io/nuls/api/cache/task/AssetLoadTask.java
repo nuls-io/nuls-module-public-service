@@ -3,6 +3,7 @@ package io.nuls.api.cache.task;
 import io.nuls.api.cache.AssetSystemCache;
 import io.nuls.api.cache.ChainAssetCache;
 import io.nuls.api.db.ChainAssetService;
+import io.nuls.api.db.ContractService;
 import io.nuls.api.model.dto.AssetsSystemTokenInfoVo;
 import io.nuls.api.model.po.asset.ChainAssetInfo;
 import io.nuls.core.core.ioc.SpringLiteContext;
@@ -14,12 +15,18 @@ public class AssetLoadTask implements Runnable {
 
     private ChainAssetService service;
 
+    private ContractService contractService;
+
     @Override
     public void run() {
         try {
             if (service == null) {
                 service = SpringLiteContext.getBean(ChainAssetService.class);
             }
+            if (null == contractService) {
+                contractService = SpringLiteContext.getBean(ContractService.class);
+            }
+            contractService.initCache();
             ChainAssetCache.initCache(service.getList());
             while (!AssetSystemCache.isCached()) {
                 Thread.sleep(5000L);

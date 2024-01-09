@@ -19,6 +19,7 @@ public class MiniAccountInfo {
     private String proportion;
 
     private int decimal;
+    private String tag;
 
     public MiniAccountInfo() {
 
@@ -28,6 +29,7 @@ public class MiniAccountInfo {
         this.address = accountInfo.getAddress();
         this.alias = accountInfo.getAlias();
         this.type = accountInfo.getType();
+        this.tag = accountInfo.getTag();
     }
 
     public String getAddress() {
@@ -84,5 +86,13 @@ public class MiniAccountInfo {
 
     public void setProportion(String proportion) {
         this.proportion = proportion;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public String getTag() {
+        return tag;
     }
 }

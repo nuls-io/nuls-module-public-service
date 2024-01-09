@@ -23,6 +23,7 @@ package io.nuls.api.rpc.controller;
 import io.nuls.api.ApiContext;
 import io.nuls.api.analysis.WalletRpcHandler;
 import io.nuls.api.cache.ApiCache;
+import io.nuls.api.cache.AssetSystemCache;
 import io.nuls.api.constant.config.ApiConfig;
 import io.nuls.api.db.*;
 import io.nuls.api.manager.CacheManager;
@@ -71,7 +72,7 @@ public class AccountController {
     @RpcMethod("getActiveAddressData")
     public RpcResult getActiveAddressData(List<Object> params) {
         VerifyUtils.verifyParams(params, 1);
-        int   pageSize;
+        int pageSize;
         try {
             pageSize = (int) params.get(0);
         } catch (Exception e) {
@@ -81,6 +82,7 @@ public class AccountController {
         result.setResult(this.accountService.getActiveAddressData(pageSize));
         return result;
     }
+
     @RpcMethod("getAccountList")
     public RpcResult getAccountList(List<Object> params) {
         VerifyUtils.verifyParams(params, 3);
@@ -410,10 +412,10 @@ public class AccountController {
             accountInfo.setTimeLock(balanceInfo.getTimeLock());
         }
         accountInfo.setSymbol(ApiContext.defaultSymbol);
-        if(StringUtils.isBlank(BlockHoleAddress)){
-            BlockHoleAddress =  AddressTool.getAddressString(HexUtil.decode("000000000000000000000000000000000000000000000000000000000000000000"),chainId);
+        if (StringUtils.isBlank(BlockHoleAddress)) {
+            BlockHoleAddress = AddressTool.getAddressString(HexUtil.decode("000000000000000000000000000000000000000000000000000000000000000000"), chainId);
         }
-        if(address.equals(BlockHoleAddress)){
+        if (address.equals(BlockHoleAddress)) {
             //黑洞地址特殊处理
             accountInfo.setAlias("BlockHoleAddress");
             accountInfo.setBalance(BigInteger.ZERO);
@@ -421,6 +423,7 @@ public class AccountController {
             accountInfo.setTotalIn(BigInteger.ZERO);
             accountInfo.setType(9);
         }
+        accountInfo.setTag(AssetSystemCache.getAddressTag(accountInfo.getAddress()));
         return result.setResult(accountInfo);
     }
 
@@ -459,6 +462,7 @@ public class AccountController {
             accountInfo.setTimeLock(balanceInfo.getTimeLock());
         }
         accountInfo.setSymbol(ApiContext.defaultSymbol);
+        accountInfo.setTag(AssetSystemCache.getAddressTag(accountInfo.getAddress()));
         return result.setResult(accountInfo);
 
     }

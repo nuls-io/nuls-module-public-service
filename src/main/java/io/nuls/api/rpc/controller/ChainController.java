@@ -8,6 +8,7 @@ import io.nuls.api.constant.AddressType;
 import io.nuls.api.db.*;
 import io.nuls.api.exception.JsonRpcException;
 import io.nuls.api.manager.CacheManager;
+import io.nuls.api.model.dto.SearchAssetInfo;
 import io.nuls.api.model.po.*;
 import io.nuls.api.model.po.asset.ChainAssetInfo;
 import io.nuls.api.model.po.asset.ChainAssetInfoVo;
@@ -15,6 +16,7 @@ import io.nuls.api.model.rpc.RpcErrorCode;
 import io.nuls.api.model.rpc.RpcResult;
 import io.nuls.api.model.rpc.RpcResultError;
 import io.nuls.api.model.rpc.SearchResultDTO;
+import io.nuls.api.utils.AssetSearchUtil;
 import io.nuls.api.utils.AssetTool;
 import io.nuls.api.utils.DBUtil;
 import io.nuls.api.utils.VerifyUtils;
@@ -211,11 +213,9 @@ public class ChainController {
                 }
             } else {
                 result = new SearchResultDTO();
-                List<ChainAssetInfo> list = ChainAssetCache.search(text);
+                List<SearchAssetInfo> list = AssetSearchUtil.search(chainId, text);
                 if (null != list && !list.isEmpty()) {
-                    List<ChainAssetInfoVo> voList = new ArrayList<>();
-                    list.forEach(info -> voList.add(new ChainAssetInfoVo(info)));
-                    result.setData(voList);
+                    result.setData(list);
                     result.setType("asset");
                 } else {
                     return RpcResult.dataNotFound();
