@@ -33,7 +33,7 @@ public class StatisticalRewardTask implements Runnable {
             if (apiCache != null) {
                 apiCache.getCoinContextInfo().setDailyReward(reward);
             }
-            //查询当前最新block高度
+            //Query the current latestblockheight
             BlockHeaderInfo headerInfo = blockService.getBestBlockHeader(chainId);
             if (headerInfo == null) {
                 return;
@@ -44,9 +44,9 @@ public class StatisticalRewardTask implements Runnable {
                 statisticalInfo.setChainId(chainId);
                 statisticalInfo.setLastStatisticalHeight(0);
             }
-            //统计已打包区块的交易数量
-            //获取上一次统计截止的区块高度，获取当前最新区块高度，累计之间所有区块的交易数量
-            //超过1000条数据后，每次循环统计1000条
+            //Counting the number of transactions in packaged blocks
+            //Obtain the block height as of the last statistical deadline, obtain the latest block height, and accumulate the transaction quantity of all blocks between them
+            //exceed1000After data entry, count each iteration1000strip
             long startHeight = statisticalInfo.getLastStatisticalHeight();
             long endHeight = headerInfo.getHeight();
             while (endHeight - startHeight > 1000) {

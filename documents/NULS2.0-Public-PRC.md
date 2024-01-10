@@ -1,68 +1,68 @@
-# NULS2.0——API接口文档
+# NULS2.0——APIInterface documentation
 
-## 简介
+## brief introduction
 
-每个 NULS2.0节点都可选的提供了一套 API 接口，用于从节点获取可视化区块链数据，使得开发区块链应用变得十分方便。接口通过 [JSON-RPC](http://wiki.geekdream.com/Specification/json-rpc_2.0.html) 的方式提供，底层使用 HTTP协议进行通讯。
+each NULS2.0A set of optional nodes is provided API Interface, used to obtain visual blockchain data from nodes, making the development of blockchain applications very convenient. Interface passed through [JSON-RPC](http://wiki.geekdream.com/Specification/json-rpc_2.0.html) Provided in a certain way, with underlying usage HTTPProtocol for communication.
 
-要启动一个提供 RPC 服务的节点，需做到以下几个步骤：
+To initiate a provision RPC The nodes of the service need to follow the following steps：
 
-- 获取钱包
+- Get Wallet
 
-方式一：下载能提供RPC服务的全节点钱包（http://正式上线后填充 下载地址链接）
+Method 1：Download can provideRPCFull node wallet for services（http://Fill in after official launch Download address link）
 
-方式二：同步https://github.com/nuls-io/nuls-v2上NULS2.0项目master分支的源代码，执行如下命令，手动打包全节点钱包：
+Method 2：synchronizationhttps://github.com/nuls-io/nuls-v2upperNULS2.0projectmasterBranch source code, execute the following command to manually package the entire node wallet：
 
 ```
 ./package -a public-service
 ./package
 ```
 
-- 节点服务器需安装mongoDB数据库
-- 修改module.ncf文件，[public-service]的相关配置，如下：
+- Node servers need to be installedmongoDBdatabase
+- modifymodule.ncfFiles,[public-service]The relevant configurations are as follows：
 
 ```
 [public-service]
-#数据库url地址
+#databaseurladdress
 databaseUrl=127.0.0.1
-#数据库端口号
+#Database port number
 databasePort=27017
 ```
 
-完成配置后，启动节点程序，客户端会解析已同步的区块，并存储到mongoDB中。
+After completing the configuration, start the node program, and the client will parse the synchronized blocks and store them in themongoDBMedium.
 
-## 监听端口
+## Listening port
 
-默认端口为18003，可修改module.ncf文件，[public-service]的相关配置，如下：
+The default port is18003, modifiablemodule.ncfFiles,[public-service]The relevant configurations are as follows：
 
 ```
 [public-service]
-#public-service模块对外的rpc端口号
+#public-serviceModule ExternalrpcPort number
 rpcPort=18003
 ```
 
-## 接口说明
+## Interface Description
 
-### 字符集编码
+### Character set encoding
 
 UTF-8
 
-### 远程调用协议
+### Remote Call Protocol
 
 JSON-RPC
 
 ```
 {
 	"jsonrpc":"2.0",
-	"method":"getChainInfo",		//接口名称
-	"params":[],					//所有接口的参数，都已数组方式传递，且参数顺序不能变
+	"method":"getChainInfo",		//Interface Name
+	"params":[],					//All interface parameters have been passed in an array manner, and the order of parameters cannot be changed
 	"id":1234
 }
 ```
 
-### 接口返回格式
+### Interface return format
 
 ```
-正常返回
+Normal return
 //example
 {
      "jsonrpc": "2.0",
@@ -72,7 +72,7 @@ JSON-RPC
          "localHeight": 4936
      }
 }
-异常返回
+Abnormal return
 //example
 {
      "jsonrpc": "2.0",
@@ -85,231 +85,231 @@ JSON-RPC
 }
 ```
 
-### 代币转换
+### Token conversion
 
-涉及到有代币的接口，参数和返回里的代币数量为了避免小数精度丢失，统一转为BigInteger格式。NULS主网的小数精度为8位，因此接口层统一右移8位，即100,000,000 = 1NULS。
+When it comes to interfaces with tokens, the number of tokens in parameters and returns is uniformly converted to avoid losing decimal precisionBigIntegerFormat.NULSThe decimal precision of the main network is8Bit, therefore the interface layer is uniformly shifted to the right8Bit100,000,000 = 1NULS.
 
-### 返回数据定义
+### Return Data Definition
 
-#### 交易类型(txType)
+#### Transaction type(txType)
 
 ```
-    int COIN_BASE = 1;						//coinBase奖励
-    int TRANSFER = 2;						//转账
- 	int ACCOUNT_ALIAS = 3;					//设置账户别名
-   	int REGISTER_AGENT = 4;					//新建共识节点
-   	int DEPOSIT = 5;						//委托参与共识
-    int CANCEL_DEPOSIT = 6;					//取消委托
-    int YELLOW_PUNISH = 7;					//黄牌惩罚
-    int RED_PUNISH = 8;						//红牌惩罚
-    int STOP_AGENT = 9;						//注销共识节点
-    int CROSS_CHAIN = 10;					//跨链转账
-	int REGISTER_CHAIN_AND_ASSET = 11;		//注册链
-    int DESTROY_CHAIN_AND_ASSET = 12;		//销毁链
-    int ADD_ASSET_TO_CHAIN = 13;			//新增资产上链
-   	int REMOVE_ASSET_FROM_CHAIN = 14;		//注销资产
-    int CREATE_CONTRACT = 15;				//创建智能合约
-    int CALL_CONTRACT = 16;					//调用智能合约
-    int DELETE_CONTRACT = 17;				//删除智能合约
-    int CONTRACT_TRANSFER = 18;				//合约内部转账
-    int CONTRACT_RETURN_GAS = 19;			//合约执行手续费返还
-    int CONTRACT_CREATE_AGENT = 20;			//合约创建共识节点
-	int CONTRACT_DEPOSIT = 21;				//合约委托参与共识
- 	int CONTRACT_CANCEL_DEPOSIT = 22;		//合约取消委托
- 	int CONTRACT_STOP_AGENT = 23;			//合约注销共识节点
+    int COIN_BASE = 1;						//coinBasereward
+    int TRANSFER = 2;						//Transfer
+ 	int ACCOUNT_ALIAS = 3;					//Set account alias
+   	int REGISTER_AGENT = 4;					//Create a new consensus node
+   	int DEPOSIT = 5;						//Entrusting participation in consensus
+    int CANCEL_DEPOSIT = 6;					//Cancel delegation
+    int YELLOW_PUNISH = 7;					//Yellow card punishment
+    int RED_PUNISH = 8;						//Red card punishment
+    int STOP_AGENT = 9;						//Unregister consensus node
+    int CROSS_CHAIN = 10;					//Cross chain transfer
+	int REGISTER_CHAIN_AND_ASSET = 11;		//Registration Chain
+    int DESTROY_CHAIN_AND_ASSET = 12;		//Destruction chain
+    int ADD_ASSET_TO_CHAIN = 13;			//Add new assets on the chain
+   	int REMOVE_ASSET_FROM_CHAIN = 14;		//Cancellation of assets
+    int CREATE_CONTRACT = 15;				//Create a smart contract
+    int CALL_CONTRACT = 16;					//Calling smart contracts
+    int DELETE_CONTRACT = 17;				//Delete smart contract
+    int CONTRACT_TRANSFER = 18;				//Internal transfer of contract
+    int CONTRACT_RETURN_GAS = 19;			//Contract execution fee refund
+    int CONTRACT_CREATE_AGENT = 20;			//Contract creation consensus node
+	int CONTRACT_DEPOSIT = 21;				//Contract Entrustment Participation Consensus
+ 	int CONTRACT_CANCEL_DEPOSIT = 22;		//Contract cancellation commission
+ 	int CONTRACT_STOP_AGENT = 23;			//Contract Cancellation Consensus Node
 ```
 
 
 
-#### 资产信息(assetInfo)
+#### Asset information(assetInfo)
 
 ```
 assetInfo：{
-    "key": "100-1",						//string	主键
-    "chainId": 100,						//int		资产的链id 		
-    "assetId": 1,						//int		资产id
-    "symbol": "NULS",					//string	资产符号
-    "decimals":8						//int		资产支持小数位
-    "initCoins": 100000000000000,		//bigInt	资产初始金额
-    "address": "tNULSeBaMoodYW7A……",	//string	资产创建人地址			
-    "status": 1							//int		状态， 0：注销	1：启用
+    "key": "100-1",						//string	Primary key
+    "chainId": 100,						//int		The chain of assetsid 		
+    "assetId": 1,						//int		assetid
+    "symbol": "NULS",					//string	Asset symbols
+    "decimals":8						//int		Asset support decimal places
+    "initCoins": 100000000000000,		//bigInt	Initial amount of assets
+    "address": "tNULSeBaMoodYW7A……",	//string	Address of asset creator			
+    "status": 1							//int		Status, 0：logout	1：Enable
 }
 
 
 ```
 
-#### 区块头信息(blockHeaderInfo)
+#### Block header information(blockHeaderInfo)
 
 ```
 blockHeaderInfo: {
-    "hash": "c31d198b6fb5a……",					//string	区块hash
-    "height": 304,								//long		区块高度
-    "preHash": "d7596990d508……",				//string	前一区块hash
-    "merkleHash": "85c661b36aa3fdc……",			//string	梅克尔hash
-    "createTime": 1559725301,					//long		创建时间
-    "agentHash": null,							//string	出块节点的hash
-    "agentId": "8CPcA7kaXSHbWb3GHP7……",			//string	出块节点的id
-    "packingAddress": "8CPcA7kaXSH……",			//string	出块节点的区块打包地址
-    "agentAlias": null,							//string	出块节点的代理人别名
-    "txCount": 1,								//int		区块打包交易数量
-    "roundIndex": 155972530,					//long		出块轮次
-    "totalFee": 0,								//bigInt	打包的交易手续费
-    "reward": 0,								//bigInt	出块奖励
-    "size": 235,								//long		区块大小
-    "packingIndexOfRound": 1,					//int		本轮的出块顺序
-    "scriptSign": "210e2ab7a219bca2a……",		//string	区块签名
-    "txHashList": [								//[string]	区块打包的交易对应的交易hash集合
+    "hash": "c31d198b6fb5a……",					//string	blockhash
+    "height": 304,								//long		block height
+    "preHash": "d7596990d508……",				//string	Previous blockhash
+    "merkleHash": "85c661b36aa3fdc……",			//string	Merkelhash
+    "createTime": 1559725301,					//long		Creation time
+    "agentHash": null,							//string	Out of block nodeshash
+    "agentId": "8CPcA7kaXSHbWb3GHP7……",			//string	Out of block nodesid
+    "packingAddress": "8CPcA7kaXSH……",			//string	The block packaging address of the outbound node
+    "agentAlias": null,							//string	Proxy alias for block node
+    "txCount": 1,								//int		Number of block packaging transactions
+    "roundIndex": 155972530,					//long		Block output round
+    "totalFee": 0,								//bigInt	Packaged transaction fees
+    "reward": 0,								//bigInt	Reward for block output
+    "size": 235,								//long		block size
+    "packingIndexOfRound": 1,					//int		The order of block production in this round
+    "scriptSign": "210e2ab7a219bca2a……",		//string	Block signature
+    "txHashList": [								//[string]	Transactions corresponding to block packaged transactionshashaggregate
         "85c661b36aa3fdc93b9bc27bb8fdf1……"
     ],
-    "roundStartTime": 1559725291,				//long		本轮出块的起始出块时间
-    "agentVersion": 1,							//int		出块节点的协议版本号
-    "seedPacked": true							//boolean	当前区块是否是种子节点打包
+    "roundStartTime": 1559725291,				//long		The starting block output time of this round
+    "agentVersion": 1,							//int		The protocol version number of the block node
+    "seedPacked": true							//boolean	Is the current block a seed node packaging
 }
 ```
 
-#### 交易信息(txInfo)
+#### Transaction information(txInfo)
 
 ```
 txInfo: {
-    "hash": "0020b15e564……",				//string	交易hash
-    "type": 2,								//int 		交易类型(txType)
-    "height": -1,							//long		确认交易的区块高度,-1表示还未被确认
-    "size": 228,							//int		交易大小
-    "createTime": 1552300674920,			//long		创建时间
-    "remark": "transfer test",				//string	备注
-    "txData": null,							//object	交易业务对象，根据交易类型区分，
-    													具体见后面的数据定义
-    "txDataHex": null,						//string	业务对象16进制序列化字符串
-    "txDataList": null,						//[object]	交易业务对象集合，根据交易类型区分
-    "fee": { 								//bigInt	手续费
-        "chainId": 100,						//手续费链id
-        "assetId": 1,						//手续费资产id
-        "symbol": "ATOM",					//手续费资产符号
-        "value": 100000						//手续费金额
+    "hash": "0020b15e564……",				//string	transactionhash
+    "type": 2,								//int 		Transaction type(txType)
+    "height": -1,							//long		Confirm the block height of the transaction,-1Indicates that it has not been confirmed yet
+    "size": 228,							//int		Transaction size
+    "createTime": 1552300674920,			//long		Creation time
+    "remark": "transfer test",				//string	Remarks
+    "txData": null,							//object	Trading business objects, distinguished by transaction type,
+    													Please refer to the following data definition for details
+    "txDataHex": null,						//string	Business objects16Serialized string in hexadecimal format
+    "txDataList": null,						//[object]	Collection of transaction business objects, distinguished by transaction type
+    "fee": { 								//bigInt	Handling fees
+        "chainId": 100,						//Service fee chainid
+        "assetId": 1,						//Handling fee assetsid
+        "symbol": "ATOM",					//Handling fee asset symbol
+        "value": 100000						//Handling fee amount
     },
     "coinFroms": [
     {
-        "address": "5MR_2CbSSboa……",			//string	转出地址
-        "chainId": 12345,						//int		转出资产的链id
-        "assetsId": 1,							//int		转出资产的id
-        "amount": 1870000000000,				//bigInt	转出金额	
-        "locked": 0,							//long		锁定时间
-        "nonce": "ffffffff"						//string	转出资产最新nonce值
-        "symbol":"nuls"							//string	资产符号
+        "address": "5MR_2CbSSboa……",			//string	Transfer address
+        "chainId": 12345,						//int		Chain of transferring out assetsid
+        "assetsId": 1,							//int		Transfer of assetsid
+        "amount": 1870000000000,				//bigInt	Transfer amount	
+        "locked": 0,							//long		Lock time
+        "nonce": "ffffffff"						//string	Latest transfer of assetsnoncevalue
+        "symbol":"nuls"							//string	Asset symbols
     }
     ],
     "coinTos": [
     {
-        "address": "5MR_2CbSSboa……",			//string	接收地址
-        "chainId": 12345,						//int		接收资产的链id
-        "assetsId": 1,							//int		接收资产的id
-        "amount": 1870000000000,				//bigInt	接收金额	
-        "locked": 0,							//long		锁定时间
-        "symbol":"nuls"							//string	资产符号
+        "address": "5MR_2CbSSboa……",			//string	Receiving address
+        "chainId": 12345,						//int		Chain for receiving assetsid
+        "assetsId": 1,							//int		Receiving assetsid
+        "amount": 1870000000000,				//bigInt	Received amount	
+        "locked": 0,							//long		Lock time
+        "symbol":"nuls"							//string	Asset symbols
     }
     ],
-    "value": 1860000000000						//bigInt	交易涉及到的资产变动额
+    "value": 1860000000000						//bigInt	The amount of asset changes involved in the transaction
 }
 ```
 
-#### 账户信息(accountInfo)
+#### Account information(accountInfo)
 
 ```
 accountInfo: {
-    "address": "5MR_2ChNj……",					//string	账户地址
-    "alias": null,								//string	账户别名
-    "type": 1,									//int		账户类型 
-                                                //1：普通地址	2：合约地址	3：多签地址
-    "txCount": 8,								//int		交易笔数
-    "totalOut": 0,								//bigInt	总支出
-    "totalIn": 1000000000000000,				//bigInt	总收入
-    "consensusLock": 0,							//bigInt	本链默认资产共识锁定
-    "timeLock": 0,								//bigInt	本链默认资产时间锁定
-    "balance": 1000000000000000,				//bigInt	本链默认资产可用余额
-    "totalBalance": 1000000000000000,			//bigInt	本链默认资产总额
-    "totalReward": 0,							//bigInt	共识总奖励
-    "tokens": []								//[string]	拥有的nrc20资产符号列表
+    "address": "5MR_2ChNj……",					//string	Account address
+    "alias": null,								//string	Account Aliases
+    "type": 1,									//int		Account type 
+                                                //1：Normal address	2：Contract address	3：Multiple signed addresses
+    "txCount": 8,								//int		Number of transactions
+    "totalOut": 0,								//bigInt	Total expenditure
+    "totalIn": 1000000000000000,				//bigInt	Total revenue
+    "consensusLock": 0,							//bigInt	The default asset consensus lock in this chain
+    "timeLock": 0,								//bigInt	The default asset time lock in this chain
+    "balance": 1000000000000000,				//bigInt	The default available balance of assets in this chain
+    "totalBalance": 1000000000000000,			//bigInt	The default total assets of this chain
+    "totalReward": 0,							//bigInt	Consensus total reward
+    "tokens": []								//[string]	Ownednrc20Asset Symbol List
 }
 ```
 
-#### 资产信息(accountLedgerInfo)
+#### Asset information(accountLedgerInfo)
 
 ```
 accountLedgerInfo: {
-    "address": "tNULSeBaMrbMRiFAUeeAt……",			//string	账户地址
-    "chainId": 2,									//int		资产的链id
-    "assetId": 1,									//int		资产的id
-    "symbol": "NULS",								//string	资产的符号
-    "totalBalance": 1000000000000000,				//bigInt	资产总额
-    "balance": 1000000000000000,					//bigInt	可用余额
-    "timeLock": 0,									//bigInt	时间锁定
-    "consensusLock": 0								//bigInt	共识锁定
+    "address": "tNULSeBaMrbMRiFAUeeAt……",			//string	Account address
+    "chainId": 2,									//int		The chain of assetsid
+    "assetId": 1,									//int		Assetsid
+    "symbol": "NULS",								//string	Symbols for assets
+    "totalBalance": 1000000000000000,				//bigInt	Total assets
+    "balance": 1000000000000000,					//bigInt	Available balance
+    "timeLock": 0,									//bigInt	Time lock
+    "consensusLock": 0								//bigInt	Consensus locking
 }
 ```
 
-#### 共识节点信息(consensusInfo)
+#### Consensus node information(consensusInfo)
 
 ```
  {
-     "txHash": "0020c734c7ec……",				//string	创建共识节点的交易hash
-     "agentId": "e4ae68a2",						//string	节点id
-     "agentAddress": "5MR_2CfWGwnfh……",			//string	创建节点的代理账户地址
-     "packingAddress": "5MR_2CeXYdnth……",		//string	节点负责打包区块的账户地址
-     "rewardAddress": "5MR_2CeXYdnt……",			//string	节点获取共识奖励的账户地址
-     "agentAlias": null,						//string	节点的代理地址别名
-     "deposit": 2000000000000,					//bigInt	创建节点时代理节点的保证金
-     "commissionRate": 10,						//int		节点收取的佣金比例，单位%
-     "createTime": 1552300674920,				//long		节点的创建时间
-     "status": 0,								//int		节点状态 
-     											//0:待共识, 1:共识中, 2:已注销
-     "totalDeposit": 20000000000000,			//bigInt	委托参与共识总金额
-     "depositCount": 0,							//int		委托次数
-     "creditValue": 0,							//double	信用值 取值[-1,1]
-     "totalPackingCount": 3966,					//int		节点已打包出块总数
-     "lostRate": 0,								//double	丢块率
-     "lastRewardHeight": 8000,					//long		最后一次出块获取奖励的区块高度
-     "deleteHash": null,						//string	注销节点的交易hash
-     "blockHeight": 67,							//long		创建节点时的区块高度
-     "deleteHeight": 0,							//long		注销节点时的区块高度
-     "totalReward": 1256976254880,				//bigInt	总共识奖励				                                                       totalReward=commissionReward+agentReward
-     "commissionReward": 1256976254880,			//bigInt	委托共识奖励
-     "agentReward": 0,							//bigInt	节点获取奖励
-     "roundPackingTime": 0,						//long		当前轮次节点负责打包区块的时间
-     "version": 1,								//int		节点的协议版本号
-     "type": 1,									//int		1:普通节点,2:开发者节点,3:大使节点
+     "txHash": "0020c734c7ec……",				//string	Create transactions for consensus nodeshash
+     "agentId": "e4ae68a2",						//string	nodeid
+     "agentAddress": "5MR_2CfWGwnfh……",			//string	Create a proxy account address for the node
+     "packingAddress": "5MR_2CeXYdnth……",		//string	The account address where the node is responsible for packaging blocks
+     "rewardAddress": "5MR_2CeXYdnt……",			//string	The account address where the node obtains consensus rewards
+     "agentAlias": null,						//string	Node's proxy address alias
+     "deposit": 2000000000000,					//bigInt	Deposit for proxy nodes when creating nodes
+     "commissionRate": 10,						//int		The commission ratio charged by the node, in units%
+     "createTime": 1552300674920,				//long		The creation time of the node
+     "status": 0,								//int		Node status 
+     											//0:Pending consensus, 1:In consensus, 2:Unregistered
+     "totalDeposit": 20000000000000,			//bigInt	Total amount of entrusted participation consensus
+     "depositCount": 0,							//int		Number of Commissions
+     "creditValue": 0,							//double	Credit value Value[-1,1]
+     "totalPackingCount": 3966,					//int		The total number of blocks packaged by nodes
+     "lostRate": 0,								//double	Block loss rate
+     "lastRewardHeight": 8000,					//long		The height of the block where the reward was obtained for the last block output
+     "deleteHash": null,						//string	Unregister node transactionshash
+     "blockHeight": 67,							//long		Block height when creating nodes
+     "deleteHeight": 0,							//long		Block height when logging out nodes
+     "totalReward": 1256976254880,				//bigInt	Total consensus reward				                                                       totalReward=commissionReward+agentReward
+     "commissionReward": 1256976254880,			//bigInt	Commission consensus reward
+     "agentReward": 0,							//bigInt	Node obtains rewards
+     "roundPackingTime": 0,						//long		The time when the current round node is responsible for packaging blocks
+     "version": 1,								//int		Protocol version number of the node
+     "type": 1,									//int		1:Normal node,2:Developer node,3:Ambassador node
  }
 ```
 
-#### 委托共识信息(depositInfo)
+#### Commission consensus information(depositInfo)
 
 ```
 depositInfo:{
-    "txHash": "0020dd1b606191068566c……",			//string	委托共识的交易hash
-    "amount": 20000000000000,						//bigint	委托金额		
-    "agentHash": "0020c734c7ecf447……",				//string	委托的共识节点的交易hash
-    "address": "5MR_2CfWGwnfhPcdnho……",				//string	委托人的账户地址
-    "createTime": 1552292357109,					//long		委托时间
-    "blockHeight": 69,								//long		委托时的区块高度
-    "deleteHeight": 0,								//long		取消委托时的区块高度
-    "type": 0										//int		0:委托, 1:取消委托
-    "fee": { 										//bigInt	委托交易的手续费
-        "chainId": 100,								//手续费链id
-        "assetId": 1,								//手续费资产id
-        "symbol": "ATOM",							//手续费资产符号
-        "value": 100000								//手续费金额
+    "txHash": "0020dd1b606191068566c……",			//string	Transactions with delegated consensushash
+    "amount": 20000000000000,						//bigint	Entrusted amount		
+    "agentHash": "0020c734c7ecf447……",				//string	Transaction of consensus nodes entrustedhash
+    "address": "5MR_2CfWGwnfhPcdnho……",				//string	Principal's account address
+    "createTime": 1552292357109,					//long		Entrustment time
+    "blockHeight": 69,								//long		Block height at the time of delegation
+    "deleteHeight": 0,								//long		Block height when canceling delegation
+    "type": 0										//int		0:entrust, 1:Cancel delegation
+    "fee": { 										//bigInt	Commission fees for entrusted transactions
+        "chainId": 100,								//Service fee chainid
+        "assetId": 1,								//Handling fee assetsid
+        "symbol": "ATOM",							//Handling fee asset symbol
+        "value": 100000								//Handling fee amount
     },
 }
 ```
 
 
 
-## 接口列表
+## Interface List
 
-### 链相关接口[chain]
+### Chain related interfaces[chain]
 
-#### 查询本链信息
+#### Query information on this chain
 
-请求：
+request：
 
 ```
 {
@@ -320,31 +320,31 @@ depositInfo:{
 }
 ```
 
-返回：
+return：
 
 ```
 {
      "jsonrpc": "2.0",
      "id": 1234,
      "result": {
-          "chainId": 100,								//本链的id
-          "chainName": "nuls",							//链名称
-          "defaultAsset": {assetInfo},					//本链默认资产信息
-          "assets": [									//本链所有资产信息集合
+          "chainId": 100,								//This chain'sid
+          "chainName": "nuls",							//Chain Name
+          "defaultAsset": {assetInfo},					//Default asset information for this chain
+          "assets": [									//All asset information sets in this chain
                {assetInfo}
           ],
-          "seeds": [									//链的共识种子节点地址
+          "seeds": [									//Consensus seed node address of the chain
                "8CPcA7kaXSHbWb3GHP7bd5hRLFu8RZv57rY9w"	
           ],
-          "inflationCoins": 500000000000000,			//本链默认资产的通胀代币数量/年
-          "status": 1									//状态：0 注销，1启用
+          "inflationCoins": 500000000000000,			//The number of inflation tokens for default assets in this chain/year
+          "status": 1									//state：0 Cancellation,1Enable
      }
 }
 ```
 
-#### 查询链运行后的通用信息
+#### Query the general information after the chain runs
 
-请求：
+request：
 
 ```
 {
@@ -353,40 +353,40 @@ depositInfo:{
     "params":[chainId],
     "id":1234
 }
-//参数说明
-chainId: int									//本链的id
+//Parameter Description
+chainId: int									//This chain'sid
 ```
 
-返回：
+return：
 
 ```
 {
      "jsonrpc": "2.0",
      "id": 1234,
      "result": {
-          "networkHeight": 278,							//网络最新区块高度
-          "localHeight": 278							//当前节点已同步的区块高度
-          "defaultAsset": {								//本链默认资产信息
-               "symbol": "NULS",						//资产符号
-               "chainId": 2,							//资产链ID
-               "assetId": 1,							//资产ID
-               "decimals": 8							//支持小数位
+          "networkHeight": 278,							//The latest block height in the network
+          "localHeight": 278							//The height of synchronized blocks at the current node
+          "defaultAsset": {								//Default asset information for this chain
+               "symbol": "NULS",						//Asset symbols
+               "chainId": 2,							//Asset ChainID
+               "assetId": 1,							//assetID
+               "decimals": 8							//Supports decimal places
           },
-          "agentAsset": {								//本链参与共识所用资产信息
+          "agentAsset": {								//Asset information used for consensus participation in this chain
                "symbol": "NULS",
                "chainId": 2,
                "assetId": 1,
                "decimals": 8
           },
-          "isRunCrossChain": true,						//是否支持跨链
-          "isRunSmartContract": true					//是否启用智能合约
+          "isRunCrossChain": true,						//Does it support cross chain
+          "isRunSmartContract": true					//Whether to enable smart contracts
      }
 }
 ```
 
-#### 查询其他已注册跨链的链信息
+#### Query other registered cross chain chain information
 
-请求：
+request：
 
 ```
 {
@@ -395,11 +395,11 @@ chainId: int									//本链的id
     "params":[chainId],
     "id":1234
 }
-//参数说明
-chainId: int									//本链的id
+//Parameter Description
+chainId: int									//This chain'sid
 ```
 
-返回：
+return：
 
 ```
 {
@@ -407,18 +407,18 @@ chainId: int									//本链的id
      "id": 1234,
      "result": [
           {
-               "chainName": "nuls2",					//链名称
-               "chainId": 2								//链id
+               "chainName": "nuls2",					//Chain Name
+               "chainId": 2								//chainid
           }
      ]
 }
 ```
 
-### 区块相关接口[block]
+### Block related interfaces[block]
 
-#### 查询最新区块头
+#### Query the latest block header
 
-请求：
+request：
 
 ```
 {
@@ -427,23 +427,23 @@ chainId: int									//本链的id
     "params":[chainId],
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
+//Parameter Description
+chainId: int									//Chain basedid
 ```
 
-返回：
+return：
 
 ```
 {
      "jsonrpc": "2.0",
      "id": 1234,
-     "result": {blockHeaderInfo}						//区块头信息
+     "result": {blockHeaderInfo}						//Block header information
 }
 ```
 
-#### 根据高度查询区块头
+#### Query block headers based on height
 
-请求：
+request：
 
 ```
 {
@@ -452,24 +452,24 @@ chainId: int									//链的id
     "params":[chainId, blockHeight],
     "id":1234
 }
-//参数说明
-chainId: int									 //链的id
-blockHeight：long								//区块高度
+//Parameter Description
+chainId: int									 //Chain basedid
+blockHeight：long								//block height
 ```
 
-返回：
+return：
 
 ```
 {
      "jsonrpc": "2.0",
      "id": 1234,
-     "result": {blockHeaderInfo}						//区块头信息
+     "result": {blockHeaderInfo}						//Block header information
 }
 ```
 
-#### 根据区块hash查询区块头
+#### Based on blockshashQuery block header
 
-请求：
+request：
 
 ```
 {
@@ -478,23 +478,23 @@ blockHeight：long								//区块高度
     "params":[chainId, blockHash],
     "id":1234
 }
-chainId: int									 //链的id
-blockHash：string								//区块hash
+chainId: int									 //Chain basedid
+blockHash：string								//blockhash
 ```
 
-返回：
+return：
 
 ```
 {
      "jsonrpc": "2.0",
      "id": 1234,
-     "result": {blockHeaderInfo}						//区块头信息
+     "result": {blockHeaderInfo}						//Block header information
 }
 ```
 
-#### 根据高度查询完整区块
+#### Query complete blocks based on height
 
-请求：
+request：
 
 ```
 {
@@ -503,29 +503,29 @@ blockHash：string								//区块hash
     "params":[chainId, blockHeight],
     "id":1234
 }
-//参数说明
-chainId: int									 //链的id
-blockHeight：long								//区块高度
+//Parameter Description
+chainId: int									 //Chain basedid
+blockHeight：long								//block height
 ```
 
-返回：
+return：
 
 ```
 {
      "jsonrpc": "2.0",
      "id": 1234,
      "result": {
-     	"header":{blockHeaderInfo},						//区块头信息
-     	"txList":[										//打包的交易信息
+     	"header":{blockHeaderInfo},						//Block header information
+     	"txList":[										//Packaged transaction information
      		{txInfo}
      	]
      }						
 }
 ```
 
-#### 根据区块hash查询完整区块
+#### Based on blockshashQuery complete blocks
 
-请求：
+request：
 
 ```
 {
@@ -534,29 +534,29 @@ blockHeight：long								//区块高度
     "params":[chainId, blockHash],
     "id":1234
 }
-//参数说明
-chainId: int									 //链的id
-blockHash：string								//区块hash
+//Parameter Description
+chainId: int									 //Chain basedid
+blockHash：string								//blockhash
 ```
 
-返回：
+return：
 
 ```
 {
      "jsonrpc": "2.0",
      "id": 1234,
      "result": {
-     	"header":{blockHeaderInfo},						//区块头信息
-     	"txList":[										//打包的交易信息
+     	"header":{blockHeaderInfo},						//Block header information
+     	"txList":[										//Packaged transaction information
      		{txInfo}
      	]
      }						
 }
 ```
 
-#### 查询区块头列表
+#### Query block header list
 
-请求：
+request：
 
 ```
 {
@@ -565,15 +565,15 @@ blockHash：string								//区块hash
     "params":[chainId,pageNumber,pageSize, isHidden, packedAddress],
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-pageNumber:int									//页码
-pageSize:int									//每页显示条数，取值[1-1000]
-isHidden:boolean								//是否隐藏只有共识奖励交易的块 
-packedAddress:string							//根据区块打包地址过滤，非必填
+//Parameter Description
+chainId: int									//Chain basedid
+pageNumber:int									//Page number
+pageSize:int									//Display the number of entries per page, with a value of[1-1000]
+isHidden:boolean								//Do you want to hide blocks with only consensus reward transactions 
+packedAddress:string							//Filter based on block packaging address, not mandatory
 ```
 
-返回:
+return:
 
 ```
 {
@@ -590,11 +590,11 @@ packedAddress:string							//根据区块打包地址过滤，非必填
 }
 ```
 
-### 账户相关的接口[account]
+### Account related interfaces[account]
 
-#### 查询账户详细信息
+#### Query account details
 
-请求：
+request：
 
 ```
 {
@@ -603,24 +603,24 @@ packedAddress:string							//根据区块打包地址过滤，非必填
     "params":[chainId,address],
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-address: string									//账户地址
+//Parameter Description
+chainId: int									//Chain basedid
+address: string									//Account address
 ```
 
-返回：
+return：
 
 ```
 {
      "jsonrpc": "2.0",
      "id": 1234,
-     "result": {accountInfo}					//账户信息
+     "result": {accountInfo}					//Account information
 }
 ```
 
-#### 根据别名查询账户详细信息
+#### Query account details based on alias
 
-请求：
+request：
 
 ```
 {
@@ -629,24 +629,24 @@ address: string									//账户地址
     "params":[chainId,alias],
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-alias: string									//账户别名
+//Parameter Description
+chainId: int									//Chain basedid
+alias: string									//Account Aliases
 ```
 
-返回：
+return：
 
 ```
 {
      "jsonrpc": "2.0",
      "id": 1234,
-     "result": {accountInfo}					//账户信息
+     "result": {accountInfo}					//Account information
 }
 ```
 
-#### 查询持币账户排名
+#### Query the ranking of coin holding accounts
 
-请求：
+request：
 
 ```
 {
@@ -655,15 +655,15 @@ alias: string									//账户别名
     "params":[chainId,assetChainId,assetId,pageNumber,pageSize],
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-assetChainId: int								//资产链id
-assetId: int									//资产id
-pageNumber:int									//页码
-pageSize:int									//每页显示条数，取值[1-1000]
+//Parameter Description
+chainId: int									//Chain basedid
+assetChainId: int								//Asset Chainid
+assetId: int									//assetid
+pageNumber:int									//Page number
+pageSize:int									//Display the number of entries per page, with a value of[1-1000]
 ```
 
-返回：
+return：
 
 ```
 {
@@ -675,13 +675,13 @@ pageSize:int									//每页显示条数，取值[1-1000]
           "totalCount": 1,
           "list": [
             {
-                "address": "NULSd6HhGcgkvEjzGU6Zmx2cxonjKQXA26Cth",		//账户地址
-                "alias": null,											//账户别名
-                "type": 3,												//地址类型,1:普通地址,2:合约地址,3:多签地址
-                "totalBalance": 3029296137980,							//总余额
-                "locked": 0,											//锁定金额
-                "proportion": "0.159%",									//金额总占比
-                "decimal": 8											//资产小数位
+                "address": "NULSd6HhGcgkvEjzGU6Zmx2cxonjKQXA26Cth",		//Account address
+                "alias": null,											//Account Aliases
+                "type": 3,												//Address type,1:Normal address,2:Contract address,3:Multiple signed addresses
+                "totalBalance": 3029296137980,							//Total balance
+                "locked": 0,											//Lock in amount
+                "proportion": "0.159%",									//Total amount proportion
+                "decimal": 8											//Decimal places of assets
             }
                ……
           ]
@@ -689,9 +689,9 @@ pageSize:int									//每页显示条数，取值[1-1000]
 }
 ```
 
-#### 查询账户本链资产列表
+#### Query the asset list of the account's main chain
 
-请求：
+request：
 
 ```
 {
@@ -700,12 +700,12 @@ pageSize:int									//每页显示条数，取值[1-1000]
     "params":[chainId,address],
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-address: string									//账户地址
+//Parameter Description
+chainId: int									//Chain basedid
+address: string									//Account address
 ```
 
-返回：
+return：
 
 ```
 {
@@ -717,9 +717,9 @@ address: string									//账户地址
 }
 ```
 
-#### 查询账户跨链资产列表
+#### Query account cross chain asset list
 
-请求：
+request：
 
 ```
 {
@@ -728,12 +728,12 @@ address: string									//账户地址
     "params":[chainId,address],
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-address: string									//账户地址
+//Parameter Description
+chainId: int									//Chain basedid
+address: string									//Account address
 ```
 
-返回：
+return：
 
 ```
 {
@@ -745,9 +745,9 @@ address: string									//账户地址
 }
 ```
 
-#### 查询账户单个资产余额
+#### Query the balance of individual assets in the account
 
-请求：
+request：
 
 ```
 {
@@ -756,35 +756,35 @@ address: string									//账户地址
     "params":[chainId,assetChainId,assetId,address],
     "id":1234
 }
-//参数说明
-chainId: int									//本链的id
-assetChainId: int								//资产的链id
-assetId: int									//资产的id
-address: string									//账户地址
+//Parameter Description
+chainId: int									//This chain'sid
+assetChainId: int								//The chain of assetsid
+assetId: int									//Assetsid
+address: string									//Account address
 ```
 
-返回：
+return：
 
 ```
 {
      "jsonrpc": "2.0",
      "id": 1234,
      "result": {
-          "totalBalance": 1000000000000000,					//bigInt	资产总额
-          "balance": 1000000000000000,						//bigInt	可用余额
-          "timeLock": 0,									//bigInt	时间锁定金额
-          "consensusLock": 0,								//bigInt	共识锁定金额
-          "freeze": 0,										//bigInt	交易未确认金额
-          "nonce": "0000000000000000",						//string	资产的nonce值
-          "nonceType": 1									//int		nonce值是否已确认
-          													// 0:未确认, 1:已确认
+          "totalBalance": 1000000000000000,					//bigInt	Total assets
+          "balance": 1000000000000000,						//bigInt	Available balance
+          "timeLock": 0,									//bigInt	Time lock amount
+          "consensusLock": 0,								//bigInt	Consensus locking amount
+          "freeze": 0,										//bigInt	Transaction unconfirmed amount
+          "nonce": "0000000000000000",						//string	Assetsnoncevalue
+          "nonceType": 1									//int		nonceHas the value been confirmed
+          													// 0:Unconfirmed, 1:Confirmed
      }
 }
 ```
 
-#### 查询账户锁定金额列表
+#### Query account locked amount list
 
-请求：
+request：
 
 ```
 {
@@ -793,34 +793,34 @@ address: string									//账户地址
     "params":[chainId,pageNumber,pageSize,address],
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-pageNumber:int									//页码
-pageSize:int									//每页显示条数，取值[1-1000]
-address: string									//账户地址
+//Parameter Description
+chainId: int									//Chain basedid
+pageNumber:int									//Page number
+pageSize:int									//Display the number of entries per page, with a value of[1-1000]
+address: string									//Account address
 ```
 
-返回：
+return：
 
 ```
 {
      "jsonrpc": "2.0",
      "id": 1234,
      "result": {
-          "txHash":"d3ks2x9bAl38bfsl……" 		//交易hash
-          "type":1								//锁定类型 
-          										//1：时间锁定, 2:高度锁定, 3:共识锁定
-          "time":1552300674920					//生成时间
-          "lockedValue":155650000000			//锁定值
-          "amount":100000000					//锁定金额
-          "reason":"共识奖励"					 //锁定原因
+          "txHash":"d3ks2x9bAl38bfsl……" 		//transactionhash
+          "type":1								//Lock type 
+          										//1：Time lock, 2:Height lock, 3:Consensus locking
+          "time":1552300674920					//Generation time
+          "lockedValue":155650000000			//Locked value
+          "amount":100000000					//Lock in amount
+          "reason":"Consensus rewards"					 //Reason for locking
      }
 }
 ```
 
-#### 查询别名是否可用
+#### Check if aliases are available
 
-请求：
+request：
 
 ```
 {
@@ -829,26 +829,26 @@ address: string									//账户地址
     "params":[chainId,alias],
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-alias:string									//别名
+//Parameter Description
+chainId: int									//Chain basedid
+alias:string									//alias
 ```
 
-返回：
+return：
 
 ```
 {
      "jsonrpc": "2.0",
      "id": 1234,
      "result": {
-          "value": true							//boolean	true: 可用, false: 不可用
+          "value": true							//boolean	true: available, false: Not available
      }
 }
 ```
 
-#### 查询各条链的地址前缀
+#### Query the address prefix of each chain
 
-请求：
+request：
 
 ```
 {
@@ -859,7 +859,7 @@ alias:string									//别名
 }
 ```
 
-返回：
+return：
 
 ```
 {
@@ -867,8 +867,8 @@ alias:string									//别名
     "id": "1234",
     "result": [
         {
-            "chainId": 1,						//链ID
-            "addressPrefix": "NULS"				//地址前缀
+            "chainId": 1,						//chainID
+            "addressPrefix": "NULS"				//Address prefix
         },
         {
             "chainId": 9,
@@ -880,11 +880,11 @@ alias:string									//别名
 
 
 
-### 交易相关接口[transaction]
+### Transaction related interfaces[transaction]
 
-#### 查询交易详情
+#### Query transaction details
 
-请求：
+request：
 
 ```
 {
@@ -893,12 +893,12 @@ alias:string									//别名
     "params":[chainId,txHash],
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-txHash: string									//交易hash	
+//Parameter Description
+chainId: int									//Chain basedid
+txHash: string									//transactionhash	
 ```
 
-返回：
+return：
 
 ```
 {
@@ -908,9 +908,9 @@ txHash: string									//交易hash
 }
 ```
 
-#### 查询交易列表
+#### Query transaction list
 
-请求：
+request：
 
 ```
 {
@@ -919,17 +919,17 @@ txHash: string									//交易hash
     "params":[chainId,pageNumber,pageSize,txType,isHidden,startTime,endTime],                       
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-pageNumber:int									//页码
-pageSize:int									//每页显示条数，取值[1-1000]
-txType:int										//交易类型(txType),type=0时查询所有交易
-isHidden:boolean    							//是否隐藏共识奖励交易，默认是不隐藏，这个参数只能是type=0时有效
-startTime:long									//区块开始时间(单位：秒)，默认为0
-endTime:long									//区块结束时间(单位：秒)，默认为0
+//Parameter Description
+chainId: int									//Chain basedid
+pageNumber:int									//Page number
+pageSize:int									//Display the number of entries per page, with a value of[1-1000]
+txType:int										//Transaction type(txType),type=0When querying all transactions
+isHidden:boolean    							//Whether to hide consensus reward transactions, default is not hidden, this parameter can only betype=0Time effective
+startTime:long									//Block start time(unit：second), default to0
+endTime:long									//End time of block(unit：second), default to0
 ```
 
-返回：
+return：
 
 ```
 {
@@ -941,33 +941,33 @@ endTime:long									//区块结束时间(单位：秒)，默认为0
           "totalCount": 1,
           "list": [
                {
-                    "txHash": "a8611112f2b35385ee84f85……",		//交易hash
-                    "address": "tNULSeBaMrbMRiFA……",			//账户地址
-                    "type": 1,									//交易类型
-                    "createTime": 1531152,						//交易时间，单位秒
-                    "height": 0,								//交易被打包确定的区块高度
-                    "chainId": 2,								//资产的链id
-                    "assetId": 1,								//资产id
-                    "symbol": "NULS",							//资产符号
-                    "values": 1000000000000000,					//交易金额
-                    "fee": { 									//bigInt	手续费
-                        "chainId": 100,							//手续费链id
-                        "assetId": 1,							//手续费资产id
-                        "symbol": "ATOM",						//手续费资产符号
-                        "value": 100000							//手续费金额
+                    "txHash": "a8611112f2b35385ee84f85……",		//transactionhash
+                    "address": "tNULSeBaMrbMRiFA……",			//Account address
+                    "type": 1,									//Transaction type
+                    "createTime": 1531152,						//Transaction time, in seconds
+                    "height": 0,								//The block height determined by the transaction being packaged
+                    "chainId": 2,								//The chain of assetsid
+                    "assetId": 1,								//assetid
+                    "symbol": "NULS",							//Asset symbols
+                    "values": 1000000000000000,					//Transaction amount
+                    "fee": { 									//bigInt	Handling fees
+                        "chainId": 100,							//Service fee chainid
+                        "assetId": 1,							//Handling fee assetsid
+                        "symbol": "ATOM",						//Handling fee asset symbol
+                        "value": 100000							//Handling fee amount
                     },
-                    "balance": 1000000000000000,				//交易后账户的余额
-                    "transferType": 1,							// -1:转出, 1:转入
-                    "status": 1									//交易状态 0:未确认,1:已确认
+                    "balance": 1000000000000000,				//The balance of the account after the transaction
+                    "transferType": 1,							// -1:Transfer out, 1:Transfer in
+                    "status": 1									//Transaction status 0:Unconfirmed,1:Confirmed
                }
           ]
      }
 }
 ```
 
-#### 查询区块打包的交易
+#### Query block packaged transactions
 
-请求：
+request：
 
 ```
 {
@@ -976,13 +976,13 @@ endTime:long									//区块结束时间(单位：秒)，默认为0
     "params":[chainId,blockHeight,txType], 
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-blockHeight:long								//区块高度
-txType:int										//交易类型(txType),type=0时查询所有交易
+//Parameter Description
+chainId: int									//Chain basedid
+blockHeight:long								//block height
+txType:int										//Transaction type(txType),type=0When querying all transactions
 ```
 
-返回：
+return：
 
 ```
 {
@@ -994,33 +994,33 @@ txType:int										//交易类型(txType),type=0时查询所有交易
           "totalCount": 1,
           "list": [
                {
-                    "txHash": "a8611112f2b35385ee84f85……",		//交易hash
-                    "address": "tNULSeBaMrbMRiFA……",			//账户地址
-                    "type": 1,									//交易类型
-                    "createTime": 1531152,						//交易时间，单位秒
-                    "height": 0,								//交易被打包确定的区块高度
-                    "chainId": 2,								//资产的链id
-                    "assetId": 1,								//资产id
-                    "symbol": "NULS",							//资产符号
-                    "values": 1000000000000000,					//交易金额
-                    "fee": { 									//bigInt	手续费
-                        "chainId": 100,							//手续费链id
-                        "assetId": 1,							//手续费资产id
-                        "symbol": "ATOM",						//手续费资产符号
-                        "value": 100000							//手续费金额
+                    "txHash": "a8611112f2b35385ee84f85……",		//transactionhash
+                    "address": "tNULSeBaMrbMRiFA……",			//Account address
+                    "type": 1,									//Transaction type
+                    "createTime": 1531152,						//Transaction time, in seconds
+                    "height": 0,								//The block height determined by the transaction being packaged
+                    "chainId": 2,								//The chain of assetsid
+                    "assetId": 1,								//assetid
+                    "symbol": "NULS",							//Asset symbols
+                    "values": 1000000000000000,					//Transaction amount
+                    "fee": { 									//bigInt	Handling fees
+                        "chainId": 100,							//Service fee chainid
+                        "assetId": 1,							//Handling fee assetsid
+                        "symbol": "ATOM",						//Handling fee asset symbol
+                        "value": 100000							//Handling fee amount
                     },
-                    "balance": 1000000000000000,				//交易后账户的余额
-                    "transferType": 1,							// -1:转出, 1:转入
-                    "status": 1									//交易状态 0:未确认,1:已确认
+                    "balance": 1000000000000000,				//The balance of the account after the transaction
+                    "transferType": 1,							// -1:Transfer out, 1:Transfer in
+                    "status": 1									//Transaction status 0:Unconfirmed,1:Confirmed
                }
           ]
      }
 }
 ```
 
-#### 查询账户的交易列表
+#### Query the transaction list of the account
 
-请求：
+request：
 
 ```
 {
@@ -1029,19 +1029,19 @@ txType:int										//交易类型(txType),type=0时查询所有交易
     "params":[chainId,pageNumber,pageSize,address,txType,startHeight, endHeight,assetChainId, assetId],                       
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-pageNumber:int									//页码
-pageSize:int									//每页显示条数，取值[1-1000]
-address: string									//账户地址
-txType:int										//交易类型(txType),type=0时查询所有交易
-startHeight:long                                //打包交易的块起始高度，默认为-1,不限制
-endHeight:long                                  //交易的块截止高度，默认为-1，不限制
-assetChainId:int                                //资产chainId，默认为0
-assetId:int                                     //资产ID，默认为0
+//Parameter Description
+chainId: int									//Chain basedid
+pageNumber:int									//Page number
+pageSize:int									//Display the number of entries per page, with a value of[1-1000]
+address: string									//Account address
+txType:int										//Transaction type(txType),type=0When querying all transactions
+startHeight:long                                //The starting height of the block for packaging transactions, default to-1,Unrestricted
+endHeight:long                                  //The block cutoff height for transactions, defaulting to-1, unrestricted
+assetChainId:int                                //assetchainId, default to0
+assetId:int                                     //assetID, default to0
 ```
 
-返回：
+return：
 
 ```
 {
@@ -1053,33 +1053,33 @@ assetId:int                                     //资产ID，默认为0
           "totalCount": 1,
           "list": [
                {
-                    "txHash": "a8611112f2b35385ee84f85……",		//交易hash
-                    "address": "tNULSeBaMrbMRiFA……",			//账户地址
-                    "type": 1,									//交易类型
-                    "createTime": 1531152,						//交易时间，单位秒
-                    "height": 0,								//交易被打包确定的区块高度
-                    "chainId": 2,								//资产的链id
-                    "assetId": 1,								//资产id
-                    "symbol": "NULS",							//资产符号
-                    "values": 1000000000000000,					//交易金额
-                    "fee": { 									//bigInt	手续费
-                        "chainId": 100,							//手续费链id
-                        "assetId": 1,							//手续费资产id
-                        "symbol": "ATOM",						//手续费资产符号
-                        "value": 100000							//手续费金额
+                    "txHash": "a8611112f2b35385ee84f85……",		//transactionhash
+                    "address": "tNULSeBaMrbMRiFA……",			//Account address
+                    "type": 1,									//Transaction type
+                    "createTime": 1531152,						//Transaction time, in seconds
+                    "height": 0,								//The block height determined by the transaction being packaged
+                    "chainId": 2,								//The chain of assetsid
+                    "assetId": 1,								//assetid
+                    "symbol": "NULS",							//Asset symbols
+                    "values": 1000000000000000,					//Transaction amount
+                    "fee": { 									//bigInt	Handling fees
+                        "chainId": 100,							//Service fee chainid
+                        "assetId": 1,							//Handling fee assetsid
+                        "symbol": "ATOM",						//Handling fee asset symbol
+                        "value": 100000							//Handling fee amount
                     },
-                    "balance": 1000000000000000,				//交易后账户的余额
-                    "transferType": 1,							// -1:转出, 1:转入
-                    "status": 1									//交易状态 0:未确认,1:已确认
+                    "balance": 1000000000000000,				//The balance of the account after the transaction
+                    "transferType": 1,							// -1:Transfer out, 1:Transfer in
+                    "status": 1									//Transaction status 0:Unconfirmed,1:Confirmed
                }
           ]
      }
 }
 ```
 
-#### 验证离线组装交易是否合法
+#### Verify whether offline assembly transactions are legal
 
-请求：
+request：
 
 ```
 {
@@ -1088,26 +1088,26 @@ assetId:int                                     //资产ID，默认为0
     "params":[chainId, txHex], 
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-txHex: string									//组装的交易序列化后的16进制字符串
+//Parameter Description
+chainId: int									//Chain basedid
+txHex: string									//Assembled transaction serialized16Hexadecimal Strings
 ```
 
-返回：
+return：
 
 ```
 {
      "jsonrpc": "2.0",
      "id": 1234,
      "result": {
-          "value": "46b90763901898c0c250bd749……"				//交易hash
+          "value": "46b90763901898c0c250bd749……"				//transactionhash
      }
 }
 ```
 
-#### 广播离线组装交易
+#### Broadcast offline assembly transactions
 
-请求：
+request：
 
 ```
 {
@@ -1116,26 +1116,26 @@ txHex: string									//组装的交易序列化后的16进制字符串
     "params":[chainId, txHex], 
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-txHex: string									//组装的交易序列化后的16进制字符串
+//Parameter Description
+chainId: int									//Chain basedid
+txHex: string									//Assembled transaction serialized16Hexadecimal Strings
 ```
 
-返回：
+return：
 
 ```
 {
      "jsonrpc": "2.0",
      "id": 1234,
      "result": {
-          "value": true							//true广播成功，false广播失败
+          "value": true							//trueBroadcast successful,falseBroadcast failed
      }
 }
 ```
 
-#### 广播离线组装交易(不验证合约)
+#### Broadcast offline assembly transactions(Not verifying contracts)
 
-请求：
+request：
 
 ```
 {
@@ -1144,28 +1144,28 @@ txHex: string									//组装的交易序列化后的16进制字符串
     "params":[chainId, txHex], 
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-txHex: string									//组装的交易序列化后的16进制字符串
+//Parameter Description
+chainId: int									//Chain basedid
+txHex: string									//Assembled transaction serialized16Hexadecimal Strings
 ```
 
-返回：
+return：
 
 ```
 {
      "jsonrpc": "2.0",
      "id": 1234,
      "result": {
-          "value": true							//true广播成功，false广播失败
+          "value": true							//trueBroadcast successful,falseBroadcast failed
      }
 }
 ```
 
-### 共识相关接口[consensus]
+### Consensus related interfaces[consensus]
 
-#### 查询可委托共识节点列表
+#### Query the list of delegated consensus nodes
 
-请求：
+request：
 
 ```
 {
@@ -1174,15 +1174,15 @@ txHex: string									//组装的交易序列化后的16进制字符串
     "params":[chainId,pageNumber,pageSize,type],
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-pageNumber:int									//页码
-pageSize:int									//每页显示条数，取值[1-1000]
-type:int										//节点类型
-												//0:所有节点,1:普通节点,2:开发者节点,3:大使节点
+//Parameter Description
+chainId: int									//Chain basedid
+pageNumber:int									//Page number
+pageSize:int									//Display the number of entries per page, with a value of[1-1000]
+type:int										//Node type
+												//0:All nodes,1:Normal node,2:Developer node,3:Ambassador node
 ```
 
-返回：
+return：
 
 ```
 {
@@ -1199,9 +1199,9 @@ type:int										//节点类型
 }
 ```
 
-#### 查询所有委托共识节点列表（包括已退出、或被红牌罚下的）
+#### Query the list of all delegated consensus nodes（Including Exited、Or being penalized with a red card）
 
-请求：
+request：
 
 ```
 {
@@ -1210,13 +1210,13 @@ type:int										//节点类型
     "params":[chainId,pageNumber,pageSize],
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-pageNumber:int									//页码
-pageSize:int									//每页显示条数，取值[1-1000]
+//Parameter Description
+chainId: int									//Chain basedid
+pageNumber:int									//Page number
+pageSize:int									//Display the number of entries per page, with a value of[1-1000]
 ```
 
-返回：
+return：
 
 ```
 {
@@ -1233,9 +1233,9 @@ pageSize:int									//每页显示条数，取值[1-1000]
 }
 ```
 
-#### 查询账户委托的共识节点列表
+#### Query the consensus node list entrusted by the account
 
-请求：
+request：
 
 ```
 {
@@ -1244,14 +1244,14 @@ pageSize:int									//每页显示条数，取值[1-1000]
     "params":[chainId,pageNumber,pageSize, address],
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-pageNumber:int									//页码
-pageSize:int									//每页显示条数，取值[1-1000]
-address:string									//账户地址
+//Parameter Description
+chainId: int									//Chain basedid
+pageNumber:int									//Page number
+pageSize:int									//Display the number of entries per page, with a value of[1-1000]
+address:string									//Account address
 ```
 
-返回：
+return：
 
 ```
 {
@@ -1268,9 +1268,9 @@ address:string									//账户地址
 }
 ```
 
-#### 查询共识节点详情
+#### Query consensus node details
 
-请求：
+request：
 
 ```
 {
@@ -1279,12 +1279,12 @@ address:string									//账户地址
     "params":[chainId,txHash],
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-txHash:string									//创建节点时的交易hash
+//Parameter Description
+chainId: int									//Chain basedid
+txHash:string									//Transactions during node creationhash
 ```
 
-返回：
+return：
 
 ```
 {
@@ -1294,9 +1294,9 @@ txHash:string									//创建节点时的交易hash
 }
 ```
 
-#### 查询账户创建的共识节点详情
+#### Query the consensus node details created by the account
 
-请求：
+request：
 
 ```
 {
@@ -1305,12 +1305,12 @@ txHash:string									//创建节点时的交易hash
     "params":[chainId,address],
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-address:string									//账户地址
+//Parameter Description
+chainId: int									//Chain basedid
+address:string									//Account address
 ```
 
-返回：
+return：
 
 ```
 {
@@ -1320,9 +1320,9 @@ address:string									//账户地址
 }
 ```
 
-#### 查询节点委托中列表信息
+#### Query list information in node delegation
 
-请求：
+request：
 
 ```
 {
@@ -1331,14 +1331,14 @@ address:string									//账户地址
     "params":[chainId,pageNumber,pageSize,txHash],
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-pageNumber:int									//页码
-pageSize:int									//每页显示条数，取值[1-1000]
-txHash:string									//创建节点时的交易hash
+//Parameter Description
+chainId: int									//Chain basedid
+pageNumber:int									//Page number
+pageSize:int									//Display the number of entries per page, with a value of[1-1000]
+txHash:string									//Transactions during node creationhash
 ```
 
-返回：
+return：
 
 ```
 {
@@ -1355,9 +1355,9 @@ txHash:string									//创建节点时的交易hash
 }
 ```
 
-#### 查询节点历史委托列表
+#### Query node history delegation list
 
-请求：
+request：
 
 ```
 {
@@ -1366,15 +1366,15 @@ txHash:string									//创建节点时的交易hash
     "params":[chainId,pageNumber,pageSize,txHash,type],
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-pageNumber:int									//页码
-pageSize:int									//每页显示条数，取值[1-1000]
-txHash:string									//创建节点时的交易hash
-type:int										//0:加入委托,1:退出委托,2:所有  
+//Parameter Description
+chainId: int									//Chain basedid
+pageNumber:int									//Page number
+pageSize:int									//Display the number of entries per page, with a value of[1-1000]
+txHash:string									//Transactions during node creationhash
+type:int										//0:Join the delegation,1:Exit the commission,2:All  
 ```
 
-返回：
+return：
 
 ```
 {
@@ -1391,9 +1391,9 @@ type:int										//0:加入委托,1:退出委托,2:所有
 }
 ```
 
-#### 查询账户的委托列表
+#### Query the delegation list of the account
 
-请求：
+request：
 
 ```
 {
@@ -1402,15 +1402,15 @@ type:int										//0:加入委托,1:退出委托,2:所有
     "params":[chainId,pageNumber,pageSize,address,agentHash],
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-pageNumber:int									//页码
-pageSize:int									//每页显示条数，取值[1-1000]
-address:string									//账户地址	
-txHash:string									//创建节点时的交易hash,为空时查询账户所有委托
+//Parameter Description
+chainId: int									//Chain basedid
+pageNumber:int									//Page number
+pageSize:int									//Display the number of entries per page, with a value of[1-1000]
+address:string									//Account address	
+txHash:string									//Transactions during node creationhash,When empty, query all delegates in the account
 ```
 
-返回：
+return：
 
 ```
 {
@@ -1427,9 +1427,9 @@ txHash:string									//创建节点时的交易hash,为空时查询账户所有
 }
 ```
 
-#### 查询账户的委托总额
+#### Query the total entrusted amount of the account
 
-请求：
+request：
 
 ```
 {
@@ -1438,25 +1438,25 @@ txHash:string									//创建节点时的交易hash,为空时查询账户所有
     "params":[chainId,address,agentHash],
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-address:string									//账户地址	
-txHash:string									//创建节点时的交易hash,为空时查询账户所有委托
+//Parameter Description
+chainId: int									//Chain basedid
+address:string									//Account address	
+txHash:string									//Transactions during node creationhash,When empty, query all delegates in the account
 ```
 
-返回：
+return：
 
 ```
 {
      "jsonrpc": "2.0",
      "id": 1234,
-     "result": 10000000000						//委托总额
+     "result": 10000000000						//Total amount entrusted
 }
 ```
 
-#### 查询共识惩罚列表
+#### Query consensus penalty list
 
-请求：
+request：
 
 ```
 {
@@ -1465,15 +1465,15 @@ txHash:string									//创建节点时的交易hash,为空时查询账户所有
     "params":[chainId,pageNumber,pageSize,0,agentAddress],
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-pageNumber:int									//页码
-pageSize:int									//每页显示条数，取值[1-1000]
-type:int							 			//惩罚类型  0:查询所有,1:黄牌,2:红牌
-agentAddress:string								//共识节点的代理账户地址	
+//Parameter Description
+chainId: int									//Chain basedid
+pageNumber:int									//Page number
+pageSize:int									//Display the number of entries per page, with a value of[1-1000]
+type:int							 			//Punishment type  0:Query All,1:Yellow card,2:Red card
+agentAddress:string								//Proxy account address for consensus nodes	
 ```
 
-返回：
+return：
 
 ```
 {
@@ -1485,23 +1485,23 @@ agentAddress:string								//共识节点的代理账户地址
           "totalCount": 1,
           "list": [
            		{
-           			"txHash":				//string	惩罚交易hash
-           			"type":					//int		惩罚类型 1:黄牌,2:红牌
-           			"address":				//string	惩罚共识节点的代理账户地址
-           			"time":					//long		惩罚时间
-           			"blockHeight":			//long		惩罚交易的区块高度
-           			"roundIndex":			//long		区块的轮次		
-           			"packageIndex":			//long		打包的序列号
-           			"reason":				//string	惩罚原因
+           			"txHash":				//string	Punish tradinghash
+           			"type":					//int		Punishment type 1:Yellow card,2:Red card
+           			"address":				//string	Punish the proxy account address of consensus nodes
+           			"time":					//long		Punishment time
+           			"blockHeight":			//long		Block height for penalty transactions
+           			"roundIndex":			//long		Rotation of blocks		
+           			"packageIndex":			//long		Packaged serial number
+           			"reason":				//string	Reason for punishment
            		}
           ]
      }
 }
 ```
 
-#### 查询轮次列表
+#### Query round list
 
-请求：
+request：
 
 ```
 {
@@ -1510,13 +1510,13 @@ agentAddress:string								//共识节点的代理账户地址
     "params":[chainId,pageNumber,pageSize],
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-pageNumber:int									//页码
-pageSize:int									//每页显示条数，取值[1-1000]
+//Parameter Description
+chainId: int									//Chain basedid
+pageNumber:int									//Page number
+pageSize:int									//Display the number of entries per page, with a value of[1-1000]
 ```
 
-返回：
+return：
 
 ```
 {
@@ -1528,16 +1528,16 @@ pageSize:int									//每页显示条数，取值[1-1000]
           "totalCount": 4036,
           "list": [
                {
-                    "index": 155233203,				//long	共识轮次
-                    "startTime": 1552371670001,		//long	当前轮起始时间
-                    "memberCount": 2,				//int	当前轮出块节点数
-                    "endTime": 1552371690001,		//long	当前轮结束时间
-                    "redCardCount": 0,				//int	本轮罚出红牌数量
-                    "yellowCardCount": 0,			//int	本轮发出黄牌数量
-                    "producedBlockCount": 1,		//int	本轮共计出块数量
-                    "startHeight": 8000,			//long	本轮起始高度
-                    "endHeight": 0,					//long	本轮结束高度	
-                    "lostRate": 0					//double 丢块率
+                    "index": 155233203,				//long	Consensus round
+                    "startTime": 1552371670001,		//long	Starting time of the current round
+                    "memberCount": 2,				//int	The current number of block output nodes
+                    "endTime": 1552371690001,		//long	End time of current round
+                    "redCardCount": 0,				//int	The number of red cards penalized in this round
+                    "yellowCardCount": 0,			//int	Number of yellow cards issued in this round
+                    "producedBlockCount": 1,		//int	The total number of blocks produced in this round
+                    "startHeight": 8000,			//long	Starting height of this round
+                    "endHeight": 0,					//long	End height of this round	
+                    "lostRate": 0					//double Block loss rate
                }
           ]
      }
@@ -1546,11 +1546,11 @@ pageSize:int									//每页显示条数，取值[1-1000]
 
 
 
-### 智能合约相关接口[contract]
+### Smart contract related interfaces[contract]
 
-#### 查询合约详情
+#### Query contract details
 
-请求：
+request：
 
 ```
 {
@@ -1559,45 +1559,45 @@ pageSize:int									//每页显示条数，取值[1-1000]
     "params":[chainId, contractAddress],
     "id":1234
 }
-chainId: int									//链的id
-contractAddress:string							//智能合约地址
+chainId: int									//Chain basedid
+contractAddress:string							//Smart contract address
 ```
 
-返回：
+return：
 
 ```
 {
      "jsonrpc": "2.0",
      "id": 1234,
      "result": {
-          "contractAddress": "tNULSeBaNC46Z66DgU……",		//string	合约地址
-          "creater": "tNULSeBaMvEtDfvZuu……",				//string	合约创建人地址
-          "createTxHash": "00209d28833258b192493……",		//string	创建合约的交易hash
-          "blockHeight": 15,								//long		创建合约的区块高度
-          "success": true,									//boolean	是否创建成功
-          "balance": 0,										//bigInt	合约的NULS余额
-          "errorMsg": null,									//string	创建失败的错误信息
-          "status": 0,										//int		合约状态
-          									-1:执行失败,0:未认证,1:正在审核,2:通过验证,3:已删除
-          "certificationTime": 0,							//long		认证时间
-          "createTime": 1553336525059,						//long		合约创建时间
-          "remark": "create contract test",					//string	备注
-          "txCount": 2,										//int		合约相关的交易
-          "deleteHash": null,								//string	删除合约的交易hash
-          "methods": [										//[object]	合约包含的函数
+          "contractAddress": "tNULSeBaNC46Z66DgU……",		//string	Contract address
+          "creater": "tNULSeBaMvEtDfvZuu……",				//string	Contract Creator Address
+          "createTxHash": "00209d28833258b192493……",		//string	Create transactions for contractshash
+          "blockHeight": 15,								//long		Block height for creating contracts
+          "success": true,									//boolean	Was it successfully created
+          "balance": 0,										//bigInt	ContractualNULSbalance
+          "errorMsg": null,									//string	Error message for failed creation
+          "status": 0,										//int		Contract status
+          									-1:Execution failed,0:Unauthenticated,1:Under review,2:Through verification,3:Removed
+          "certificationTime": 0,							//long		Certification time
+          "createTime": 1553336525059,						//long		Contract creation time
+          "remark": "create contract test",					//string	Remarks
+          "txCount": 2,										//int		Contract related transactions
+          "deleteHash": null,								//string	Delete transactions for contractshash
+          "methods": [										//[object]	Functions included in the contract
                {
-                    "name": "name",							//string	接口名称
-                    "returnType": "String",					//string	返回值类型
-                    "params": []							//[object]	接口参数
+                    "name": "name",							//string	Interface Name
+                    "returnType": "String",					//string	return type
+                    "params": []							//[object]	Interface parameters
                }
           ],
-          "nrc20": true,									//boolean	是否是nrc20合约
-          "tokenName": "KQB",								//string	token名称		
-          "symbol": "KQB",									//string	token符号
-          "decimals": 2,									//string	小数位
-          "totalSupply": "1000000000000",					//bigInt	总量
-          "transferCount": 2,								//int		token转账次数
-          "owners": [										//[string]	token持有者
+          "nrc20": true,									//boolean	Is itnrc20contract
+          "tokenName": "KQB",								//string	tokenname		
+          "symbol": "KQB",									//string	tokensymbol
+          "decimals": 2,									//string	Decimal places
+          "totalSupply": "1000000000000",					//bigInt	total
+          "transferCount": 2,								//int		tokenNumber of transfers
+          "owners": [										//[string]	tokenholder
                "tNULSeBaMvEtDfvZuukDf2mVyfGo3DdiN8KLRG",
                "tNULSeBaMnrs6JKrCy6TQdzYJZkMZJDng7QAsD"
           ]
@@ -1605,9 +1605,9 @@ contractAddress:string							//智能合约地址
 }
 ```
 
-#### 查询合约列表
+#### Query Contract List
 
-请求：
+request：
 
 ```
 {
@@ -1616,15 +1616,15 @@ contractAddress:string							//智能合约地址
     "params":[chainId,pageNumber,pageSize,onlyNrc20,isHidden],
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-pageNumber:int									//页码
-pageSize:int									//每页显示条数，取值[1-1000]
-tokenType:int 								    //合约token类型  0: 非token, 1: NRC20, 2: NRC721
-isHidden: boolean 								//是否隐藏token类型合约
+//Parameter Description
+chainId: int									//Chain basedid
+pageNumber:int									//Page number
+pageSize:int									//Display the number of entries per page, with a value of[1-1000]
+tokenType:int 								    //contracttokentype  0: wrongtoken, 1: NRC20, 2: NRC721
+isHidden: boolean 								//Whether to hidetokenType contract
 ```
 
-返回：
+return：
 
 ```
 {
@@ -1636,27 +1636,27 @@ isHidden: boolean 								//是否隐藏token类型合约
           "totalCount": 1,
           "list": [
            		{
-           			"contractAddress":				//string	合约地址
-           			"remark":						//string	备注
-           			"txCount":						//int		智能合约相关交易数量
-           			"status":						//int		合约状态
-           									-1:执行失败,0:未认证,1:正在审核,2:通过验证,3:已删除
-           			"createTime":					//long		创建时间
-           			"balance":						//bigInt	合约剩余NULS余额
-           			"tokenName":					//string	token名称
-           		    "symbol": "KQB",				//string	token符号
-                    "decimals": 2,					//string	小数位
-        			"totalSupply": "1000000000000", //bigInt	总量,
-        			"tokenType":1                   //int       token类型, 0: 非token, 1: NRC20, 2: NRC721
+           			"contractAddress":				//string	Contract address
+           			"remark":						//string	Remarks
+           			"txCount":						//int		Number of transactions related to smart contracts
+           			"status":						//int		Contract status
+           									-1:Execution failed,0:Unauthenticated,1:Under review,2:Through verification,3:Removed
+           			"createTime":					//long		Creation time
+           			"balance":						//bigInt	Contract surplusNULSbalance
+           			"tokenName":					//string	tokenname
+           		    "symbol": "KQB",				//string	tokensymbol
+                    "decimals": 2,					//string	Decimal places
+        			"totalSupply": "1000000000000", //bigInt	total,
+        			"tokenType":1                   //int       tokentype, 0: wrongtoken, 1: NRC20, 2: NRC721
            		}
           ]
      }
 }
 ```
 
-#### 查询合约相关交易列表
+#### Query contract related transaction list
 
-请求：
+request：
 
 ```
 {
@@ -1665,15 +1665,15 @@ isHidden: boolean 								//是否隐藏token类型合约
     "params":[chainId,pageNumber,pageSize,txType,contractAddress],
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-pageNumber:int									//页码
-pageSize:int									//每页显示条数，取值[1-1000]
-txType:int										//交易类型 默认为0，查询所有交易
-contractAddress:string							//合约地址
+//Parameter Description
+chainId: int									//Chain basedid
+pageNumber:int									//Page number
+pageSize:int									//Display the number of entries per page, with a value of[1-1000]
+txType:int										//Transaction type Default to0, query all transactions
+contractAddress:string							//Contract address
 ```
 
-返回：
+return：
 
 ```
 {
@@ -1685,21 +1685,21 @@ contractAddress:string							//合约地址
           "totalCount": 3,
           "list": [
                {
-                    "contractAddress": "tNULSeBaN32a2h……",		//string 合约地址
-                    "txHash": "0020658e3edc61196e73be0……		//string 交易hash
-                    "blockHeight": 12,							//long	 交易确认区块高度
-                    "time": 1553336503846,						//long 	 交易生成时间
-                    "type": 20									//int    交易类型
-                    "fee": "5100000"							//bigint 交易手续费
+                    "contractAddress": "tNULSeBaN32a2h……",		//string Contract address
+                    "txHash": "0020658e3edc61196e73be0……		//string transactionhash
+                    "blockHeight": 12,							//long	 Transaction confirmation block height
+                    "time": 1553336503846,						//long 	 Transaction generation time
+                    "type": 20									//int    Transaction type
+                    "fee": "5100000"							//bigint Transaction fees
                }
           ]
      }
 }
 ```
 
-#### 查询nrc20合约转账记录列表
+#### querynrc20Contract transfer record list
 
-请求：
+request：
 
 ```
 {
@@ -1708,14 +1708,14 @@ contractAddress:string							//合约地址
     "params":[chainId,pageNumber,pageSize,contractAddress],
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-pageNumber:int									//页码
-pageSize:int									//每页显示条数，取值[1-1000]
-contractAddress:string							//合约地址
+//Parameter Description
+chainId: int									//Chain basedid
+pageNumber:int									//Page number
+pageSize:int									//Display the number of entries per page, with a value of[1-1000]
+contractAddress:string							//Contract address
 ```
 
-返回：
+return：
 
 ```
 {
@@ -1727,21 +1727,21 @@ contractAddress:string							//合约地址
           "totalCount": 3,
           "list": [
               {
-                 "address": "tNULSeBaMvEt……",				//string	账户地址
-                 "tokenName": "KQB",						//string	转账token名称
-                 "tokenSymbol": "KQB",						//string	转账token符号
-                 "contractAddress": "tNULSeBaNC46Z……",		//string	合约地址
-                 "balance": 999900000000,					//bigint	转账后余额
-                 "decimals": 2								//int		精确小数位数
+                 "address": "tNULSeBaMvEt……",				//string	Account address
+                 "tokenName": "KQB",						//string	Transfertokenname
+                 "tokenSymbol": "KQB",						//string	Transfertokensymbol
+                 "contractAddress": "tNULSeBaNC46Z……",		//string	Contract address
+                 "balance": 999900000000,					//bigint	Balance after transfer
+                 "decimals": 2								//int		Exact decimal places
               }
           ]
      }
 }
 ```
 
-#### 查询账户nrc20转账记录列表
+#### Query accountnrc20Transfer Record List
 
-请求：
+request：
 
 ```
 {
@@ -1750,15 +1750,15 @@ contractAddress:string							//合约地址
     "params":[chainId,pageNumber,pageSize,address,contractAddress],
     "id":1234
 }
-//参数说明
-chainId: int									//链的id
-pageNumber:int									//页码
-pageSize:int									//每页显示条数，取值[1-1000]
-address:string									//账户地址
-contractAddress:string							//合约地址
+//Parameter Description
+chainId: int									//Chain basedid
+pageNumber:int									//Page number
+pageSize:int									//Display the number of entries per page, with a value of[1-1000]
+address:string									//Account address
+contractAddress:string							//Contract address
 ```
 
-返回：
+return：
 
 ```
 {
@@ -1770,29 +1770,29 @@ contractAddress:string							//合约地址
           "totalCount": 1,
           "list": [
                {
-                    "txHash": "002016f5a811b939535……",		//string	交易hash
-                    "height": 19,							//long		交易打包确认区块高度
-                    "contractAddress": "tNULSeBaNC……",		//string	合约地址
-                    "name": "KQB",							//string	token名称
-                    "symbol": "KQB",						//string	token符号
-                    "decimals": 2,							//int		精确小数位数
-                    "fromAddress": "tNULSeBaMvE……",			//string	转账地址
-                    "toAddress": "tNULSeBaMnrs6……",			//string	接收地址
-                    "value": "100000000",					//bigInt	转账金额
-                    "time": 1553336574791,					//long		交易时间
-                    "fromBalance": "999900000000",			//bigInt	转账人余额
-                    "toBalance": "100000000"				//bigInt	接收人余额
+                    "txHash": "002016f5a811b939535……",		//string	transactionhash
+                    "height": 19,							//long		Transaction packaging confirmation block height
+                    "contractAddress": "tNULSeBaNC……",		//string	Contract address
+                    "name": "KQB",							//string	tokenname
+                    "symbol": "KQB",						//string	tokensymbol
+                    "decimals": 2,							//int		Exact decimal places
+                    "fromAddress": "tNULSeBaMvE……",			//string	Transfer address
+                    "toAddress": "tNULSeBaMnrs6……",			//string	Receiving address
+                    "value": "100000000",					//bigInt	Transfer amount
+                    "time": 1553336574791,					//long		Transaction time
+                    "fromBalance": "999900000000",			//bigInt	Transferor balance
+                    "toBalance": "100000000"				//bigInt	Recipient balance
                }
           ]
      }
 }
 ```
 
-### 统计相关接口[statistical]
+### Statistical related interfaces[statistical]
 
-#### 交易数量统计
+#### Transaction quantity statistics
 
-请求：
+request：
 
 ```
 {
@@ -1801,12 +1801,12 @@ contractAddress:string							//合约地址
 "params":[chainId,type],
 "id":1234
 }
-//参数说明
-chainId: int								//链的id
-type: int							 		//0:最近14天, 1:最近一周, 2:最近一月, 3:最近一年
+//Parameter Description
+chainId: int								//Chain basedid
+type: int							 		//0:recently14day, 1:Last week, 2:Last month, 3:Last year
 ```
 
-返回：
+return：
 
 ```
 {
@@ -1814,8 +1814,8 @@ type: int							 		//0:最近14天, 1:最近一周, 2:最近一月, 3:最近一�
      "id": 1234,
      "result": [
           {
-               "key": "2018-6",						//string	统计周期
-               "value": 265234						//long		统计数量
+               "key": "2018-6",						//string	Statistical cycle
+               "value": 265234						//long		Statistical quantity
           },
           {
                "key": "2018-7",
@@ -1825,9 +1825,9 @@ type: int							 		//0:最近14天, 1:最近一周, 2:最近一月, 3:最近一�
 }
 ```
 
-#### 统计共识节点数量
+#### Count the number of consensus nodes
 
-请求：
+request：
 
 ```
 {
@@ -1836,27 +1836,27 @@ type: int							 		//0:最近14天, 1:最近一周, 2:最近一月, 3:最近一�
     "params":[chainId],
     "id":1234
 }
-//参数说明
-chainId: int								//链的id
+//Parameter Description
+chainId: int								//Chain basedid
 ```
 
-返回：
+return：
 
 ```
 {
      "jsonrpc": "2.0",
      "id": 1234,
      "result":{
-          "consensusCount":78,						//int	共识节点数量
-          "seedsCount":5,							//int	种子节点数量
-          "totalCount":83							//int	总数量
+          "consensusCount":78,						//int	Number of consensus nodes
+          "seedsCount":5,							//int	Number of seed nodes
+          "totalCount":83							//int	Total quantity
      }
 }
 ```
 
-#### 共识奖励统计
+#### Consensus reward statistics
 
-请求：
+request：
 
 ```
 {
@@ -1865,12 +1865,12 @@ chainId: int								//链的id
     "params":[chainId,type],
     "id":1234
 }
-//参数说明
-chainId: int								//链的id
-type: int							 		//0:14天，1:周，2：月，3：年，4：全部
+//Parameter Description
+chainId: int								//Chain basedid
+type: int							 		//0:14Oh my god,1:Zhou,2：Month,3：Year,4：whole
 ```
 
-返回：
+return：
 
 ```
 {
@@ -1878,8 +1878,8 @@ type: int							 		//0:14天，1:周，2：月，3：年，4：全部
      "id": 1234,
      "result": [
           {
-               "key": "6/5",							//string	统计周期
-               "value": 556572872229264					//bigInt	共识奖励总额
+               "key": "6/5",							//string	Statistical cycle
+               "value": 556572872229264					//bigInt	Total amount of consensus rewards
           },
           {
                "key": "6/6",
@@ -1905,9 +1905,9 @@ type: int							 		//0:14天，1:周，2：月，3：年，4：全部
 }
 ```
 
-#### 年化奖励率统计
+#### Annual reward rate statistics
 
-请求：
+request：
 
 ```
 {
@@ -1916,12 +1916,12 @@ type: int							 		//0:14天，1:周，2：月，3：年，4：全部
     "params":[chainId,type],
     "id":1234
 }
-//参数说明
-chainId: int								//链的id
-type: int							 		//0:14天，1:周，2：月，3：年，4：全部
+//Parameter Description
+chainId: int								//Chain basedid
+type: int							 		//0:14Oh my god,1:Zhou,2：Month,3：Year,4：whole
 ```
 
-返回：
+return：
 
 ```
 {
@@ -1929,8 +1929,8 @@ type: int							 		//0:14天，1:周，2：月，3：年，4：全部
      "id": 1234,
      "result": [
           {
-               "key": "5/29",						//string	统计周期
-               "value": 116.17						//dobule	年化收益%
+               "key": "5/29",						//string	Statistical cycle
+               "value": 116.17						//dobule	Annualized income%
           },
           {
                "key": "5/30",

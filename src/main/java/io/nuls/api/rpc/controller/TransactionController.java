@@ -166,11 +166,11 @@ public class TransactionController {
                 if (to.getLockTime() < 0) {
                     locked = true;
                 } else if (to.getLockTime() > 1000000000) {
-                    //时间锁定
+                    //Time lock
                     locked = to.getLockTime() > System.currentTimeMillis() / 1000;
                     lockTime = to.getLockTime();
                 } else if (to.getLockTime() > 0) {
-                    //高度锁定
+                    //Height lock
                     ApiCache apiCache = CacheManager.getCache(chainId);
                     if (null != apiCache && null != apiCache.getBestHeader()) {
                         locked = to.getLockTime() > apiCache.getBestHeader().getHeight();

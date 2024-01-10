@@ -14,71 +14,71 @@ public interface DBTableConstant {
     String CHAIN_CONFIG_TABLE = "chain_config_table";
 
     String SYNC_INFO_TABLE = "sync_info_table";
-    //区块信息表
+    //Block Information Table
     String BLOCK_HEADER_TABLE = "block_header_table_";
 
     String BLOCK_HEX_TABLE = "block_hex_table_";
-    //账户信息表
+    //Account Information Table
     String ACCOUNT_TABLE = "account_table_";
-    //资产信息表
+    //Asset Information Table
     String ACCOUNT_LEDGER_TABLE = "account_ledger_table_";
-    //共识节点信息表
+    //Consensus Node Information Table
     String AGENT_TABLE = "agent_table_";
-    //别名信息表
+    //Alias information table
     String ALIAS_TABLE = "alias_table_";
-    //委托记录表
+    //Entrustment Record Form
     String DEPOSIT_TABLE = "deposit_table_";
-    //交易表
+    //Transaction table
     String TX_TABLE = "tx_table_";
-    //交易关系记录表
+    //Transaction Relationship Record Table
     String TX_RELATION_TABLE = "tx_relation_table_";
 
     String CROSS_TX_RELATION_TABLE = "cross_tx_relation_table_";
-    //交易关系记录表
+    //Transaction Relationship Record Table
     String TX_UNCONFIRM_RELATION_TABLE = "tx_unconfirm_relation_table_";
-    //交易表
+    //Transaction table
     String TX_UNCONFIRM_TABLE = "tx_UNCONFIRM_table_";
-    //coinData记录
+    //coinDatarecord
     String COINDATA_TABLE = "coin_data_table_";
-    //红黄牌记录表
+    //Red and Yellow Card Record Form
     String PUNISH_TABLE = "punish_table_";
 
     String ROUND_TABLE = "round_table_";
 
     String ROUND_ITEM_TABLE = "round_item_table_";
-    //账户token信息表
+    //accounttokenInformation table
     String ACCOUNT_TOKEN_TABLE = "account_token_table_";
-    //智能合约信息表
+    //Smart Contract Information Table
     String CONTRACT_TABLE = "contract_table_";
-    //智能合约交易记录表
+    //Smart Contract Transaction Record Table
     String CONTRACT_TX_TABLE = "contract_tx_table_";
-    //智能合约token转账记录表
+    //Smart contractstokenTransfer Record Form
     String TOKEN_TRANSFER_TABLE = "token_transfer_table_";
-    //智能合约结果记录
+    //Smart contract result recording
     String CONTRACT_RESULT_TABLE = "contract_result_table_";
-    //统计表
+    //Statistical table
     String STATISTICAL_TABLE = "statistical_table_";
 
     String CHAIN_STATISTICAL_TABLE = "chain_statistical_table";
 
-    //token721的造币信息表
+    //token721Mint Information Table
     String TOKEN721_IDS_TABLE = "token721_ids_table_";
-    //账户token721信息表
+    //accounttoken721Information table
     String ACCOUNT_TOKEN721_TABLE = "account_token721_table_";
-    //智能合约token721转账记录表
+    //Smart contractstoken721Transfer Record Form
     String TOKEN721_TRANSFER_TABLE = "token721_transfer_table_";
 
     String LAST_DAY_REWARD_TABLE = "token721_transfer_table_";
 
-    //token1155的造币信息表
+    //token1155Mint Information Table
     String TOKEN1155_IDS_TABLE = "token1155_ids_table_";
-    //账户token1155信息表
+    //accounttoken1155Information table
     String ACCOUNT_TOKEN1155_TABLE = "account_token1155_table_";
-    //智能合约token1155转账记录表
+    //Smart contractstoken1155Transfer Record Form
     String TOKEN1155_TRANSFER_TABLE = "token1155_transfer_table_";
 
-    //---------------------------------字段(field)------------------------------
-    //new_info表，最新统计的时间点
+    //---------------------------------field(field)------------------------------
+    //new_infoTable, latest statistical time points
     String LAST_STATISTICAL_TIME = "last_statistical_time";
 
     String TX_COUNT = "txCount";
@@ -87,6 +87,6 @@ public interface DBTableConstant {
 
     String LastDayRewardKey = "lastDayReward";
 
-    //交易关系表分片数量
+    //Number of transaction relationship table shards
     int TX_RELATION_SHARDING_COUNT = 128;
 }

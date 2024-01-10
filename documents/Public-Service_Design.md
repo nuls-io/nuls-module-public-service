@@ -1,92 +1,92 @@
-# public-service模块设计文档
+# public-serviceModule Design Document
 
 [TOC]
 
-## 总体概览
+## Overall Overview
 
-### 模块概述
+### Module Overview
 
-#### 为什么要有public-service模块
+#### Why do we need to havepublic-servicemodule
 
-区块链项目在运行过程中，所产生的链上的数据，都会相互广播，每个节点也会存储数据。但这些数据，并不能直观的展示给用户，且用户需要查询相关的数据也很麻烦。public-service指在给用户提供一个通过浏览器或网页钱包查询链上数据和相关统计信息。
+During the operation of blockchain projects, the data generated on the chain will be broadcasted to each other, and each node will also store the data. However, these data cannot be visually displayed to users, and it is also troublesome for users to query relevant data.public-serviceIt refers to providing users with a way to query on chain data and related statistical information through a browser or web wallet.
 
-#### public-service要做什么
+#### public-serviceWhat to do
 
-解析节点钱包已同步到的区块，将数据存入到可提供关系查询和统计的数据库中。
+Analyze the blocks that the node wallet has synchronized to, and store the data in a database that can provide relationship queries and statistics.
 
-对外提供查询区块、交易、账户、共识信息、合约信息、统计信息等接口。
+Provide external query blocks、transaction、account、Consensus information、Contract information、Statistical information and other interfaces.
 
-#### public-service在系统中的定位
+#### public-servicePositioning in the system
 
-public-service属于辅助型模块，非底层核心模块，因此默认钱包启动后不会运行该模块。
+public-serviceIt belongs to the auxiliary module and is not the underlying core module, so it will not run by default after the wallet is started.
 
-运行public-service前服务器需要先安装数据库，默认实现是mongoDB数据库。
+workingpublic-serviceThe front-end server needs to install the database first, and the default implementation ismongoDBdatabase
 
-## 功能设计
+## functional design
 
-### 功能架构图
+### Functional architecture diagram
 
 ![](/img/public-service-functions.png)
 
 
 
-### 接口说明
+### Interface Description
 
 **io.nuls.api.analysis**
 
-负责调用底层模块接口和解析接口返回的数据
+Responsible for calling the underlying module interface and parsing the data returned by the interface
 
-WalletRpcHandler：public-service调用其他模块RPC接口处理类
+WalletRpcHandler：public-serviceCall other modulesRPCInterface processing class
 
-AnalysisHandler: public-service解析底层区块数据处理类
+AnalysisHandler: public-serviceParsing underlying block data processing classes
 
 **io.nuls.api.db**
 
-提供public-service数据库增删改查的接口与实现
+providepublic-serviceThe interface and implementation of database addition, deletion, modification, and query
 
 **io.nuls.api.model**
 
-public-service的数据结构，包括持久层、dto层
+public-serviceThe data structure, including the persistence layer、dtolayer
 
 **io.nuls.api.rpc**
 
-对外提供rpc接口，查询区块、交易、账户信息等
+External provisionrpcInterface, querying blocks、transaction、Account information, etc
 
 **io.nuls.api.service**
 
-public-service同步区块和回滚区块的主业务接口
+public-serviceThe main business interface for synchronizing and rolling back blocks
 
-SyncService: 同步区块
+SyncService: sync block
 
-RollbackService：回滚区块
+RollbackService：Rolling back blocks
 
 **io.nuls.api.task**
 
-public-service定时任务，包括同步区块任务、统计任务等
+public-serviceTimed tasks, including synchronized block tasks、Statistical tasks, etc
 
-SyncBlockTask：同步区块的定时任务
+SyncBlockTask：Timed tasks for synchronizing blocks
 
-## 模块RPC接口
+## moduleRPCinterface
 
-参考[NULS2.0-API接口文档](./account.md)
+reference[NULS2.0-APIInterface documentation](./account.md)
 
  
 
-## Java特有的设计
+## JavaUnique design
 
-### JAVA实现细节简要说明
+### JAVABrief description of implementation details
 
 **io.nuls.api.cache.ApiCache**
 
-缓存链上的常用数据，包括链信息、账户信息、共识信息、统计信息等。
+Common data on the cache chain, including chain information、Account information、Consensus information、Statistical information, etc.
 
 **io.nuls.api.task.SyncBlockTask**
 
-调用底层区块模块接口，获取下一个区块，区块连续性验证成功后，存储数据到mongoDB，继续获取下一区块信息；若区块hash连续性验证失败，回滚当前已存储的最新块，直到连续性验证通过为止。
+Call the underlying block module interface to retrieve the next block. After successful block continuity verification, store the data in themongoDBContinue to obtain information for the next block；If the blockhashContinuity verification failed, roll back the latest stored block until continuity verification passes.
 
-若获取不到下一区块，说明当前public-service已经解析到最新高度，则每过10秒，重新获取一次最新高度的区块并做解析和存储。
+If the next block cannot be obtained, it indicates that the currentpublic-serviceIf the resolution has reached the latest height, then every time10Second, retrieve the latest height block and perform parsing and storage.
 
 **io.nuls.api.service.SyncService**
 
-同步区块的主接口， 首先得处理区块奖励的统计，再根据不同交易，处理各个业务相关的数据，再处理轮次相关的信息，最后将解析完的数据存储到数据库。
+The main interface for synchronizing blocks, Firstly, we need to process the statistics of block rewards, then process data related to various businesses based on different transactions, process information related to rounds, and finally store the parsed data in the database.
 

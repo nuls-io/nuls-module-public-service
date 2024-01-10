@@ -5,10 +5,10 @@ import java.math.BigInteger;
 public class ChainAssetInfo {
     private String id;//9-1
 
-    private int assetType;// 本链资产-0，跨链资产-1
-    private int status;//0=enable，1=disable
+    private int assetType;// This chain asset-0Cross chain assets-1
+    private int status;//0=enable,1=disable
 
-    private String totalSupply;//总量
+    private String totalSupply;//total
     private String name, symbol;
     private int decimals;
     private int addresses;

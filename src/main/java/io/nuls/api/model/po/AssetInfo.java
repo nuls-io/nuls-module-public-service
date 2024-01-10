@@ -22,7 +22,7 @@ public class AssetInfo extends TxDataInfo {
     private String address;
 
     private int status;
-    //该资产在当前链的总量
+    //The total amount of this asset in the current chain
     private BigInteger localTotalCoins;
 
     public AssetInfo() {

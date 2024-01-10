@@ -11,7 +11,7 @@ public class NulsChainAssetInfo {
     private int assetId = 0;
     private String symbol;
     private String assetName;
-    private short assetType = 1; //资产类型 [1-链内普通资产 2-链内合约资产 3-平行链资产 4-异构链资产 5-链内普通资产绑定异构链资产 6-平行链资产绑定异构链资产 7-链内普通资产绑定多异构链资产 8-平行链资产绑定多异构链资产 9-异构链资产绑定多异构链资产]
+    private short assetType = 1; //Asset type [1-On chain ordinary assets 2-On chain contract assets 3-Parallel chain assets 4-Heterogeneous chain assets 5-On chain ordinary assets bound to heterogeneous chain assets 6-Parallel chain assets bound to heterogeneous chain assets 7-Binding ordinary assets within the chain to multiple heterogeneous chain assets 8-Binding Parallel Chain Assets to Multiple Heterogeneous Chain Assets 9-Binding heterogeneous chain assets to multiple heterogeneous chain assets]
     private BigInteger initNumber = BigInteger.ZERO;
     private short decimalPlace = 8;
     private String ownerAddress;

@@ -71,7 +71,7 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
         while (true) {
             try {
                 BlockInfo info = blockInfoQueue.take();
-                //判断是不是另一天了，如果是，则统计前一天数据，并存储
+                //Determine if it is another day. If it is, count the data from the previous day and store it
                 execute(info);
             } catch (Exception e) {
                 LoggerUtil.commonLog.error(e);
@@ -175,7 +175,7 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
     }
 
     public void realAfterPropertiesSet() throws NulsException {
-        //启动时检查1、历史数据，2、当前高度
+        //Check at startup1、Historical data,2、Current height
         BlockHeaderInfo header = blockService.getBestBlockHeader(PublicServiceConstant.defaultChainId);
         while (header == null) {
             try {
@@ -195,14 +195,14 @@ public class DaliyTxsAddressStatisticalTask implements Runnable, InitializingBea
         long startHeight;
         if (null != header) {
             if (null == doc) {
-//            扫描最近一个月的数据并插入数据库
-                long val = header.getHeight() - 32 * 8640;//多算两天
+//            Scan the data from the past month and insert it into the database
+                long val = header.getHeight() - 32 * 8640;//Calculate for two more days
                 startHeight = val <= 0 ? 0 : val;
             } else {
                 startHeight = doc.getLong("endHeight") + 1;
                 bestExist = true;
             }
-//        完成从endHeight到当前高度的统计
+//        Complete fromendHeightStatistics up to the current height
             LoggerUtil.commonLog.info("Start active address statistical: {}", startHeight);
             for (long i = startHeight; i <= header.getHeight(); i++) {
                 try {

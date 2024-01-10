@@ -69,7 +69,7 @@ public class RoundManager {
         ApiCache apiCache = CacheManager.getCache(chainId);
         CurrentRound currentRound = apiCache.getCurrentRound();
         int indexOfRound = blockInfo.getHeader().getPackingIndexOfRound();
-        //下一个出块者
+        //Next blocker
         currentRound.setPackerOrder(indexOfRound < currentRound.getMemberCount() ? indexOfRound + 1 : indexOfRound);
         PocRoundItem item = currentRound.getItemList().get(indexOfRound - 1);
         BlockHeaderInfo header = blockInfo.getHeader();
@@ -158,7 +158,7 @@ public class RoundManager {
         Collections.sort(sorterList);
 
         BlockHeaderInfo header = blockInfo.getHeader();
-        //生成新的round
+        //Generate newround
         CurrentRound round = new CurrentRound();
         round.setIndex(header.getRoundIndex());
         round.setStartHeight(header.getHeight());

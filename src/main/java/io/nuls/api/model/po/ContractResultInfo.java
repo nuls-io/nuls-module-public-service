@@ -51,7 +51,7 @@ public class ContractResultInfo {
     private List<ContractInternalCreateInfo> internalCreates;
 
     private List<Token1155Transfer> token1155Transfers;
-    // 增加跨链资产合约内部转账的数据
+    // Increase data on internal transfers of cross chain asset contracts
     private List<CrossAssetTransfer> crossAssetTransfers;
 
     public Document toDocument() {

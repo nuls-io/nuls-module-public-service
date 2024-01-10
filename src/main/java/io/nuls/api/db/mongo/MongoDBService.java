@@ -150,11 +150,11 @@ public class MongoDBService implements InitializingBean {
 
     public List<Document> getDocumentListOfCollection(String collName) {
         MongoCollection<Document> collection = getCollection(collName);
-        //检索所有文档
+        //Retrieve all documents
         /**
-         * 1. 获取迭代器FindIterable<Document>
-         * 2. 获取游标MongoCursor<Document>
-         * 3. 通过游标遍历检索出的文档集合
+         * 1. Get iteratorFindIterable<Document>
+         * 2. Get cursorMongoCursor<Document>
+         * 3. Retrieved document collection through cursor traversal
          * */
         FindIterable<Document> findIterable = collection.find();
         MongoCursor<Document> mongoCursor = findIterable.iterator();
@@ -197,19 +197,19 @@ public class MongoDBService implements InitializingBean {
 //            LoggerUtil.commonLog.info("find over", collName);
             list = new ArrayList<>();
             documentMongoCursor = iterable.iterator();
-//            LoggerUtil.commonLog.info("循环 {}", collName);
+//            LoggerUtil.commonLog.info("loop {}", collName);
             while (documentMongoCursor.hasNext()) {
-//                LoggerUtil.commonLog.info("循环1 {}", collName);
+//                LoggerUtil.commonLog.info("loop1 {}", collName);
                 list.add(documentMongoCursor.next());
-//                LoggerUtil.commonLog.info("循环2 {}", list.get(list.size() - 1).get("_id"));
+//                LoggerUtil.commonLog.info("loop2 {}", list.get(list.size() - 1).get("_id"));
             }
         } catch (Throwable t) {
             LoggerUtil.commonLog.error(t);
         } finally {
             if (null != documentMongoCursor) {
-//                LoggerUtil.commonLog.info("循环Done {}", collName);
+//                LoggerUtil.commonLog.info("loopDone {}", collName);
                 documentMongoCursor.close();
-//                LoggerUtil.commonLog.info("循环Done 2 {}", collName);
+//                LoggerUtil.commonLog.info("loopDone 2 {}", collName);
             }
         }
         LoggerUtil.commonLog.info("Query {} == {}", collName, list.size());

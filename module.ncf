@@ -15,41 +15,41 @@ language=en
 logPath=E:/work/src/nuls-v2/Logs
 logLevel=INFO
 dataPath=E:/work/src/nuls-v2/data
-#默认本链ID
+#Default This ChainID
 chainId=1
-#地址前缀
+#Address prefix
 addressPrefix=NULS
-#默认本链主资产ID
+#Default main asset of this chainID
 assetId=1
-#默认资产小数位数
+#Default Decimal Places for Assets
 decimals=8
-#默认链名称
+#Default Chain Name
 chainName=nuls
-#本链默认资产符号
+#The default asset symbol for this chain
 symbol=NULS
-#主网链id
+#Main network chainid
 mainChainId=1
-#主网主资产id
+#Main network assetsid
 mainAssetId=1
-#主网主资产符号
+#Main network main asset symbol
 mainSymbol=NULS
 blackHolePublicKey=000000000000000000000000000000000000000000000000000000000000000000
 
 
 [public-service]
-#public-service模块对外的rpc端口号
+#public-serviceModule ExternalrpcPort number
 rpcPort=8003
-#数据库url地址
+#databaseurladdress
 databaseUrl=127.0.0.1
-#数据库端口号
+#Database port number
 databasePort=27017
-#连接池最大数
+#Maximum number of connection pools
 maxAliveConnect=20
-#连接最大等待时间
+#Maximum waiting time for connection
 maxWaitTime=120000
-#连接最大持续时间
+#Maximum duration of connection
 socketTimeout=300000
-#连接超时时间
+#Connection timeout
 connectTimeOut=30000
 developerNodeAddress=NULSd6Hgf15aUZj6918tEwy9aT4JG1ZQotXRF
 ambassadorNodeAddress=NULSd6HgcfGtsmm79QDoBK1MAjqNmm3rgKXSj

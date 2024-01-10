@@ -83,37 +83,37 @@ public class MessageIntfTest {
         String result = null;
         try {
             URL url = new URL(httpUrl);
-            // 通过远程url连接对象打开连接
+            // By remoteurlConnect Object Open Connection
             connection = (HttpURLConnection) url.openConnection();
-            // 设置连接请求方式
+            // Set connection request method
             connection.setRequestMethod("POST");
-            // 设置连接主机服务器超时时间：15000毫秒
+            // Set the timeout period for connecting to the host server：15000millisecond
             connection.setConnectTimeout(15000);
-            // 设置读取主机服务器返回数据超时时间：60000毫秒
+            // Set the timeout period for reading data returned by the host server：60000millisecond
             connection.setReadTimeout(60000);
 
-            // 默认值为：false，当向远程服务器传送数据/写数据时，需要设置为true
+            // The default value is：falseWhen transmitting data to a remote server/When writing data, it needs to be set totrue
             connection.setDoOutput(true);
-            // 默认值为：true，当前向远程服务读取数据时，设置为true，该参数可有可无
+            // The default value is：trueWhen reading data from a remote service, set totrue, this parameter can be optional or optional
             connection.setDoInput(true);
-            // 设置传入参数的格式:请求参数应该是 name1=value1&name2=value2 的形式。
+            // Format incoming parameters:The request parameter should be name1=value1&name2=value2 The form of.
             connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            // 设置鉴权信息：Authorization: Bearer da3efcbf-0845-4fe3-8aba-ee040be542c0
+            // Set authentication information：Authorization: Bearer da3efcbf-0845-4fe3-8aba-ee040be542c0
             connection.setRequestProperty("Authorization", "Bearer da3efcbf-0845-4fe3-8aba-ee040be542c0");
-            // 通过连接对象获取一个输出流
+            // Obtain an output stream by connecting objects
             os = connection.getOutputStream();
-            // 通过输出流对象将参数写出去/传输出去,它是通过字节数组写出的
+            // Write parameters out through output stream objects/Transfer out,It is written through a byte array
             os.write(param.getBytes());
-            // 通过连接对象获取一个输入流，向远程读取
+            // Obtain an input stream by connecting objects and read it remotely
             if (connection.getResponseCode() == 200) {
 
                 is = connection.getInputStream();
-                // 对输入流对象进行包装:charset根据工作项目组的要求来设置
+                // Wrapping input stream objects:charsetSet up according to the requirements of the work project team
                 br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
 
                 StringBuffer sbf = new StringBuffer();
                 String temp = null;
-                // 循环遍历一行一行读取数据
+                // Loop through line by line to read data
                 while ((temp = br.readLine()) != null) {
                     sbf.append(temp);
                     sbf.append("\r\n");
@@ -125,7 +125,7 @@ public class MessageIntfTest {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            // 关闭资源
+            // close resource
             if (null != br) {
                 try {
                     br.close();
@@ -147,7 +147,7 @@ public class MessageIntfTest {
                     e.printStackTrace();
                 }
             }
-            // 断开与远程地址url的连接
+            // Disconnect from remote addressurlConnection of
             connection.disconnect();
         }
         return result;

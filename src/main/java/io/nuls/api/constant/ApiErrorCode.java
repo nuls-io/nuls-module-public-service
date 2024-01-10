@@ -23,11 +23,11 @@ package io.nuls.api.constant;
 import io.nuls.core.constant.CommonCodeConstanst;
 
 /**
- * 协议升级模块的错误信息表
+ * Error message table for protocol upgrade module
  *
  * @author captain
  * @version 1.0
- * @date 18-11-20 上午11:01
+ * @date 18-11-20 morning11:01
  */
 public interface ApiErrorCode extends CommonCodeConstanst {
 

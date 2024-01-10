@@ -79,7 +79,7 @@ public class MongoStatisticalServiceImpl implements StatisticalService {
     }
 
     /**
-     * @param type 0:14天，1:周，2：月，3：年，4：全部
+     * @param type 0:14Oh my god,1:Zhou,2：Month,3：Year,4：whole
      * @return
      */
     public List getStatisticalList(int chainId, int type, String field) {

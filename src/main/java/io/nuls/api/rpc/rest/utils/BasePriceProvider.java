@@ -31,7 +31,7 @@ import java.util.Map;
 /**
  * @Author: zhoulijun
  * @Time: 2020/8/10 17:52
- * @Description: 功能描述
+ * @Description: Function Description
  */
 public abstract class BasePriceProvider implements PriceProvider {
 
@@ -45,7 +45,7 @@ public abstract class BasePriceProvider implements PriceProvider {
 
     public Map<String, Object> httpRequest(String url) {
         SSLContext sslcontext = createIgnoreVerifySSL();
-// 设置协议http和https对应的处理socket链接工厂的对象
+// Set ProtocolhttpandhttpsCorresponding processingsocketObject linking factory
         Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory> create()
                 .register("http", PlainConnectionSocketFactory.INSTANCE)
                 .register("https", new SSLConnectionSocketFactory(sslcontext)).build();
@@ -53,13 +53,13 @@ public abstract class BasePriceProvider implements PriceProvider {
         HttpClients.custom().setConnectionManager(connManager);
 //        CloseableHttpClient httpClient = HttpClientBuilder.create()
 ////                .setSSLHostnameVerifier((hostName, sslSession) -> {
-////            return true; // 证书校验通过
+////            return true; // Certificate verification passed
 ////        })
 //                .build();
         CloseableHttpClient httpClient = HttpClients.custom().setConnectionManager(connManager).build();
 
         HttpGet httpGet = new HttpGet(url);
-//        本地调试专用
+//        Local debugging dedicated
 //        HttpHost proxy = new HttpHost("127.0.0.1",1080);
 //        RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(TIMEOUT_MILLIS)
 //                .setSocketTimeout(TIMEOUT_MILLIS).setConnectTimeout(TIMEOUT_MILLIS).setProxy(proxy).build();
@@ -76,26 +76,26 @@ public abstract class BasePriceProvider implements PriceProvider {
                 Map<String, Object> data = JSONUtils.jsonToMap(dataStr);
                 return data;
             }
-            Log.warn("调用接口:{} 异常, StatusCode:{}", url, response.getStatusLine().getStatusCode());
+            Log.warn("Calling interfaces:{} abnormal, StatusCode:{}", url, response.getStatusLine().getStatusCode());
             return null;
         } catch (IOException e) {
-            Log.warn("调用接口:{} 异常1, {}", url, e.getMessage());
+            Log.warn("Calling interfaces:{} abnormal1, {}", url, e.getMessage());
             e.printStackTrace();
             return null;
         } catch (Exception e) {
-            Log.warn("调用接口:{} 异常2, {}", url, e.getMessage());
+            Log.warn("Calling interfaces:{} abnormal2, {}", url, e.getMessage());
             return null;
         }
     }
 
     public static SSLContext createIgnoreVerifySSL() {
-        SSLContext sslContext = null;// 创建套接字对象
+        SSLContext sslContext = null;// Create socket object
         try {
-            sslContext = SSLContext.getInstance("TLSv1.2");//指定TLS版本
+            sslContext = SSLContext.getInstance("TLSv1.2");//specifyTLSversion
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
-        // 实现X509TrustManager接口，用于绕过验证
+        // achieveX509TrustManagerInterface, used to bypass verification
         X509TrustManager trustManager = new X509TrustManager() {
             @Override
             public void checkClientTrusted(java.security.cert.X509Certificate[] paramArrayOfX509Certificate,
@@ -113,7 +113,7 @@ public abstract class BasePriceProvider implements PriceProvider {
             }
         };
         try {
-            sslContext.init(null, new TrustManager[] { trustManager }, null);//初始化sslContext对象
+            sslContext.init(null, new TrustManager[] { trustManager }, null);//initializationsslContextobject
         } catch (KeyManagementException e) {
             throw new RuntimeException(e);
         }

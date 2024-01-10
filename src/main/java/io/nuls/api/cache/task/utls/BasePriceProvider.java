@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * @Author: zhoulijun
  * @Time: 2020/8/10 17:52
- * @Description: 功能描述
+ * @Description: Function Description
  */
 public abstract class BasePriceProvider implements PriceProvider{
 
@@ -54,13 +54,13 @@ public abstract class BasePriceProvider implements PriceProvider{
                 Map<String, Object> data = JSONUtils.jsonToMap(dataStr);
                 return data;
             }
-            Log.error("调用接口:{} 异常, StatusCode:{}", url, response.getStatusLine().getStatusCode());
+            Log.error("Calling interfaces:{} abnormal, StatusCode:{}", url, response.getStatusLine().getStatusCode());
             return null;
         } catch (IOException e) {
-            Log.error("调用接口:{} 异常, {}", url, e.getMessage());
+            Log.error("Calling interfaces:{} abnormal, {}", url, e.getMessage());
             return null;
         } catch (Exception e){
-            Log.error("调用接口:{} 异常, {}", url, e.getMessage());
+            Log.error("Calling interfaces:{} abnormal, {}", url, e.getMessage());
             return null;
         }
     }
@@ -78,13 +78,13 @@ public abstract class BasePriceProvider implements PriceProvider{
                 HttpEntity entity = response.getEntity();
                 return  EntityUtils.toString(entity);
             }
-            Log.error("调用接口:{} 异常, StatusCode:{}", url, response.getStatusLine().getStatusCode());
+            Log.error("Calling interfaces:{} abnormal, StatusCode:{}", url, response.getStatusLine().getStatusCode());
             return null;
         } catch (IOException e) {
-            Log.error("调用接口:{} 异常, {}", url, e.getMessage());
+            Log.error("Calling interfaces:{} abnormal, {}", url, e.getMessage());
             return null;
         } catch (Exception e){
-            Log.error("调用接口:{} 异常, {}", url, e.getMessage());
+            Log.error("Calling interfaces:{} abnormal, {}", url, e.getMessage());
             return null;
         }
     }

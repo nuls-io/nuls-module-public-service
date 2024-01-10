@@ -21,35 +21,35 @@
 package io.nuls.api.constant;
 
 /**
- * 模块运行状态枚举
+ * Module operation status enumeration
  * The module runs state enumeration.
  *
  * @author captain
  * @version 1.0
- * @date 18-11-28 下午5:58
+ * @date 18-11-28 afternoon5:58
  */
 public enum RunningStatusEnum {
 
     /**
-     * 初始化完成
+     * Initialization completed
      * ready
      */
     READY,
 
     /**
-     * 启动中
+     * Starting
      * starting
      */
     STARTING,
 
     /**
-     * 运行正常
+     * Running normally
      * running
      */
     RUNNING,
 
     /**
-     * 运行异常
+     * Abnormal operation
      * fail
      */
     FAIL;
