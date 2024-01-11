@@ -32,7 +32,7 @@ connectTimeOut=30000
 ## Contribute to This Module
 Click Star and Fork to start contributing improvements to this module.
 Hope more contributors can submit improvement suggestions and bug reports here.
-Issues: https://github.com/nuls-io/nuls-v2/issues
+Issues: https://github.com/nuls-io/nuls-module-public-service/issues
 
 
 
