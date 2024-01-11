@@ -1,4 +1,4 @@
-# Module Description
+# NULS2.0 Public Service Module
 
 This is NULS2.0 provides external data query function RPC Interface. 
 
@@ -54,6 +54,7 @@ You are welcome to contribute to NULS! We sincerely invite developers with rich 
 https://nuls.io/community
 
 Documentation：https://docs.nuls.io
+
 NULS Brand Assets: https://nuls.io/brand-assets
 
 
