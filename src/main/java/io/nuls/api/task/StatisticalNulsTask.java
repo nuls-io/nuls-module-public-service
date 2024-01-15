@@ -151,7 +151,7 @@ public class StatisticalNulsTask implements Runnable {
         List<DestroyInfo> list = new LinkedList<>();
         //销毁数量
         byte[] address = AddressTool.getAddress(ApiContext.blackHolePublicKey, chainId);
-        AssetInfo assetInfo = CacheManager.getAssetInfoMap().get(chainId + "-" + 1);
+        AssetInfo assetInfo = CacheManager.getRegisteredAsset(chainId + "-" + 1);
 
         BigInteger total = null;
         if (null != assetInfo) {

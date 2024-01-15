@@ -188,7 +188,7 @@ public class AccountController {
                 pageInfo = accountService.getAccountTxs(chainId, address, pageNumber, pageSize, type, startHeight, endHeight, assetChainId, assetId);
                 result.setResult(new PageInfo<>(pageNumber, pageSize, pageInfo.getTotalCount(), pageInfo.getList().stream().map(d -> {
                     Map res = MapUtils.beanToMap(d);
-                    AssetInfo assetInfo = CacheManager.getAssetInfoMap().get(d.getChainId() + "-" + d.getAssetId());
+                    AssetInfo assetInfo = CacheManager.getRegisteredAsset(d.getChainId() + "-" + d.getAssetId());
                     if (assetInfo != null) {
                         res.put("symbol", assetInfo.getSymbol());
                         res.put("decimals", assetInfo.getDecimals());
@@ -251,7 +251,7 @@ public class AccountController {
             PageInfo<TxRelationInfo> pageInfo = accountService.queryAccountTxs(chainId, address, pageNumber, assetChainId, assetId);
             result.setResult(new PageInfo<>(pageNumber, 10, pageInfo.getTotalCount(), pageInfo.getList().stream().map(d -> {
                 Map res = MapUtils.beanToMap(d);
-                AssetInfo assetInfo = CacheManager.getAssetInfoMap().get(d.getChainId() + "-" + d.getAssetId());
+                AssetInfo assetInfo = CacheManager.getRegisteredAsset(d.getChainId() + "-" + d.getAssetId());
                 if (assetInfo != null) {
                     res.put("symbol", assetInfo.getSymbol());
                     res.put("decimals", assetInfo.getDecimals());
@@ -361,7 +361,7 @@ public class AccountController {
                 pageInfo = accountService.getAcctTxs(chainId, assetChainId, assetId, address, type, startTime, endTime, pageNumber, pageSize);
                 result.setResult(new PageInfo<>(pageNumber, pageSize, pageInfo.getTotalCount(), pageInfo.getList().stream().map(d -> {
                     Map res = MapUtils.beanToMap(d);
-                    AssetInfo assetInfo = CacheManager.getAssetInfoMap().get(d.getChainId() + "-" + d.getAssetId());
+                    AssetInfo assetInfo = CacheManager.getRegisteredAsset(d.getChainId() + "-" + d.getAssetId());
                     if (assetInfo != null) {
                         res.put("symbol", assetInfo.getSymbol());
                         res.put("decimals", assetInfo.getDecimals());
@@ -774,7 +774,7 @@ public class AccountController {
             ledgerInfo.setBalance(balanceInfo.getBalance());
             ledgerInfo.setTimeLock(balanceInfo.getTimeLock());
             ledgerInfo.setConsensusLock(balanceInfo.getConsensusLock());
-            AssetInfo assetInfo = CacheManager.getAssetInfoMap().get(ledgerInfo.getAssetKey());
+            AssetInfo assetInfo = CacheManager.getRegisteredAsset(ledgerInfo.getAssetKey());
             if (assetInfo != null) {
                 ledgerInfo.setSymbol(assetInfo.getSymbol());
                 ledgerInfo.setDecimals(assetInfo.getDecimals());
@@ -813,7 +813,7 @@ public class AccountController {
             ledgerInfo.setBalance(balanceInfo.getBalance());
             ledgerInfo.setTimeLock(balanceInfo.getTimeLock());
             ledgerInfo.setConsensusLock(balanceInfo.getConsensusLock());
-            AssetInfo assetInfo = CacheManager.getAssetInfoMap().get(ledgerInfo.getAssetKey());
+            AssetInfo assetInfo = CacheManager.getRegisteredAsset(ledgerInfo.getAssetKey());
             if (assetInfo != null) {
                 ledgerInfo.setSymbol(assetInfo.getSymbol());
                 ledgerInfo.setDecimals(assetInfo.getDecimals());

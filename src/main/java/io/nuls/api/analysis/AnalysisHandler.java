@@ -297,7 +297,7 @@ public class AnalysisHandler {
             fromInfo.setNonce(HexUtil.encode(from.getNonce()));
             AssetInfo assetInfo = CacheManager.getRegisteredAsset(fromInfo.getAssetKey());
             if (null == assetInfo) {
-                LoggerUtil.commonLog.warn("Get asset info failed: {}", fromInfo.getAssetKey());
+                LoggerUtil.commonLog.warn("Get asset info failed: {} of {}", fromInfo.getAssetKey(), CacheManager.getAssetInfoCount());
             }
             fromInfo.setSymbol(assetInfo.getSymbol());
             fromInfo.setDecimal(assetInfo.getDecimals());

@@ -223,7 +223,7 @@ public class MongoChainAssetService implements ChainAssetService {
     }
 
     private AssetInfo getAssetRegInfo(int chainId, String assetKey) {
-        AssetInfo info = CacheManager.getAssetInfoMap().get(assetKey);
+        AssetInfo info = CacheManager.getRegisteredAsset(assetKey);
         if (null != info) {
             return info;
         }

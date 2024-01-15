@@ -73,14 +73,24 @@ public class CacheManager {
         return cache != null;
     }
 
-    public static Map<String, AssetInfo> getAssetInfoMap() {
-        return assetInfoMap;
+    public static int getAssetInfoCount() {
+        return CacheManager.assetInfoMap.size();
     }
 
-    public static void setAssetInfoMap(Map<String, AssetInfo> assetInfoMap) {
-        CacheManager.assetInfoMap = assetInfoMap;
+    public static void putAssetInfo(AssetInfo info) {
+        putAssetInfo(info.getKey(), info);
     }
 
+    public static void putAssetInfo(String key, AssetInfo info) {
+        if (CacheManager.assetInfoMap == null) {
+            CacheManager.assetInfoMap = new ConcurrentHashMap<>();
+        }
+        CacheManager.assetInfoMap.put(info.getKey(), info);
+    }
+
+    public static boolean containsAssetKey(String key) {
+        return CacheManager.assetInfoMap.containsKey(key);
+    }
     public static AssetInfo getRegisteredAsset(String key) {
         return assetInfoMap.get(key);
     }
@@ -91,5 +101,9 @@ public class CacheManager {
 
     public static void setChainInfoMap(Map<Integer, ChainInfo> chainInfoMap) {
         CacheManager.chainInfoMap = chainInfoMap;
+    }
+
+    public static void putAssetInfoMap(Map<String, AssetInfo> assetInfoMap) {
+        CacheManager.assetInfoMap = assetInfoMap;
     }
 }

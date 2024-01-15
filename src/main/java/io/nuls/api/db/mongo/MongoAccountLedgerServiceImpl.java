@@ -129,7 +129,7 @@ public class MongoAccountLedgerServiceImpl implements AccountLedgerService {
     DecimalFormat format = new DecimalFormat("###.#####");
 
     public PageInfo<MiniAccountInfo> getAssetRanking(int chainId, int assetChainId, int assetId, int pageNumber, int pageSize) {
-        AssetInfo assetInfo = CacheManager.getAssetInfoMap().get(assetChainId + "-" + assetId);
+        AssetInfo assetInfo = CacheManager.getRegisteredAsset(assetChainId + "-" + assetId);
         if (assetInfo == null) {
             return new PageInfo<>();
         } else if (assetInfo.getChainId() == ApiContext.defaultChainId && assetInfo.getAssetId() == ApiContext.defaultAssetId) {

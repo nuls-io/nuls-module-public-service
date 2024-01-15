@@ -963,7 +963,7 @@ public class SyncService {
 
         chainInfoList.add(chainInfo);
         CacheManager.getChainInfoMap().put(chainInfo.getChainId(), chainInfo);
-        CacheManager.getAssetInfoMap().put(chainInfo.getDefaultAsset().getKey(), chainInfo.getDefaultAsset());
+        CacheManager.putAssetInfo(chainInfo.getDefaultAsset().getKey(), chainInfo.getDefaultAsset());
     }
 
     private void processDestroyChainTx(int chainId, TransactionInfo tx) {
@@ -1014,7 +1014,7 @@ public class SyncService {
             chainInfo.getAssets().add(assetInfo);
             chainInfoList.add(chainInfo);
         }
-        CacheManager.getAssetInfoMap().put(assetInfo.getKey(), assetInfo);
+        CacheManager.putAssetInfo(assetInfo.getKey(), assetInfo);
     }
 
     private void processCancelAssetTx(int chainId, TransactionInfo tx) {
@@ -1473,7 +1473,7 @@ public class SyncService {
 
         syncInfo.setStep(91);
         chainService.updateStep(syncInfo);
-        this.chainAssetService.save(chainId,this.chainAssetTxMap,this.chainAssetCountList);
+        this.chainAssetService.save(chainId, this.chainAssetTxMap, this.chainAssetCountList);
 
         //完成解析
         syncInfo.setStep(100);

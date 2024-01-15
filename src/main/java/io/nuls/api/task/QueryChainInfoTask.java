@@ -38,8 +38,8 @@ public class QueryChainInfoTask implements Runnable {
 
                 assetInfoMap = (Map<String, AssetInfo>) map.get("assetInfoMap");
                 for (AssetInfo assetInfo : assetInfoMap.values()) {
-                    if (!CacheManager.getAssetInfoMap().containsKey(assetInfo.getKey())) {
-                        CacheManager.getAssetInfoMap().put(assetInfo.getKey(), assetInfo);
+                    if (!CacheManager.containsAssetKey(assetInfo.getKey())) {
+                        CacheManager.putAssetInfo(assetInfo.getKey(), assetInfo);
                     }
                 }
                 ApiContext.isReady = true;
@@ -52,7 +52,7 @@ public class QueryChainInfoTask implements Runnable {
                 assetInfoMap.put(chainInfo.getDefaultAsset().getKey(), chainInfo.getDefaultAsset());
 
                 CacheManager.setChainInfoMap(chainInfoMap);
-                CacheManager.setAssetInfoMap(assetInfoMap);
+                CacheManager.putAssetInfoMap(assetInfoMap);
 
                 ApiContext.isReady = true;
             }

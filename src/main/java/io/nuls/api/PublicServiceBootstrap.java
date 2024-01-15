@@ -188,7 +188,7 @@ public class PublicServiceBootstrap extends RpcModule {
     @Override
     public RpcModuleState onDependenciesReady() {
         try {
-            LoggerUtil.commonLog.info("public service onDependenciesReady......{}",ApiContext.defaultChainId);
+            LoggerUtil.commonLog.info("public service onDependenciesReady......{}", ApiContext.defaultChainId);
             Result<Map> result = WalletRpcHandler.getConsensusConfig(ApiContext.defaultChainId);
             if (result.isSuccess()) {
                 Map<String, Object> configMap = result.getData();
@@ -197,15 +197,15 @@ public class PublicServiceBootstrap extends RpcModule {
                 ApiContext.awardAssetId = (int) configMap.get("awardAssetId");
                 ApiContext.minDeposit = new BigInteger(configMap.get("commissionMin").toString());
             } else {
-                LoggerUtil.commonLog.error("Get consensus config failed. {}",result.getMsg());
+                LoggerUtil.commonLog.error("Get consensus config failed. {}", result.getMsg());
                 System.exit(-1);
             }
             initDB();
 
-            if (hasDependent(ModuleE.SC)||hasDependent(new Module("nuls-cores",ROLE))) {
+            if (hasDependent(ModuleE.SC) || hasDependent(new Module("nuls-cores", ROLE))) {
                 ApiContext.isRunSmartContract = true;
             }
-            if (hasDependent(ModuleE.CC)||hasDependent(new Module("nuls-cores",ROLE))) {
+            if (hasDependent(ModuleE.CC) || hasDependent(new Module("nuls-cores", ROLE))) {
                 ApiContext.isRunCrossChain = true;
             }
 
@@ -255,10 +255,10 @@ public class PublicServiceBootstrap extends RpcModule {
             for (ChainInfo chainInfo : chainInfoList) {
                 CacheManager.getChainInfoMap().put(chainInfo.getChainId(), chainInfo);
                 for (AssetInfo assetInfo : chainInfo.getAssets()) {
-                    CacheManager.getAssetInfoMap().put(assetInfo.getKey(), assetInfo);
+                    CacheManager.putAssetInfo(assetInfo.getKey(), assetInfo);
                 }
             }
-//            LoggerUtil.commonLog.info("init db 4");
+            LoggerUtil.commonLog.info("Asset info cached size: {}", CacheManager.getAssetInfoCount());
         }
     }
 
