@@ -10,6 +10,7 @@ import io.nuls.api.model.entity.*;
 import io.nuls.api.model.po.*;
 import io.nuls.api.model.po.mini.DelayStopAgent;
 import io.nuls.api.rpc.RpcCall;
+import io.nuls.api.utils.LoggerUtil;
 import io.nuls.base.RPCUtil;
 import io.nuls.base.basic.AddressTool;
 import io.nuls.base.basic.NulsByteBuffer;
@@ -295,6 +296,9 @@ public class AnalysisHandler {
             fromInfo.setAmount(from.getAmount());
             fromInfo.setNonce(HexUtil.encode(from.getNonce()));
             AssetInfo assetInfo = CacheManager.getRegisteredAsset(fromInfo.getAssetKey());
+            if (null == assetInfo) {
+                LoggerUtil.commonLog.warn("Get asset info failed: {}", fromInfo.getAssetKey());
+            }
             fromInfo.setSymbol(assetInfo.getSymbol());
             fromInfo.setDecimal(assetInfo.getDecimals());
             fromInfoList.add(fromInfo);
@@ -972,12 +976,12 @@ public class AnalysisHandler {
             }
             CoinTo coinTo = coinData.getTo().get(0);
             crossAssetTransferList.add(new CrossAssetTransfer(
-                AddressTool.getStringAddressByBytes(from.getAddress()),
-                AddressTool.getStringAddressByBytes(coinTo.getAddress()),
-                coinTo.getAmount().toString(),
-                coinTo.getAssetsChainId(),
-                coinTo.getAssetsId(),
-                coinTo.getLockTime()
+                    AddressTool.getStringAddressByBytes(from.getAddress()),
+                    AddressTool.getStringAddressByBytes(coinTo.getAddress()),
+                    coinTo.getAmount().toString(),
+                    coinTo.getAssetsChainId(),
+                    coinTo.getAssetsId(),
+                    coinTo.getLockTime()
             ));
         }
         resultInfo.setCrossAssetTransfers(crossAssetTransferList);
