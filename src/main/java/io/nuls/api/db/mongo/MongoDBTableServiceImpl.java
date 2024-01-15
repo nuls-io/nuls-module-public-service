@@ -167,8 +167,8 @@ public class MongoDBTableServiceImpl implements DBTableService {
         mongoDBService.createIndex(DBTableConstant.CONTRACT_TX_TABLE + chainId, Indexes.ascending("contractAddress"));
         mongoDBService.createIndex(DBTableConstant.CONTRACT_TX_TABLE + chainId, Indexes.descending("time"));
 
-        mongoDBService.createIndex(DBTableConstant.CHAIN_ASSET_TX_TABLE, Indexes.descending("assetId","createTime"));
-        mongoDBService.createIndex(DBTableConstant.CHAIN_ASSET_TX_TABLE, Indexes.descending("assetId","from","to","createTime"));
+//        mongoDBService.createIndex(DBTableConstant.CHAIN_ASSET_TX_TABLE, Indexes.descending("assetId","createTime"));
+//        mongoDBService.createIndex(DBTableConstant.CHAIN_ASSET_TX_TABLE, Indexes.descending("assetId","from","to","createTime"));
 
     }
 
