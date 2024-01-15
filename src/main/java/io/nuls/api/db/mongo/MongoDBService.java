@@ -188,7 +188,7 @@ public class MongoDBService implements InitializingBean {
         MongoCursor<Document> documentMongoCursor = null;
         List<Document> list = null;
         try {
-//            LoggerUtil.commonLog.info(" {}", collName);
+            LoggerUtil.commonLog.info(" {}", collName);
             MongoCollection<Document> collection = getCollection(collName);
 
 //            LoggerUtil.commonLog.info(" db-get", collName);
