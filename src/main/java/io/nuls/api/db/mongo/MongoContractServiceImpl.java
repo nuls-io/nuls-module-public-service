@@ -31,12 +31,18 @@ public class MongoContractServiceImpl implements ContractService {
 
 
     @Override
-    public void initCache() {
+    public void  initCache() {
         //缓存NRC20 token信息
 //        LoggerUtil.commonLog.info("contract cache 1 , {}", CacheManager.getApiCaches().size());
+
+        BasicDBObject fields = new BasicDBObject();
+        fields.append("_id", 1).append("isNrc20", 1).append("totalSupply", 1).append("symbol", 1).append("decimals", 1).append("tokenType", 1)
+                .append("tokenName", 1)
+                .append("tokenUri", 1);
+
         for (ApiCache apiCache : CacheManager.getApiCaches().values()) {
 //            LoggerUtil.commonLog.info("contract cache 1,1 , {}", apiCache.getChainInfo().getChainId());
-            List<Document> documentList = mongoDBService.query(DBTableConstant.CONTRACT_TABLE + apiCache.getChainInfo().getChainId());
+            List<Document> documentList = mongoDBService.query(DBTableConstant.CONTRACT_TABLE + apiCache.getChainInfo().getChainId(),fields);
 //            LoggerUtil.commonLog.info("contract cache 2 , {}", documentList.size());
             for (Document document : documentList) {
 //                LoggerUtil.commonLog.info("contract cache 3 , {}", document.getString("_id"));
@@ -62,7 +68,6 @@ public class MongoContractServiceImpl implements ContractService {
                     apiCache.addNrc1155Info(nrc1155Info);
                 }
             }
-//            LoggerUtil.commonLog.info("contract cache 4 , {}", documentList.size());
         }
     }
 
