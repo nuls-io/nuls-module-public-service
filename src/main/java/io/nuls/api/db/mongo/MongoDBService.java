@@ -248,6 +248,7 @@ public class MongoDBService implements InitializingBean {
                 documentMongoCursor.close();
             }
         }
+        LoggerUtil.commonLog.info("Query {} == {}", collName, list.size());
         return list;
     }
 
