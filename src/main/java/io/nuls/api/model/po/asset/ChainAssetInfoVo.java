@@ -22,9 +22,13 @@ public class ChainAssetInfoVo {
     private String sourceChainName, iconUrl;
     private String contract;
     private String website, community, price;
+    private String sourceChainLogo;
+    private String sourceChainExplorerUrl;
 
     public ChainAssetInfoVo(ChainAssetInfo info) {
         this(info.getId(), info.getTotalSupply(), info.getNulsChainSupply(), info.getName(), info.getSymbol(), info.getDecimals(), info.getAddresses(), info.getAddressesYesterday(), info.getTxCount(), info.getSourceChainId(), info.getContract(), info.getWebsite(), info.getCommunity());
+        this.sourceChainLogo = info.getSourceChainLogo();
+        this.sourceChainExplorerUrl = info.getSourceChainExplorerUrl();
     }
 
     public ChainAssetInfoVo(String id, String totalSupply, String nulsChainSupply, String name, String symbol, int decimals, int addresses, int addressesYesterday, long txCount, int sourceChainId, String contract, String website, String community) {
@@ -189,5 +193,21 @@ public class ChainAssetInfoVo {
 
     public void setAddressesChangeRate(double addressesChangeRate) {
         this.addressesChangeRate = addressesChangeRate;
+    }
+
+    public String getSourceChainLogo() {
+        return sourceChainLogo;
+    }
+
+    public void setSourceChainLogo(String sourceChainLogo) {
+        this.sourceChainLogo = sourceChainLogo;
+    }
+
+    public String getSourceChainExplorerUrl() {
+        return sourceChainExplorerUrl;
+    }
+
+    public void setSourceChainExplorerUrl(String sourceChainExplorerUrl) {
+        this.sourceChainExplorerUrl = sourceChainExplorerUrl;
     }
 }
