@@ -1,7 +1,9 @@
 package io.nuls.api.rpc.controller;
 
+import io.nuls.api.cache.AssetSystemCache;
 import io.nuls.api.cache.ChainAssetCache;
 import io.nuls.api.db.ChainAssetService;
+import io.nuls.api.model.dto.NerveChainVo;
 import io.nuls.api.model.po.PageInfo;
 import io.nuls.api.model.po.asset.ChainAssetHolderInfo;
 import io.nuls.api.model.po.asset.ChainAssetInfo;
@@ -33,6 +35,13 @@ public class AssetController {
         ChainAssetInfo info = ChainAssetCache.getAssetInfo(assetKey);
         if (null == info) {
             info = assetService.get(assetKey);
+        }
+
+        NerveChainVo vo = AssetSystemCache.getChain((long) info.getSourceChainId());
+        if (null != vo) {
+            info.setSourceChainName(vo.getName());
+            info.setSourceChainLogo(vo.getIconUrl());
+            info.setSourceChainExplorerUrl(vo.getExplorerUrl());
         }
         return new RpcResult().setResult(new ChainAssetInfoVo(info));
     }

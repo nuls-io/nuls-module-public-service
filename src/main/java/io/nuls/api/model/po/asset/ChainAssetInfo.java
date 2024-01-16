@@ -25,6 +25,10 @@ public class ChainAssetInfo {
     private boolean update;
     private String nulsChainSupply = "0";
 
+    private String sourceChainName;
+    private String sourceChainLogo;
+    private String sourceChainExplorerUrl;
+
     public String getId() {
         return id;
     }
@@ -183,5 +187,29 @@ public class ChainAssetInfo {
 
     public String getNulsChainSupply() {
         return nulsChainSupply;
+    }
+
+    public String getSourceChainName() {
+        return sourceChainName;
+    }
+
+    public void setSourceChainName(String sourceChainName) {
+        this.sourceChainName = sourceChainName;
+    }
+
+    public String getSourceChainLogo() {
+        return sourceChainLogo;
+    }
+
+    public void setSourceChainLogo(String sourceChainLogo) {
+        this.sourceChainLogo = sourceChainLogo;
+    }
+
+    public String getSourceChainExplorerUrl() {
+        return sourceChainExplorerUrl;
+    }
+
+    public void setSourceChainExplorerUrl(String sourceChainExplorerUrl) {
+        this.sourceChainExplorerUrl = sourceChainExplorerUrl;
     }
 }
