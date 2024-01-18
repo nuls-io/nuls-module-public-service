@@ -1,5 +1,6 @@
 package io.nuls.api.rpc.controller;
 
+import io.nuls.api.ApiContext;
 import io.nuls.api.cache.AssetSystemCache;
 import io.nuls.api.cache.ChainAssetCache;
 import io.nuls.api.db.ChainAssetService;
@@ -37,11 +38,31 @@ public class AssetController {
             info = assetService.get(assetKey);
         }
 
-        NerveChainVo vo = AssetSystemCache.getChain((long) info.getSourceChainId());
-        if (null != vo) {
-            info.setSourceChainName(vo.getName());
-            info.setSourceChainLogo(vo.getIconUrl());
-            info.setSourceChainExplorerUrl(vo.getExplorerUrl());
+
+        if (info.getSourceChainId()==-1) {
+            info.setSourceChainName("NULS");
+            info.setSourceChainLogo("https://nerve.network/img/NULS.6f4d3f5d.png");
+            if(ApiContext.mainChainId == 1) {
+                info.setSourceChainExplorerUrl("https://nulscan.io/");
+            }else {
+                info.setSourceChainExplorerUrl("http://beta.nulscan.io/");
+            }
+        } else if (info.getSourceChainId()==-2) {
+
+            info.setSourceChainName("NerveNetwork");
+            info.setSourceChainLogo("https://nerve.network/img/nerveIcon.30df8a3e.png");
+            if(ApiContext.mainChainId == 1) {
+                info.setSourceChainExplorerUrl("https://scan.nerve.network/");
+            }else {
+                info.setSourceChainExplorerUrl("http://beta.scan.nerve.network/");
+            }
+        }else {
+            NerveChainVo vo = AssetSystemCache.getChain((long) info.getSourceChainId());
+            if (null != vo) {
+                info.setSourceChainName(vo.getName());
+                info.setSourceChainLogo(vo.getIconUrl());
+                info.setSourceChainExplorerUrl(vo.getExplorerUrl());
+            }
         }
         return new RpcResult().setResult(new ChainAssetInfoVo(info));
     }
