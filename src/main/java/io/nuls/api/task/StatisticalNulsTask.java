@@ -199,7 +199,7 @@ public class StatisticalNulsTask implements Runnable {
                 BigInteger blackNuls = accountService.getAccountTotalBalance(chainId, blackAddress);
                 destroyNuls = destroyNuls.add(blackNuls);
                 String proportion = null;
-                if (total != null) {
+                if (total != null && total.compareTo(BigInteger.ZERO) != 0) {
                     double _proportion = new BigDecimal(blackNuls).divide(new BigDecimal(total), 6, RoundingMode.HALF_UP).doubleValue() * 100;
                     proportion = _proportion + "%";
                 }
