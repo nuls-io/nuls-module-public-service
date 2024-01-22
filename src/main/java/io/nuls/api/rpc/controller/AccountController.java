@@ -417,7 +417,7 @@ public class AccountController {
         }
         if (address.equals(BlockHoleAddress)) {
             //黑洞地址特殊处理
-            accountInfo.setAlias("BlockHoleAddress");
+            accountInfo.setAlias("Black Hole Address");
             accountInfo.setBalance(BigInteger.ZERO);
             accountInfo.setTotalBalance(BigInteger.ZERO);
             accountInfo.setTotalIn(BigInteger.ZERO);

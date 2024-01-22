@@ -165,7 +165,7 @@ public class StatisticalNulsTask implements Runnable {
         String destroyAddress = AddressTool.getStringAddressByBytes(address);
         BigInteger destroyNuls = accountService.getAccountTotalBalance(chainId, destroyAddress);
         String reason = "account set alias destroy nuls";
-        String type = "Null Address";
+        String type = "Black Hole Address";
         String aproportion = null;
         if (total != null && total.compareTo(BigInteger.ZERO) != 0) {
             double _proportion = new BigDecimal(destroyNuls).divide(new BigDecimal(total), 6, RoundingMode.HALF_UP).doubleValue() * 100;
@@ -175,7 +175,7 @@ public class StatisticalNulsTask implements Runnable {
         list.add(destroyInfo);
 
         reason = "stolen blacklist";
-        type = "Permanent lock";
+        type = "Permanenty Locked";
         for (String blackAddress : AddressTool.BLOCK_HOLE_ADDRESS_SET) {
             if (chainId != 1 && blackAddress.startsWith("NULS")) {
                 continue;
