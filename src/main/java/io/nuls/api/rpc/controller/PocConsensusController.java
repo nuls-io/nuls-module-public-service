@@ -30,6 +30,7 @@ import io.nuls.api.manager.CacheManager;
 import io.nuls.api.model.po.*;
 import io.nuls.api.model.rpc.RpcResult;
 import io.nuls.api.utils.AgentComparator;
+import io.nuls.api.utils.LoggerUtil;
 import io.nuls.api.utils.VerifyUtils;
 import io.nuls.base.basic.AddressTool;
 import io.nuls.core.basic.Result;
@@ -219,19 +220,34 @@ public class PocConsensusController {
         if (pageSize <= 0 || pageSize > 1000) {
             pageSize = 10;
         }
+        long start = System.currentTimeMillis();
         PageInfo<AgentInfo> pageInfo;
         if (!CacheManager.isChainExist(chainId)) {
             pageInfo = new PageInfo<>(pageNumber, pageSize);
             return new RpcResult().setResult(pageInfo);
         }
+        LoggerUtil.commonLog.info("Step 1 use {}ms", System.currentTimeMillis() - start);
+        start = System.currentTimeMillis();
         pageInfo = agentService.getAgentList(chainId, pageNumber, pageSize);
+
+        LoggerUtil.commonLog.info("Step 2 use {}ms", System.currentTimeMillis() - start);
+        start = System.currentTimeMillis();
         for (AgentInfo agentInfo : pageInfo.getList()) {
             long count = punishService.getYellowCount(chainId, agentInfo.getAgentAddress());
+
+            LoggerUtil.commonLog.info("----- Step 1.1 use {}ms", System.currentTimeMillis() - start);
+            start = System.currentTimeMillis();
+
+
             if (agentInfo.getTotalPackingCount() != 0 || count != 0) {
                 agentInfo.setLostRate(DoubleUtils.div(count, count + agentInfo.getTotalPackingCount()));
             }
             agentInfo.setYellowCardCount((int) count);
             Result<AgentInfo> clientResult = WalletRpcHandler.getAgentInfo(chainId, agentInfo.getTxHash());
+
+            LoggerUtil.commonLog.info("----- Step 1.2 use {}ms", System.currentTimeMillis() - start);
+            start = System.currentTimeMillis();
+
             if (clientResult.isSuccess()) {
                 agentInfo.setCreditValue(clientResult.getData().getCreditValue());
                 agentInfo.setDepositCount(clientResult.getData().getDepositCount());
@@ -243,8 +259,13 @@ public class PocConsensusController {
                     }
                 }
             }
+
+            LoggerUtil.commonLog.info("----- Step 1.3 use {}ms", System.currentTimeMillis() - start);
+            start = System.currentTimeMillis();
         }
         Collections.sort(pageInfo.getList(), AgentComparator.getInstance());
+
+        LoggerUtil.commonLog.info("----- Step 3 use {}ms", System.currentTimeMillis() - start);
         return new RpcResult().setResult(pageInfo);
     }
 
@@ -810,7 +831,7 @@ public class PocConsensusController {
         }
         //查看所查询的round是否在缓存里
         for (CurrentRound round : ApiContext.roundList) {
-            if(round.getIndex() == roundIndex) {
+            if (round.getIndex() == roundIndex) {
                 return new RpcResult().setResult(round);
             }
         }
