@@ -188,7 +188,7 @@ public class AccountController {
 
                 long start = System.currentTimeMillis();
                 pageInfo = accountService.getAccountTxs(chainId, address, pageNumber, pageSize, type, startHeight, endHeight, assetChainId, assetId);
-                LoggerUtil.commonLog.info("-getAccountTxs- Step 1 use {}ms", System.currentTimeMillis() - start);
+//                LoggerUtil.commonLog.info("-getAccountTxs- Step 1 use {}ms", System.currentTimeMillis() - start);
                 start = System.currentTimeMillis();
                 result.setResult(new PageInfo<>(pageNumber, pageSize, pageInfo.getTotalCount(), pageInfo.getList().stream().map(d -> {
                     long start2 = System.currentTimeMillis();
@@ -198,10 +198,10 @@ public class AccountController {
                         res.put("symbol", assetInfo.getSymbol());
                         res.put("decimals", assetInfo.getDecimals());
                     }
-                    LoggerUtil.commonLog.info("-getAccountTxs- Step 1.1 use {}ms", System.currentTimeMillis() - start2);
+//                    LoggerUtil.commonLog.info("-getAccountTxs- Step 1.1 use {}ms", System.currentTimeMillis() - start2);
                     return res;
                 }).collect(Collectors.toList())));
-                LoggerUtil.commonLog.info("-getAccountTxs- Step 2 use {}ms", System.currentTimeMillis() - start);
+//                LoggerUtil.commonLog.info("-getAccountTxs- Step 2 use {}ms", System.currentTimeMillis() - start);
             } else {
                 result.setResult(new PageInfo<>(pageNumber, pageSize));
             }

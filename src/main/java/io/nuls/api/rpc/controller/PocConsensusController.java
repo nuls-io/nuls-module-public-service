@@ -226,17 +226,17 @@ public class PocConsensusController {
             pageInfo = new PageInfo<>(pageNumber, pageSize);
             return new RpcResult().setResult(pageInfo);
         }
-        LoggerUtil.commonLog.info("Step 1 use {}ms", System.currentTimeMillis() - start);
-        start = System.currentTimeMillis();
+//        LoggerUtil.commonLog.info("Step 1 use {}ms", System.currentTimeMillis() - start);
+//        start = System.currentTimeMillis();
         pageInfo = agentService.getAgentList(chainId, pageNumber, pageSize);
 
-        LoggerUtil.commonLog.info("Step 2 use {}ms", System.currentTimeMillis() - start);
-        start = System.currentTimeMillis();
+//        LoggerUtil.commonLog.info("Step 2 use {}ms", System.currentTimeMillis() - start);
+//        start = System.currentTimeMillis();
         for (AgentInfo agentInfo : pageInfo.getList()) {
             long count = punishService.getYellowCount(chainId, agentInfo.getAgentAddress());
 
-            LoggerUtil.commonLog.info("----- Step 1.1 use {}ms", System.currentTimeMillis() - start);
-            start = System.currentTimeMillis();
+//            LoggerUtil.commonLog.info("----- Step 1.1 use {}ms", System.currentTimeMillis() - start);
+//            start = System.currentTimeMillis();
 
 
             if (agentInfo.getTotalPackingCount() != 0 || count != 0) {
@@ -245,8 +245,8 @@ public class PocConsensusController {
             agentInfo.setYellowCardCount((int) count);
             Result<AgentInfo> clientResult = WalletRpcHandler.getAgentInfo(chainId, agentInfo.getTxHash());
 
-            LoggerUtil.commonLog.info("----- Step 1.2 use {}ms", System.currentTimeMillis() - start);
-            start = System.currentTimeMillis();
+//            LoggerUtil.commonLog.info("----- Step 1.2 use {}ms", System.currentTimeMillis() - start);
+//            start = System.currentTimeMillis();
 
             if (clientResult.isSuccess()) {
                 agentInfo.setCreditValue(clientResult.getData().getCreditValue());
@@ -260,12 +260,12 @@ public class PocConsensusController {
                 }
             }
 
-            LoggerUtil.commonLog.info("----- Step 1.3 use {}ms", System.currentTimeMillis() - start);
-            start = System.currentTimeMillis();
+//            LoggerUtil.commonLog.info("----- Step 1.3 use {}ms", System.currentTimeMillis() - start);
+//            start = System.currentTimeMillis();
         }
         Collections.sort(pageInfo.getList(), AgentComparator.getInstance());
 
-        LoggerUtil.commonLog.info("----- Step 3 use {}ms", System.currentTimeMillis() - start);
+        LoggerUtil.commonLog.info("-----use {}ms", System.currentTimeMillis() - start);
         return new RpcResult().setResult(pageInfo);
     }
 

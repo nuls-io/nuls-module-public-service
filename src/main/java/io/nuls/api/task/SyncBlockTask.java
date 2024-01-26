@@ -137,7 +137,7 @@ public class SyncBlockTask implements Runnable {
         BlockInfo newBlock = result.getData();
         if (null == newBlock) {
             Thread.sleep(5000L);
-            LoggerUtil.commonLog.info("------block info is null: {},{}", chainId, nextHeight);
+//            LoggerUtil.commonLog.info("------block info is null: {},{}", chainId, nextHeight);
             return false;
         }
         if (checkBlockContinuity(localBestBlockHeader, newBlock.getHeader())) {
