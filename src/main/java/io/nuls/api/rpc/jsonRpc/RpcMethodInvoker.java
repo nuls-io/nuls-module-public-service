@@ -52,6 +52,7 @@ public class RpcMethodInvoker {
         } catch (Exception e) {
 
             LoggerUtil.commonLog.error("\n" + method.toString());
+            LoggerUtil.commonLog.error(e);
             if (e.getCause() instanceof JsonRpcException) {
                 JsonRpcException jsonRpcException = (JsonRpcException) e.getCause();
                 result = new RpcResult();
@@ -69,7 +70,6 @@ public class RpcMethodInvoker {
                 rpcResultError.setData(error);
                 result.setError(rpcResultError);
             } else {
-                LoggerUtil.commonLog.error(e);
                 result = new RpcResult();
                 RpcResultError error = new RpcResultError();
                 error.setMessage("system error");
