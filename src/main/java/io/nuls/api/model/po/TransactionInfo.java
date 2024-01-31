@@ -63,21 +63,21 @@ public class TransactionInfo {
                 }
             }
         }
-        if (coinFroms != null && !coinFroms.isEmpty()) {
-            if (calc) {
-                CoinFromInfo input = coinFroms.get(0);
-                this.symbol = input.getSymbol();
-                this.decimal = input.getDecimal();
-            } else {
-                for (CoinFromInfo fromInfo : coinFroms) {
-                    if (fromInfo.getChainId() == chainId && fromInfo.getAssetsId() == 1) {
-                        this.symbol = fromInfo.getSymbol();
-                        this.decimal = fromInfo.getDecimal();
-                        break;
-                    }
-                }
-            }
-        }
+//        if (coinFroms != null && !coinFroms.isEmpty()) {
+//            if (calc) {
+//                CoinFromInfo input = coinFroms.get(0);
+//                this.symbol = input.getSymbol();
+//                this.decimal = input.getDecimal();
+//            } else {
+//                for (CoinFromInfo fromInfo : coinFroms) {
+//                    if (fromInfo.getChainId() == chainId && fromInfo.getAssetsId() == 1) {
+//                        this.symbol = fromInfo.getSymbol();
+//                        this.decimal = fromInfo.getDecimal();
+//                        break;
+//                    }
+//                }
+//            }
+//        }
         this.value = value;
 //        if (type == TxType.COIN_BASE ||
 //                type == TxType.STOP_AGENT ||
