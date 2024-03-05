@@ -4,11 +4,15 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.InsertManyOptions;
 import com.mongodb.client.model.Sorts;
+import io.nuls.api.ApiContext;
 import io.nuls.api.analysis.WalletRpcHandler;
+import io.nuls.api.cache.ApiCache;
 import io.nuls.api.db.TransactionService;
+import io.nuls.api.manager.CacheManager;
 import io.nuls.api.model.po.*;
 import io.nuls.api.model.po.mini.MiniTransactionInfo;
 import io.nuls.api.model.rpc.BalanceInfo;
+import io.nuls.api.model.rpc.RpcResult;
 import io.nuls.api.utils.DocumentTransferTool;
 import io.nuls.base.basic.AddressTool;
 import io.nuls.core.basic.InitializingBean;
@@ -72,18 +76,25 @@ public class MongoTransactionServiceImpl implements TransactionService, Initiali
 
 
     public void deleteTxs(int chainId) {
-        long totalCount = mongoDBService.getEstimateCount(TX_TABLE + chainId);
-        if (totalCount > 1000000) {
-            int deleteCount = (int) (totalCount - 1000000);
-            BasicDBObject fields = new BasicDBObject();
-            fields.append("_id", 1);
-            List<Document> docList = this.mongoDBService.pageQuery(TX_TABLE + chainId, null, fields, Sorts.ascending("createTime"), 1, deleteCount);
-            List<String> hashList = new ArrayList<>();
-            for (Document document : docList) {
-                hashList.add(document.getString("_id"));
-            }
-            mongoDBService.delete(TX_TABLE + chainId, Filters.in("_id", hashList));
+//        long totalCount = mongoDBService.getEstimateCount(TX_TABLE + chainId);
+//        if (totalCount > 1000000) {
+//            int deleteCount = (int) (totalCount - 1000000);
+//            BasicDBObject fields = new BasicDBObject();
+//            fields.append("_id", 1);
+//            List<Document> docList = this.mongoDBService.pageQuery(TX_TABLE + chainId, null, fields, Sorts.ascending("createTime"), 1, deleteCount);
+//            List<String> hashList = new ArrayList<>();
+//            for (Document document : docList) {
+//                hashList.add(document.getString("_id"));
+//            }
+//            mongoDBService.delete(TX_TABLE + chainId, Filters.in("_id", hashList));
+//        }
+
+        ApiCache apiCache = CacheManager.getCache(chainId);
+        if (apiCache == null || apiCache.getBestHeader() == null) {
+            return;
         }
+        long oldTime = apiCache.getBestHeader().getCreateTime() - 365 * 24 * 3600;
+        mongoDBService.delete(TX_TABLE + chainId, Filters.lt("createTime", oldTime));
     }
 
     //tx_table只存储最近100万条数据
