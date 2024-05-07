@@ -20,22 +20,27 @@
 
 package io.nuls.api.db.mongo;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
-import com.mongodb.ServerAddress;
+import com.mongodb.*;
+import com.mongodb.client.MongoClient;
 import com.mongodb.bulk.BulkWriteResult;
 import com.mongodb.client.*;
 import com.mongodb.client.model.*;
+import com.mongodb.connection.ClusterConnectionMode;
+import com.mongodb.connection.ClusterType;
 import io.nuls.api.ApiContext;
+import io.nuls.api.constant.config.ApiConfig;
 import io.nuls.api.utils.LoggerUtil;
 import io.nuls.core.basic.InitializingBean;
+import io.nuls.core.core.annotation.Autowired;
 import io.nuls.core.core.annotation.Component;
 import io.nuls.core.core.annotation.Order;
+import io.nuls.core.log.Log;
+import io.nuls.core.model.StringUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -50,6 +55,9 @@ import static io.nuls.api.constant.DBTableConstant.TEST_TABLE;
 @Component
 @Order(Integer.MAX_VALUE)
 public class MongoDBService implements InitializingBean {
+
+    @Autowired
+    ApiConfig apiConfig;
 
     private MongoClient client;
     private MongoDatabase db;
@@ -71,42 +79,99 @@ public class MongoDBService implements InitializingBean {
             }
         }).start();
     }
-    public void doit() {
 
-
-        while (ApiContext.maxAliveConnect == 0) {
-            LoggerUtil.commonLog.info("waiting ready......");
-            try {
-                Thread.sleep(1000L);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
+    public void doit(){
         try {
+            Log.info("connect mongodb");
+            String DB_NAME = StringUtils.isBlank(apiConfig.getDbName()) ? DATABASE_NAME : apiConfig.getDbName();
             long time1, time2;
             time1 = System.currentTimeMillis();
-            MongoClientOptions options = MongoClientOptions.builder()
-                    .connectionsPerHost(ApiContext.maxAliveConnect)
-                    .threadsAllowedToBlockForConnectionMultiplier(ApiContext.maxAliveConnect)
-                    .socketTimeout(ApiContext.socketTimeout)
-                    .maxWaitTime(ApiContext.maxWaitTime)
-                    .connectTimeout(ApiContext.connectTimeOut)
-                    .build();
-            ServerAddress serverAddress = new ServerAddress(ApiContext.databaseUrl, ApiContext.databasePort);
-            MongoClient mongoClient = new MongoClient(serverAddress, options);
-            MongoDatabase mongoDatabase = mongoClient.getDatabase(DATABASE_NAME);
+            System.setProperty("DEBUG.MONGO", "true");
+            System.setProperty("DB.TRACE", "true");
+            String username = apiConfig.getMongoUser(); //TODO Update user name for DocumentDB
+            String password = apiConfig.getMongoPwd(); // TODO Update password for DocumentDB
+            String clusterEndpoint = ApiContext.databaseUrl;// TODO Update Cluster End Point for DocumentDB
+            Log.info("mongodb endpoint: " + clusterEndpoint);
+            MongoClientSettings settings =
+                    MongoClientSettings.builder()
+                            .applyToClusterSettings(builder ->
+                                    builder.hosts(Arrays.asList(new ServerAddress(clusterEndpoint, ApiContext.databasePort))))
+                            .applyToClusterSettings(builder ->
+                                    builder.requiredClusterType(ClusterType.REPLICA_SET))
+                            .applyToClusterSettings(builder ->
+                                    builder.requiredReplicaSetName("rs0"))
+                            .applyToClusterSettings(builder ->
+                                    builder.mode(ClusterConnectionMode.MULTIPLE))
+                            .readPreference(ReadPreference.secondaryPreferred())
+                            .applyToSslSettings(builder ->
+                                    builder.enabled(false))
+                            .credential(MongoCredential.createCredential(username, DATABASE_NAME, password.toCharArray()))
+//                            .applyToConnectionPoolSettings(builder ->
+//                                    builder.maxSize(10))
+//                            .applyToConnectionPoolSettings(builder ->
+//                                    builder.maxWaitQueueSize(2))
+                            .applyToConnectionPoolSettings(builder ->
+                                    builder.maxConnectionIdleTime(10, TimeUnit.MINUTES))
+                            .applyToConnectionPoolSettings(builder ->
+                                    builder.maxWaitTime(2, TimeUnit.MINUTES))
+                            .applyToClusterSettings(builder ->
+                                    builder.serverSelectionTimeout(10, TimeUnit.SECONDS))
+                            .applyToSocketSettings(builder ->
+                                    builder.connectTimeout(ApiContext.connectTimeOut, TimeUnit.MILLISECONDS))
+                            .applyToSocketSettings(builder ->
+                                    builder.readTimeout(0, TimeUnit.SECONDS))
+                            .build();
 
-            mongoDatabase.getCollection(TEST_TABLE).drop();
+            MongoClient mongoClient = MongoClients.create(settings);
+            MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
+            Log.info("show first db " + mongoClient.listDatabaseNames().first());
             time2 = System.currentTimeMillis();
-            LoggerUtil.commonLog.info("------connect mongodb use time:" + (time2 - time1));
+            Log.info("------connect mongodb use time:" + (time2 - time1));
             this.client = mongoClient;
             this.db = mongoDatabase;
         } catch (Exception e) {
-            LoggerUtil.commonLog.error(e);
+            Log.error(e);
+            e.printStackTrace();
             System.exit(-1);
         }
     }
+
+//    public void doit() {
+//
+//
+//        while (ApiContext.maxAliveConnect == 0) {
+//            LoggerUtil.commonLog.info("waiting ready......");
+//            try {
+//                Thread.sleep(1000L);
+//            } catch (InterruptedException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
+//
+//        try {
+//            long time1, time2;
+//            time1 = System.currentTimeMillis();
+//            MongoClientOptions options = MongoClientOptions.builder()
+//                    .connectionsPerHost(ApiContext.maxAliveConnect)
+//                    .threadsAllowedToBlockForConnectionMultiplier(ApiContext.maxAliveConnect)
+//                    .socketTimeout(ApiContext.socketTimeout)
+//                    .maxWaitTime(ApiContext.maxWaitTime)
+//                    .connectTimeout(ApiContext.connectTimeOut)
+//                    .build();
+//            ServerAddress serverAddress = new ServerAddress(ApiContext.databaseUrl, ApiContext.databasePort);
+//            MongoClient mongoClient = new MongoClient(serverAddress, options);
+//            MongoDatabase mongoDatabase = mongoClient.getDatabase(DATABASE_NAME);
+//
+//            mongoDatabase.getCollection(TEST_TABLE).drop();
+//            time2 = System.currentTimeMillis();
+//            LoggerUtil.commonLog.info("------connect mongodb use time:" + (time2 - time1));
+//            this.client = mongoClient;
+//            this.db = mongoDatabase;
+//        } catch (Exception e) {
+//            LoggerUtil.commonLog.error(e);
+//            System.exit(-1);
+//        }
+//    }
 
     public void createCollection(String collName) {
         try {

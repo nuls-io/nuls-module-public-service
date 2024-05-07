@@ -1,7 +1,9 @@
 package io.nuls.api.test;
 
-import com.mongodb.MongoClient;
+import com.mongodb.MongoClientSettings;
 import com.mongodb.ServerAddress;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import io.nuls.api.constant.DBTableConstant;
 import io.nuls.api.db.mongo.MongoDBService;
@@ -18,7 +20,8 @@ public class DropTableTest {
     @Test
     public void dropTable() {
         ServerAddress serverAddress = new ServerAddress("127.0.0.1", 27017);
-        MongoClient mongoClient = new MongoClient(serverAddress);
+        MongoClient mongoClient = MongoClients.create(
+                MongoClientSettings.builder().build());
         MongoDatabase mongoDatabase = mongoClient.getDatabase(DBTableConstant.DATABASE_NAME);
         MongoDBService mongoDBService = new MongoDBService(mongoClient, mongoDatabase);
 
