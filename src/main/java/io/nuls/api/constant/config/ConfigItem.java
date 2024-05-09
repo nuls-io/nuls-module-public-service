@@ -25,7 +25,7 @@
 package io.nuls.api.constant.config;
 
 /**
- * 配置信息类
+ * Configuration Information Class
  * Configuration information class
  *
  * @author qinyifeng

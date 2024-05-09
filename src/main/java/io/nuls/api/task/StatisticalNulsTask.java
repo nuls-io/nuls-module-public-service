@@ -47,7 +47,7 @@ public class StatisticalNulsTask implements Runnable {
     @Override
     public void run() {
         try {
-            BigInteger totalCoin = BigInteger.ZERO;         //总量
+            BigInteger totalCoin = BigInteger.ZERO;         //total
             SyncInfo syncInfo = chainService.getSyncInfo(chainId);
             if (syncInfo != null) {
                 totalCoin = syncInfo.getTotalSupply();
@@ -56,7 +56,7 @@ public class StatisticalNulsTask implements Runnable {
 
             ApiCache apiCache = CacheManager.getCache(chainId);
             CoinContextInfo contextInfo = apiCache.getCoinContextInfo();
-            //团队持有数量
+            //Number of team holdings
             BigInteger teamNuls = BigInteger.ZERO;
             BalanceInfo balanceInfo = null;
             if (!StringUtils.isBlank(ApiContext.TEAM_ADDRESS)) {
@@ -65,7 +65,7 @@ public class StatisticalNulsTask implements Runnable {
                 balanceInfo = WalletRpcHandler.getAccountBalance(chainId, ApiContext.TEAM_ADDRESS, defaultAsset.getChainId(), defaultAsset.getAssetId());
             }
             contextInfo.setTeam(teamNuls);
-            //销毁数量
+            //Destruction quantity
             byte[] address = AddressTool.getAddress(ApiContext.blackHolePublicKey, chainId);
             String destroyAddress = AddressTool.getStringAddressByBytes(address);
             BigInteger destroyNuls = accountService.getAccountTotalBalance(chainId, destroyAddress);
@@ -74,7 +74,7 @@ public class StatisticalNulsTask implements Runnable {
                 BigInteger blackNuls = accountService.getAccountTotalBalance(chainId, blackAddress);
                 destroyNuls = destroyNuls.add(blackNuls);
             }
-            // add by pierre at 2020-04-02 协议升级黑洞地址
+            // add by pierre at 2020-04-02 Protocol upgrade black hole address
             if (ApiContext.protocolVersion >= 5) {
                 for (String blackAddress : AddressTool.BLOCK_HOLE_ADDRESS_SET_5) {
                     BigInteger blackNuls = accountService.getAccountTotalBalance(chainId, blackAddress);
@@ -82,14 +82,14 @@ public class StatisticalNulsTask implements Runnable {
                 }
             }
             // end code by pierre
-            //商务持有数量
+            //Business Holding Quantity
             BigInteger businessNuls = BigInteger.ZERO;
             for (String businessAddress : ApiContext.BUSINESS_ADDRESS) {
                 BigInteger amount = accountService.getAccountTotalBalance(chainId, businessAddress);
                 businessNuls = businessNuls.add(amount);
             }
             contextInfo.setBusiness(businessNuls);
-            //社区持有数量
+            //Community holdings
             BigInteger communityNuls = BigInteger.ZERO;
             for (String communityAddress : ApiContext.COMMUNITY_ADDRESS) {
                 BigInteger amount = accountService.getAccountTotalBalance(chainId, communityAddress);
@@ -126,13 +126,13 @@ public class StatisticalNulsTask implements Runnable {
     }
 
 
-    //          #初始通胀金额500w/365*30
+    //          #Initial inflation amount500w/365*30
     long inflationAmount = 41095890410959L;
-    //          #通胀开始计算时间(单位:S)2020-07-12 00:00:00
+    //          #Inflation start calculation time(unit:S)2020-07-12 00:00:00
     long initTime = 1594483200;
-    //          #通缩比例(如果没有通缩则设为100)
+    //          #Deflationary ratio(If there is no deflation, set to100)
     double deflationRatio = 0.996;
-    //          #通缩间隔时间(单位：S),30天
+    //          #Deflation interval time(unit：S),30day
     long deflationTimeInterval = 2592000;
 
     private void setDeflationInfo(CoinContextInfo contextInfo) {
@@ -149,7 +149,7 @@ public class StatisticalNulsTask implements Runnable {
 
     private void setDestroyInfo(CoinContextInfo contextInfo) {
         List<DestroyInfo> list = new LinkedList<>();
-        //销毁数量
+        //Destruction quantity
         byte[] address = AddressTool.getAddress(ApiContext.blackHolePublicKey, chainId);
         AssetInfo assetInfo = CacheManager.getRegisteredAsset(chainId + "-" + 1);
 
@@ -190,7 +190,7 @@ public class StatisticalNulsTask implements Runnable {
             destroyInfo = new DestroyInfo(blackAddress, type, reason, AssetTool.toCoinString(blackNuls), proportion);
             list.add(destroyInfo);
         }
-        // add by pierre at 2020-04-02 协议升级黑洞地址
+        // add by pierre at 2020-04-02 Protocol upgrade black hole address
         if (ApiContext.protocolVersion >= 5) {
             for (String blackAddress : AddressTool.BLOCK_HOLE_ADDRESS_SET_5) {
                 if (chainId != 1 && blackAddress.startsWith("NULS")) {

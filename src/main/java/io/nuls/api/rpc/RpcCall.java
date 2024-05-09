@@ -13,7 +13,7 @@ import io.nuls.core.exception.NulsException;
 import java.util.Map;
 
 /**
- * 调用其他模块跟交易相关的接口
+ * Calling other modules and transaction related interfaces
  *
  * @author: qinyifeng
  * @date: 2018/12/05
@@ -24,7 +24,7 @@ public class RpcCall {
         return request(moduleCode, cmd, params, null);
     }
     /**
-     * 调用其他模块接口
+     * Call other module interfaces
      * Call other module interfaces
      */
     public static Object request(String moduleCode, String cmd, Map params, Long timeout) throws NulsException {

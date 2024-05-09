@@ -40,7 +40,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * 委托信息类
+ * Entrusted Information
  * Delegated information class
  *
  * @author tag

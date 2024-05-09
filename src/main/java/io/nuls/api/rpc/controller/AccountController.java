@@ -185,23 +185,16 @@ public class AccountController {
         try {
             PageInfo<TxRelationInfo> pageInfo;
             if (CacheManager.isChainExist(chainId)) {
-
-                long start = System.currentTimeMillis();
                 pageInfo = accountService.getAccountTxs(chainId, address, pageNumber, pageSize, type, startHeight, endHeight, assetChainId, assetId);
-//                LoggerUtil.commonLog.info("-getAccountTxs- Step 1 use {}ms", System.currentTimeMillis() - start);
-                start = System.currentTimeMillis();
                 result.setResult(new PageInfo<>(pageNumber, pageSize, pageInfo.getTotalCount(), pageInfo.getList().stream().map(d -> {
-                    long start2 = System.currentTimeMillis();
                     Map res = MapUtils.beanToMap(d);
-                    AssetInfo assetInfo = CacheManager.getRegisteredAsset(d.getChainId() + "-" + d.getAssetId());
+                    AssetInfo assetInfo = CacheManager.getAssetInfoMap().get(d.getChainId() + "-" + d.getAssetId());
                     if (assetInfo != null) {
                         res.put("symbol", assetInfo.getSymbol());
                         res.put("decimals", assetInfo.getDecimals());
                     }
-//                    LoggerUtil.commonLog.info("-getAccountTxs- Step 1.1 use {}ms", System.currentTimeMillis() - start2);
                     return res;
                 }).collect(Collectors.toList())));
-//                LoggerUtil.commonLog.info("-getAccountTxs- Step 2 use {}ms", System.currentTimeMillis() - start);
             } else {
                 result.setResult(new PageInfo<>(pageNumber, pageSize));
             }
@@ -212,7 +205,7 @@ public class AccountController {
     }
 
     /**
-     * 查询账户普通转账和跨链转账交易
+     * Query account regular transfer and cross chain transfer transactions
      *
      * @param params
      * @return
@@ -258,7 +251,7 @@ public class AccountController {
             PageInfo<TxRelationInfo> pageInfo = accountService.queryAccountTxs(chainId, address, pageNumber, assetChainId, assetId);
             result.setResult(new PageInfo<>(pageNumber, 10, pageInfo.getTotalCount(), pageInfo.getList().stream().map(d -> {
                 Map res = MapUtils.beanToMap(d);
-                AssetInfo assetInfo = CacheManager.getRegisteredAsset(d.getChainId() + "-" + d.getAssetId());
+                AssetInfo assetInfo = CacheManager.getAssetInfoMap().get(d.getChainId() + "-" + d.getAssetId());
                 if (assetInfo != null) {
                     res.put("symbol", assetInfo.getSymbol());
                     res.put("decimals", assetInfo.getDecimals());
@@ -368,7 +361,7 @@ public class AccountController {
                 pageInfo = accountService.getAcctTxs(chainId, assetChainId, assetId, address, type, startTime, endTime, pageNumber, pageSize);
                 result.setResult(new PageInfo<>(pageNumber, pageSize, pageInfo.getTotalCount(), pageInfo.getList().stream().map(d -> {
                     Map res = MapUtils.beanToMap(d);
-                    AssetInfo assetInfo = CacheManager.getRegisteredAsset(d.getChainId() + "-" + d.getAssetId());
+                    AssetInfo assetInfo = CacheManager.getAssetInfoMap().get(d.getChainId() + "-" + d.getAssetId());
                     if (assetInfo != null) {
                         res.put("symbol", assetInfo.getSymbol());
                         res.put("decimals", assetInfo.getDecimals());
@@ -423,8 +416,8 @@ public class AccountController {
             BlockHoleAddress = AddressTool.getAddressString(HexUtil.decode("000000000000000000000000000000000000000000000000000000000000000000"), chainId);
         }
         if (address.equals(BlockHoleAddress)) {
-            //黑洞地址特殊处理
-            accountInfo.setAlias("Black Hole Address");
+            //Special handling of black hole addresses
+            accountInfo.setAlias("BlockHoleAddress");
             accountInfo.setBalance(BigInteger.ZERO);
             accountInfo.setTotalBalance(BigInteger.ZERO);
             accountInfo.setTotalIn(BigInteger.ZERO);
@@ -781,7 +774,7 @@ public class AccountController {
             ledgerInfo.setBalance(balanceInfo.getBalance());
             ledgerInfo.setTimeLock(balanceInfo.getTimeLock());
             ledgerInfo.setConsensusLock(balanceInfo.getConsensusLock());
-            AssetInfo assetInfo = CacheManager.getRegisteredAsset(ledgerInfo.getAssetKey());
+            AssetInfo assetInfo = CacheManager.getAssetInfoMap().get(ledgerInfo.getAssetKey());
             if (assetInfo != null) {
                 ledgerInfo.setSymbol(assetInfo.getSymbol());
                 ledgerInfo.setDecimals(assetInfo.getDecimals());
@@ -820,7 +813,7 @@ public class AccountController {
             ledgerInfo.setBalance(balanceInfo.getBalance());
             ledgerInfo.setTimeLock(balanceInfo.getTimeLock());
             ledgerInfo.setConsensusLock(balanceInfo.getConsensusLock());
-            AssetInfo assetInfo = CacheManager.getRegisteredAsset(ledgerInfo.getAssetKey());
+            AssetInfo assetInfo = CacheManager.getAssetInfoMap().get(ledgerInfo.getAssetKey());
             if (assetInfo != null) {
                 ledgerInfo.setSymbol(assetInfo.getSymbol());
                 ledgerInfo.setDecimals(assetInfo.getDecimals());

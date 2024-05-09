@@ -9,7 +9,7 @@ import io.nuls.api.model.po.mini.MiniAccountInfo;
 import io.nuls.api.utils.LoggerUtil;
 
 /**
- * 刷新首页缓存task
+ * Refresh homepage cachetask
  */
 public class RefreshCacheTask implements Runnable {
 

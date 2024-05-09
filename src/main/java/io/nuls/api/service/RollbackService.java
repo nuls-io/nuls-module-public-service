@@ -56,45 +56,45 @@ public class RollbackService {
     @Autowired
     private ChainAssetService chainAssetService;
 
-    //记录每个区块打包交易涉及到的账户的余额变动
+    //Record the balance changes of the accounts involved in each block packaging transaction
     private Map<String, AccountInfo> accountInfoMap = new HashMap<>();
-    //记录每个账户的资产变动
+    //Record asset changes for each account
     private Map<String, AccountLedgerInfo> accountLedgerInfoMap = new HashMap<>();
-    //记录每个区块代理节点的变化
+    //Record the changes of each block proxy node
     private List<AgentInfo> agentInfoList = new ArrayList<>();
-    //记录每个区块设置别名信息
+    //Record alias information for each block setting
     private List<AliasInfo> aliasInfoList = new ArrayList<>();
-    //记录每个区块委托共识的信息
+    //Record the information of each block delegation consensus
     private List<DepositInfo> depositInfoList = new ArrayList<>();
-    //记录惩罚交易的hash
+    //Record penalty transactionshash
     private List<String> punishTxHashList = new ArrayList<>();
-    //记录每个区块新创建的智能合约信息
+    //Record the newly created smart contract information for each block
     private Map<String, ContractInfo> contractInfoMap = new HashMap<>();
-    //记录智能合约相关的交易信息
+    //Record transaction information related to smart contracts
     private List<String> contractTxHashList = new ArrayList<>();
-    //记录每个区块智能合约相关的账户token信息
+    //Record the accounts related to each block smart contracttokeninformation
     private Map<String, AccountTokenInfo> accountTokenMap = new HashMap<>();
-    //记录每个区块智能合约相关的账户token721信息
+    //Record the accounts related to each block smart contracttoken721information
     private Map<String, AccountToken721Info> accountToken721Map = new HashMap<>();
-    //记录合约nrc20转账信息
+    //Record contractsnrc20Transfer information
     private List<String> tokenTransferHashList = new ArrayList<>();
-    //记录合约nrc721转账信息
+    //Record contractsnrc721Transfer information
     private List<String> token721TransferHashList = new ArrayList<>();
-    //记录合约nrc721造币信息
+    //Record contractsnrc721Coinage information
     private List<Nrc721TokenIdInfo> token721IdList = new ArrayList<>();
-    //记录链信息
+    //Record chain information
     private List<ChainInfo> chainInfoList = new ArrayList<>();
-    //记录每个区块交易和账户地址的关系
+    //Record the relationship between each block transaction and account address
     private Set<TxRelationInfo> txRelationInfoSet = new HashSet<>();
-    //记录每个跨链交易和账户地址的关系
+    //Record the relationship between each cross chain transaction and account address
     private Set<String> crossTxHashSet = new HashSet<>();
-    //处理每个交易时，过滤交易中的重复地址
+    //Filter duplicate addresses in each transaction during processing
     Set<String> addressSet = new HashSet<>();
-    //记录每个区块智能合约相关的账户token1155信息
+    //Record the accounts related to each block smart contracttoken1155information
     private Map<String, AccountToken1155Info> accountToken1155Map = new HashMap<>();
-    //记录合约nrc1155的tokenId信息, key=contractAddress+tokenId
+    //Record contractsnrc1155oftokenIdinformation, key=contractAddress+tokenId
     private Map<String, Nrc1155TokenIdInfo> nrc1155TokenIdMap = new HashMap<>();
-    //记录合约nrc721转账信息
+    //Record contractsnrc721Transfer information
     private List<String> token1155TransferHashList = new ArrayList<>();
     private Map<String, ChainAssetTx> chainAssetTxMap = new HashMap<>();
     private Set<String> chainAssetCountList = new HashSet<>();
@@ -153,7 +153,7 @@ public class RollbackService {
         BlockHeaderInfo headerInfo = blockInfo.getHeader();
         AgentInfo agentInfo;
         if (headerInfo.isSeedPacked()) {
-            //如果是种子节点打包的区块，则创建一个新的AgentInfo对象，临时使用
+            //If it is a block packaged by a seed node, create a new oneAgentInfoObject, temporary use
             //If it is a block packed by the seed node, create a new AgentInfo object for temporary use.
             agentInfo = new AgentInfo();
             agentInfo.setPackingAddress(headerInfo.getPackingAddress());
@@ -161,7 +161,7 @@ public class RollbackService {
             agentInfo.setRewardAddress(agentInfo.getPackingAddress());
             headerInfo.setByAgentInfo(agentInfo);
         } else {
-            //根据区块头的打包地址，查询打包节点的节点信息，修改相关统计数据
+            //Based on the packaging address of the block header, query the node information of the packaging node and modify relevant statistical data
             //According to the packed address of the block header, query the node information of the packed node, and modify related statistics.
             agentInfo = queryAgentInfo(chainId, headerInfo.getPackingAddress(), 3);
             agentInfo.setTotalPackingCount(agentInfo.getTotalPackingCount() - 1);
@@ -184,7 +184,7 @@ public class RollbackService {
         AssetInfo assetInfo = CacheManager.getCacheChain(chainId).getDefaultAsset();
         BigInteger agentReward = BigInteger.ZERO, otherReward = BigInteger.ZERO;
         for (CoinToInfo output : list) {
-            //奖励只计算本链的共识资产
+            //Rewards are only calculated for consensus assets in this chain
             if (output.getChainId() == assetInfo.getChainId() && output.getAssetsId() == assetInfo.getAssetId()) {
                 if (output.getAddress().equals(agentInfo.getRewardAddress())) {
                     agentReward = agentReward.add(output.getAmount());
@@ -227,7 +227,7 @@ public class RollbackService {
                 processDeleteContract(chainId, tx);
             } else if (tx.getType() == TxType.CROSS_CHAIN) {
                 processCrossTransferTx(chainId, tx);
-                // add by pierre at 2019-12-23 特殊跨链转账交易，从平行链跨链转回主网的NRC20资产
+                // add by pierre at 2019-12-23 Special cross chain transfer transactions, transferring from parallel chains to the main networkNRC20asset
                 processCrossTransferTxForNRC20TransferBack(chainId, tx);
                 // end code by pierre
             } else if (tx.getType() == TxType.REGISTER_CHAIN_AND_ASSET) {
@@ -296,11 +296,11 @@ public class RollbackService {
         for (CoinToInfo output : tx.getCoinTos()) {
             addressSet.add(output.getAddress());
             calcBalance(chainId, output);
-            //创世块的数据和合约返还不计算共识奖励
+            //The data and contract returns of Genesis Block do not calculate consensus rewards
             if (tx.getHeight() == 0) {
                 continue;
             }
-            //奖励是本链主资产的时候，回滚奖励金额
+            //When the reward is the main asset of this chain, roll back the reward amount
             if (output.getChainId() == assetInfo.getChainId() && output.getAssetsId() == assetInfo.getAssetId()) {
                 AccountInfo accountInfo = queryAccountInfo(chainId, output.getAddress());
                 accountInfo.setTotalReward(accountInfo.getTotalReward().subtract(output.getAmount()));
@@ -331,7 +331,7 @@ public class RollbackService {
 
         if (tx.getCoinFroms() != null) {
             for (CoinFromInfo input : tx.getCoinFroms()) {
-                //如果地址不是本链的地址，不参与计算与存储
+                //If the address is not the address of this chain, it will not participate in calculation and storage
                 if (chainId != AddressTool.getChainIdByAddress(input.getAddress())) {
                     continue;
                 }
@@ -347,7 +347,7 @@ public class RollbackService {
 
         if (tx.getCoinTos() != null) {
             for (CoinToInfo output : tx.getCoinTos()) {
-                //如果地址不是本链的地址，不参与计算与存储
+                //If the address is not the address of this chain, it will not participate in calculation and storage
                 if (chainId != AddressTool.getChainIdByAddress(output.getAddress())) {
                     continue;
                 }
@@ -395,7 +395,7 @@ public class RollbackService {
 
         if (tx.getCoinFroms() != null) {
             for (CoinFromInfo input : tx.getCoinFroms()) {
-                //如果地址不是本链的地址，不参与计算与存储
+                //If the address is not the address of this chain, it will not participate in calculation and storage
                 if (chainId != AddressTool.getChainIdByAddress(input.getAddress())) {
                     continue;
                 }
@@ -406,7 +406,7 @@ public class RollbackService {
 
                 AssetInfo assetInfo = CacheManager.getRegisteredAsset(input.getAssetKey());
                 if (assetInfo.getChainId() != ApiContext.defaultChainId) {
-                    //资产跨链转出后，修改资产在本链的总余额
+                    //After the asset is transferred out across chains, modify the total balance of the asset in this chain
                     ChainInfo chainInfo = queryChainInfo(assetInfo.getChainId());
                     if (chainInfo != null) {
                         AssetInfo asset = chainInfo.getDefaultAsset();
@@ -427,7 +427,7 @@ public class RollbackService {
 
         if (tx.getCoinTos() != null) {
             for (CoinToInfo output : tx.getCoinTos()) {
-                //如果地址不是本链的地址，不参与计算与存储
+                //If the address is not the address of this chain, it will not participate in calculation and storage
                 if (chainId != AddressTool.getChainIdByAddress(output.getAddress())) {
                     continue;
                 }
@@ -439,7 +439,7 @@ public class RollbackService {
                     txRelationInfoSet.add(new TxRelationInfo(output.getAddress(), tx.getHash()));
 
                     AssetInfo assetInfo = CacheManager.getRegisteredAsset(output.getAssetKey());
-                    //资产跨链转入后，修改资产在本链的总余额
+                    //After cross chain transfer of assets, modify the total balance of assets in this chain
                     if (assetInfo.getChainId() != ApiContext.defaultChainId) {
                         ChainInfo chainInfo = queryChainInfo(assetInfo.getChainId());
                         if (chainInfo != null) {
@@ -514,7 +514,7 @@ public class RollbackService {
         calcBalance(chainId, output.getChainId(), output.getAssetsId(), accountInfo, tx.getFee().getValue());
         txRelationInfoSet.add(new TxRelationInfo(output.getAddress(), tx.getHash()));
 
-        //查找到代理节点，设置isNew = true，最后做存储的时候删除
+        //Find the proxy node and set it upisNew = trueFinally, delete it during storage
         AgentInfo agentInfo = queryAgentInfo(chainId, tx.getHash(), 1);
         agentInfo.setNew(true);
         accountInfo.setConsensusLock(accountInfo.getConsensusLock().subtract(agentInfo.getDeposit()));
@@ -528,7 +528,7 @@ public class RollbackService {
         calcBalance(chainId, output.getChainId(), output.getAssetsId(), accountInfo, tx.getFee().getValue());
         txRelationInfoSet.add(new TxRelationInfo(output.getAddress(), tx.getHash()));
 
-        //查找到委托记录，设置isNew = true，最后做存储的时候删除
+        //Found delegation record, setisNew = trueFinally, delete it during storage
         DepositInfo depositInfo = (DepositInfo) tx.getTxData();
         depositInfo.setKey(DBUtil.getDepositKey(depositInfo.getTxHash(), depositInfo.getAddress()));
         depositInfo.setNew(true);
@@ -548,7 +548,7 @@ public class RollbackService {
         calcBalance(chainId, output.getChainId(), output.getAssetsId(), accountInfo, tx.getFee().getValue());
         txRelationInfoSet.add(new TxRelationInfo(output.getAddress(), tx.getHash()));
 
-        //查询取消委托记录，再根据deleteHash反向查到委托记录
+        //Query the cancellation of delegation records, and then based on thedeleteHashReverse lookup of delegation records
         DepositInfo cancelInfo = (DepositInfo) tx.getTxData();
         DepositInfo depositInfo = depositService.getDepositInfoByKey(chainId, DBUtil.getDepositKey(cancelInfo.getTxHash(), accountInfo.getAddress()));
         accountInfo.setConsensusLock(accountInfo.getConsensusLock().add(depositInfo.getAmount()));
@@ -585,7 +585,7 @@ public class RollbackService {
                 accountInfo.setTxCount(accountInfo.getTxCount() - 1);
                 txRelationInfoSet.add(new TxRelationInfo(output.getAddress(), tx.getHash()));
             }
-            //lockTime > 0 这条output的金额就是节点的保证金
+            //lockTime > 0 This oneoutputThe amount is the deposit for the node
             if (output.getLockTime() > 0) {
                 accountInfo.setConsensusLock(accountInfo.getConsensusLock().add(agentInfo.getDeposit()));
                 calcBalance(chainId, output.getChainId(), output.getAssetsId(), accountInfo, tx.getFee().getValue());
@@ -595,11 +595,11 @@ public class RollbackService {
             addressSet.add(output.getAddress());
         }
 
-        //根据交易hash查询所有取消委托的记录
+        //According to the transactionhashQuery all records of canceling delegation
         List<DepositInfo> depositInfos = depositService.getDepositListByHash(chainId, tx.getHash());
         if (!depositInfos.isEmpty()) {
             for (DepositInfo cancelDeposit : depositInfos) {
-                //需要删除的数据
+                //Data that needs to be deleted
                 cancelDeposit.setNew(true);
 
                 DepositInfo depositInfo = depositService.getDepositInfoByKey(chainId, cancelDeposit.getDeleteKey());
@@ -632,7 +632,7 @@ public class RollbackService {
     private void processRedPunishTx(int chainId, TransactionInfo tx) {
         PunishLogInfo redPunish = (PunishLogInfo) tx.getTxData();
         punishTxHashList.add(tx.getHash());
-        //根据红牌找到被惩罚的节点，恢复节点状态
+        //Find the penalized node based on the red card and restore the node status
         AgentInfo agentInfo = queryAgentInfo(chainId, redPunish.getAddress(), 2);
         agentInfo.setDeleteHash(null);
         agentInfo.setDeleteHeight(0);
@@ -653,11 +653,11 @@ public class RollbackService {
             addressSet.add(output.getAddress());
         }
 
-        //根据交易hash查询所有取消委托的记录
+        //According to the transactionhashQuery all records of canceling delegation
         List<DepositInfo> depositInfos = depositService.getDepositListByHash(chainId, tx.getHash());
         if (!depositInfos.isEmpty()) {
             for (DepositInfo cancelDeposit : depositInfos) {
-                //需要删除的数据
+                //Data that needs to be deleted
                 cancelDeposit.setNew(true);
 
                 DepositInfo depositInfo = depositService.getDepositInfoByKey(chainId, cancelDeposit.getDeleteKey());
@@ -700,7 +700,7 @@ public class RollbackService {
 
         if (resultInfo.isSuccess()) {
             processTokenTransfers(chainId, resultInfo.getTokenTransfers(), resultInfo.getToken721Transfers(), resultInfo.getToken1155Transfers(), tx);
-            // add by pierre at 2022/6/27 内部合约创建
+            // add by pierre at 2022/6/27 Internal contract creation
             processInternalCreates(chainId, resultInfo.getInternalCreates(), tx);
         }
     }
@@ -727,10 +727,10 @@ public class RollbackService {
         accountInfo.setTxCount(accountInfo.getTxCount() + 1);
         calcBalance(chainId, coinFromInfo);
         txRelationInfoSet.add(new TxRelationInfo(accountInfo.getAddress(), tx.getHash()));
-        //首先查询合约交易执行结果
+        //Firstly, query the contract transaction execution results
         ContractDeleteInfo deleteInfo = (ContractDeleteInfo) tx.getTxData();
         ContractResultInfo resultInfo = deleteInfo.getResultInfo();
-        //再查询智能合约
+        //Further search for smart contracts
         ContractInfo contractInfo = queryContractInfo(chainId, deleteInfo.getContractAddress());
         contractInfo.setTxCount(contractInfo.getTxCount() - 1);
 
@@ -876,16 +876,16 @@ public class RollbackService {
                 isBurn = true;
             }
             if (isMint) {
-                // 造币回滚
-                // 减少发行总量
+                // Coin rollback
+                // Reduce the total issuance amount
                 contractInfo.setTotalSupply(new BigInteger(contractInfo.getTotalSupply()).subtract(BigInteger.ONE).toString());
-                // from为空时，视为NRC721的造币
+                // fromWhen empty, consider asNRC721Coinage
                 tokenIdInfo = new Nrc721TokenIdInfo(tokenTransfer.getContractAddress(), null, null, tokenTransfer.getTokenId(), null, null, null);
             } else if (isBurn) {
-                // 销毁回滚
-                // 增加发行总量
+                // Destroy rollback
+                // Increase the total issuance amount
                 contractInfo.setTotalSupply(new BigInteger(contractInfo.getTotalSupply()).add(BigInteger.ONE).toString());
-                // from为空时，视为NRC721的造币
+                // fromWhen empty, consider asNRC721Coinage
                 tokenIdInfo = new Nrc721TokenIdInfo(
                         tokenTransfer.getContractAddress(),
                         contractInfo.getTokenName(),
@@ -896,7 +896,7 @@ public class RollbackService {
                         tokenTransfer.getToAddress()
                 );
             } else {
-                // 转账回滚
+                // Transfer rollback
                 tokenIdInfo = new Nrc721TokenIdInfo(tokenTransfer.getContractAddress(), null, null, tokenTransfer.getTokenId(), null, null, tokenTransfer.getFromAddress());
             }
             token721IdList.add(tokenIdInfo);
@@ -944,7 +944,7 @@ public class RollbackService {
                 tokenIdInfo.subTotalSupply(value);
             } else if (isBurn) {
                 if (tokenIdInfo == null) {
-                    // from为空时，视为NRC721的造币
+                    // fromWhen empty, consider asNRC721Coinage
                     tokenIdInfo = new Nrc1155TokenIdInfo(
                             contractAddress,
                             contractInfo.getTokenName(),
@@ -1124,15 +1124,15 @@ public class RollbackService {
             syncInfo.setStep(10);
             chainService.updateStep(syncInfo);
         }
-        //回滚chain信息
+        //RollBACKchaininformation
         chainService.rollbackChainList(chainInfoList);
-        //回滾token1155转账信息
+        //Rollbacktoken1155Transfer information
         token1155Service.rollbackTokenTransfers(chainId, token1155TransferHashList, blockInfo.getHeader().getHeight());
-        //回滾token721转账信息
+        //Rollbacktoken721Transfer information
         token721Service.rollbackTokenTransfers(chainId, token721TransferHashList, blockInfo.getHeader().getHeight());
-        //回滾token转账信息
+        //RollbacktokenTransfer information
         tokenService.rollbackTokenTransfers(chainId, tokenTransferHashList, blockInfo.getHeader().getHeight());
-        //回滾智能合約交易
+        //Rolling back smart contract transactions
         contractService.rollbackContractResults(chainId, contractTxHashList);
         contractService.rollbackContractTxInfos(chainId, contractTxHashList);
         depositService.rollbackDeposit(chainId, depositInfoList);

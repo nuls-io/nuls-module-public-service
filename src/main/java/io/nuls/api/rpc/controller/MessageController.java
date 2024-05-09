@@ -33,14 +33,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 消息中转工具（临时实现）
+ * Message forwarding tool（Temporary implementation）
  *
  * @author Niels
  */
 @Controller
 public class MessageController {
     /**
-     * 提交一个消息，供其他应用查询
+     * Submit a message for other applications to query
      *
      * @param paramsMap
      * @return
@@ -61,7 +61,7 @@ public class MessageController {
     }
 
     /**
-     * 查询一个中转消息，如果查询不到，则返回失败
+     * Query a transit message, if not found, return failure
      *
      * @param paramsMap
      * @return
@@ -80,7 +80,7 @@ public class MessageController {
     }
 
     /**
-     * 提交一个消息，供其他应用查询
+     * Submit a message for other applications to query
      *
      * @param params
      * @return
@@ -97,7 +97,7 @@ public class MessageController {
     }
 
     /**
-     * 查询一个中转消息，如果查询不到，则返回失败
+     * Query a transit message, if not found, return failure
      *
      * @param params
      * @return

@@ -10,23 +10,29 @@ import io.nuls.core.rpc.model.ModuleE;
 public class ApiConfig implements ModuleConfig {
 
     /**
-     * 编码方式
+     * Encoding method
      */
     private String encoding;
     /**
-     * 语言
+     * language
      */
     private String language;
 
     /**
-     * 数据库Url地址
+     * databaseUrladdress
      */
     private String databaseUrl;
 
     /**
-     * 数据库端口号
+     * Database port number
      */
     private int databasePort;
+
+    private String mongoUser;
+
+    private String mongoPwd;
+
+    private String dbName;
 
     private int chainId;
 
@@ -298,5 +304,29 @@ public class ApiConfig implements ModuleConfig {
 
     public void setSyncAddress(String syncAddress) {
         this.syncAddress = syncAddress;
+    }
+
+    public String getMongoUser() {
+        return mongoUser;
+    }
+
+    public void setMongoUser(String mongoUser) {
+        this.mongoUser = mongoUser;
+    }
+
+    public String getMongoPwd() {
+        return mongoPwd;
+    }
+
+    public void setMongoPwd(String mongoPwd) {
+        this.mongoPwd = mongoPwd;
+    }
+
+    public String getDbName() {
+        return dbName;
+    }
+
+    public void setDbName(String dbName) {
+        this.dbName = dbName;
     }
 }

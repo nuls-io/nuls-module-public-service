@@ -29,7 +29,7 @@ public class AssetSearchUtil {
                 set.add(info.getContract());
             });
         }
-        //搜索其他类型资产
+        //Search for other types of assets
         ApiCache apiCache = CacheManager.getCache(chainId);
 
         List<Nrc20Info> nrc20List = searchNRC20(apiCache.getNrc20InfoList(), text);

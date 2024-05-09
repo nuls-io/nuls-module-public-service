@@ -63,12 +63,12 @@ import static io.nuls.api.constant.ApiConstant.DEFAULT_SCAN_PACKAGE;
 import static io.nuls.api.constant.DBTableConstant.BLOCK_HEADER_TABLE;
 
 /**
- * public-service模块启动类
+ * public-serviceModule startup class
  * nuls's public-service startup class
  *
  * @author vivi
  * @version 1.0
- * @date 19-2-25 上午10:48
+ * @date 19-2-25 morning10:48
  */
 @Component
 public class PublicServiceBootstrap extends RpcModule {
@@ -116,10 +116,10 @@ public class PublicServiceBootstrap extends RpcModule {
     public void init() {
         try {
             super.init();
-            //初始化配置项
+            //Initialize configuration items
             initCfg();
             /**
-             * 地址工具初始化
+             * Address tool initialization
              */
             AddressTool.init(addressPrefixDatas);
 //            LoggerUtil.init(ApiContext.defaultChainId, ApiContext.logLevel);
@@ -129,8 +129,8 @@ public class PublicServiceBootstrap extends RpcModule {
     }
 
     /**
-     * 初始化模块相关配置
-     * 有关mongoDB的连接初始化见：MongoDBService.afterPropertiesSet();
+     * Initialize module related configurations
+     * RegardingmongoDBThe initialization of the connection can be found in：MongoDBService.afterPropertiesSet();
      */
     private void initCfg() {
         ApiContext.mainChainId = apiConfig.getMainChainId();
@@ -228,7 +228,7 @@ public class PublicServiceBootstrap extends RpcModule {
 
     /**
      * Initialize the database connection
-     * 初始化数据库连接
+     * Initialize database connection
      */
     private void initDB() {
 //        LoggerUtil.commonLog.info("init db......");
@@ -263,23 +263,23 @@ public class PublicServiceBootstrap extends RpcModule {
     }
 
     /**
-     * 缓存浏览器首页数据
-     * 提升查询效率
+     * Caching browser homepage data
+     * Improve query efficiency
      */
     private void initCache() {
 //        LoggerUtil.commonLog.info("init cache......");
-        //缓存首页区块列表
+        //Cache homepage block list
         MongoDBService mongoDBService = SpringLiteContext.getBean(MongoDBService.class);
         cacheBlockHeaderList(mongoDBService);
-        //缓存所有共识节点
+        //Cache all consensus nodes
         MongoAgentServiceImpl agentService = SpringLiteContext.getBean(MongoAgentServiceImpl.class);
         PageInfo<AgentInfo> agentPageInfo = agentService.getAgentList(apiConfig.getChainId(), 0, 1, 200);
         ApiContext.agentPageInfo = agentPageInfo;
 
-        //缓存首页轮次信息
+        //Cache homepage round information
         cacheRoundList(mongoDBService);
 
-        //缓存nuls首页持币排名信息
+        //cachenulsHomepage coin holding ranking information
         MongoAccountLedgerServiceImpl accountLedgerService = SpringLiteContext.getBean(MongoAccountLedgerServiceImpl.class);
         PageInfo<MiniAccountInfo> miniAccountPageInfo = accountLedgerService.getAssetRanking(apiConfig.getChainId(), apiConfig.getChainId(), apiConfig.getAssetId(), 1, 15);
         ApiContext.miniAccountPageInfo = miniAccountPageInfo;

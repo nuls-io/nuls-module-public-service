@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * @Author: zhoulijun
  * @Time: 2020-03-08 19:56
- * @Description: 功能描述
+ * @Description: Function Description
  */
 public interface PriceProvider {
 

@@ -182,7 +182,7 @@ public class MongoToken1155ServiceImpl implements Token1155Service {
             Document currentDocument = mongoDBService.findOne(TOKEN1155_IDS_TABLE + chainId, tokenKeyBson);
             if (currentDocument != null) {
                 if (new BigInteger(tokenIdInfo.getTotalSupply()).compareTo(BigInteger.ZERO) == 0) {
-                    // 销毁
+                    // Destruction
                     modelList.add(new DeleteOneModel<>(tokenKeyBson));
                 } else {
                     modelList.add(new ReplaceOneModel<>(tokenKeyBson, document));

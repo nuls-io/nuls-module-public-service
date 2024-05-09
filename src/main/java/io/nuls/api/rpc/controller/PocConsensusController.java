@@ -829,14 +829,14 @@ public class PocConsensusController {
         if (roundIndex == 1) {
             return getFirstRound(chainId);
         }
-        //查看所查询的round是否在缓存里
+        //View the queriedroundIs it in the cache
         for (CurrentRound round : ApiContext.roundList) {
             if (round.getIndex() == roundIndex) {
                 return new RpcResult().setResult(round);
             }
         }
 
-        //查询数据库
+        //query data base
         CurrentRound round = new CurrentRound();
         PocRound pocRound = roundService.getRound(chainId, roundIndex);
         if (pocRound == null) {

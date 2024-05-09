@@ -10,8 +10,8 @@ import io.nuls.core.model.StringUtils;
 public class ChainAssetInfoVo {
     private String id;//9-1
 
-    private String totalSupply;//总量
-    private String nulsChainSupply;//总量
+    private String totalSupply;//total
+    private String nulsChainSupply;//total
     private String name, symbol;
     private int decimals;
     private int addresses;

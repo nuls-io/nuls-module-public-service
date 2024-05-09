@@ -6,32 +6,32 @@ public class AssetsSystemTokenInfoVo {
     private boolean nerveCross;
     private String crossChainNames;
     /**
-     * 名称
+     * name
      */
     private String name;
 
     /**
-     * 资产简称
+     * Asset abbreviation
      */
     private String symbol;
 
     /**
-     * 资产小数位数
+     * Decimal places of assets
      */
     private Long decimals;
 
     /**
-     * 资产链ID
+     * Asset ChainID
      */
     private Long assetChainId;
 
     /**
-     * 资产ID
+     * assetID
      */
     private Long assetId;
 
     /**
-     * 合约地址
+     * Contract address
      */
     private String contractAddress;
 

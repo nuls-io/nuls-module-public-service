@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * @Author: zhoulijun
  * @Time: 2020-03-08 20:17
- * @Description: 功能描述
+ * @Description: Function Description
  */
 public class BinancePriceProvider extends BasePriceProvider {
 
@@ -26,14 +26,14 @@ public class BinancePriceProvider extends BasePriceProvider {
             String url = this.url + "/api/v3/ticker/price?symbol=" + symbol + "USDT";
             Map<String, Object> data = httpRequest(url);
             if (null == data) {
-                LoggerUtil.commonLog.info("未能从币安获取到价格：" + url);
+                LoggerUtil.commonLog.info("Unable to obtain price from Binance：" + url);
                 return BigDecimal.ZERO;
             }
             BigDecimal res = new BigDecimal((String) data.get("price"));
-            LoggerUtil.commonLog.debug("获取到当前{}兑USDT的价格:{}", symbol, res);
+            LoggerUtil.commonLog.debug("Get the current{}ExchangeUSDTThe price of:{}", symbol, res);
             return res;
         } catch (Exception e) {
-            LoggerUtil.commonLog.error("调用{}接口获取{}价格失败", this.url, symbol, e);
+            LoggerUtil.commonLog.error("call{}Interface acquisition{}Price failure", this.url, symbol, e);
             return BigDecimal.ZERO;
         }
     }

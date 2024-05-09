@@ -46,7 +46,7 @@ public class AccountInfo {
 
     private List<String> token1155s;
 
-    //是否是根据最新区块的交易新创建的账户，只为业务使用，不存储该字段
+    //Is it a newly created account based on the latest block transaction, only for business use, without storing this field
     @JsonIgnore
     private boolean isNew;
     private String tag;

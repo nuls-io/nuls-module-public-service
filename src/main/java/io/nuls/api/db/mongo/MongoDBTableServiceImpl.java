@@ -124,44 +124,44 @@ public class MongoDBTableServiceImpl implements DBTableService {
     }
 
     private void initTablesIndex(int chainId) {
-        //交易关系表
+        //Transaction Relationship Table
         for (int i = 0; i < TX_RELATION_SHARDING_COUNT; i++) {
             mongoDBService.createIndex(DBTableConstant.TX_RELATION_TABLE + chainId + "_" + i, Indexes.ascending("address"));
             mongoDBService.createIndex(DBTableConstant.TX_RELATION_TABLE + chainId + "_" + i, Indexes.ascending("address", "type"));
             mongoDBService.createIndex(DBTableConstant.TX_RELATION_TABLE + chainId + "_" + i, Indexes.ascending("txHash"));
             mongoDBService.createIndex(DBTableConstant.TX_RELATION_TABLE + chainId + "_" + i, Indexes.descending("createTime"));
         }
-        //账户信息表
+        //Account Information Table
         mongoDBService.createIndex(DBTableConstant.ACCOUNT_TABLE + chainId, Indexes.descending("totalBalance"));
         mongoDBService.createIndex(DBTableConstant.ACCOUNT_LEDGER_TABLE + chainId, Indexes.descending("address"));
-        //交易表
+        //Transaction table
         mongoDBService.createIndex(DBTableConstant.TX_TABLE + chainId, Indexes.descending("height"));
-        //block 表
+        //block surface
         mongoDBService.createIndex(DBTableConstant.BLOCK_HEADER_TABLE + chainId, Indexes.ascending("hash"));
-        //委托记录表
+        //Entrustment Record Form
         mongoDBService.createIndex(DBTableConstant.DEPOSIT_TABLE + chainId, Indexes.descending("createTime"));
-        //智能合约表
+        //Smart Contract Table
         mongoDBService.createIndex(DBTableConstant.CONTRACT_TABLE + chainId, Indexes.descending("createTime"));
-        //账户token表
+        //accounttokensurface
         mongoDBService.createIndex(DBTableConstant.ACCOUNT_TOKEN_TABLE + chainId, Indexes.descending("balance"));
         mongoDBService.createIndex(DBTableConstant.ACCOUNT_TOKEN_TABLE + chainId, Indexes.ascending("address"));
         mongoDBService.createIndex(DBTableConstant.ACCOUNT_TOKEN_TABLE + chainId, Indexes.ascending("contractAddress"));
-        //token交易记录表
+        //tokenTransaction record table
         mongoDBService.createIndex(DBTableConstant.TOKEN_TRANSFER_TABLE + chainId, Indexes.descending("time"));
         mongoDBService.createIndex(DBTableConstant.TOKEN_TRANSFER_TABLE + chainId, Indexes.descending("contractAddress", "fromAddress"));
         mongoDBService.createIndex(DBTableConstant.TOKEN_TRANSFER_TABLE + chainId, Indexes.descending("contractAddress", "toAddress"));
-        // 账户token721表
+        // accounttoken721surface
         mongoDBService.createIndex(DBTableConstant.ACCOUNT_TOKEN721_TABLE + chainId, Indexes.descending("tokenCount"));
         mongoDBService.createIndex(DBTableConstant.ACCOUNT_TOKEN721_TABLE + chainId, Indexes.ascending("address"));
         mongoDBService.createIndex(DBTableConstant.ACCOUNT_TOKEN721_TABLE + chainId, Indexes.ascending("contractAddress"));
-        // token721交易记录表
+        // token721Transaction record table
         mongoDBService.createIndex(DBTableConstant.TOKEN721_TRANSFER_TABLE + chainId, Indexes.descending("time"));
         mongoDBService.createIndex(DBTableConstant.TOKEN721_TRANSFER_TABLE + chainId, Indexes.descending("contractAddress", "fromAddress"));
         mongoDBService.createIndex(DBTableConstant.TOKEN721_TRANSFER_TABLE + chainId, Indexes.descending("contractAddress", "toAddress"));
-        // token721造币信息表
+        // token721Mint Information Table
         mongoDBService.createIndex(DBTableConstant.TOKEN721_IDS_TABLE + chainId, Indexes.descending("time"));
         mongoDBService.createIndex(DBTableConstant.TOKEN721_IDS_TABLE + chainId, Indexes.ascending("contractAddress"));
-        //跨链交易表索引
+        //Cross chain transaction table index
         mongoDBService.createIndex(DBTableConstant.CROSS_TX_RELATION_TABLE + chainId, Indexes.ascending("address"));
 
         mongoDBService.createIndex(DBTableConstant.CONTRACT_TX_TABLE + chainId, Indexes.ascending("contractAddress"));
