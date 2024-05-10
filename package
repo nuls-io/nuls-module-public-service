@@ -57,7 +57,7 @@ if [ -z `echo "${sedCommand}" | grep -o "%JAVA_OPTS%"` ]; then
 	sedCommand="${sedCommand}  -e 's/%JAVA_OPTS%//g' "
 fi
 if [ -z `echo "${sedCommand}" | grep -o "%JOPT_XMX%"` ]; then
-	sedCommand="${sedCommand}  -e 's/%JOPT_XMX%/256/g' "
+	sedCommand="${sedCommand}  -e 's/%JOPT_XMX%/512/g' "
 fi
 if [ -z `echo "${sedCommand}" | grep -o "%JOPT_METASPACESIZE%"` ]; then
 	sedCommand="${sedCommand}  -e 's/%JOPT_METASPACESIZE%/128/g' "
