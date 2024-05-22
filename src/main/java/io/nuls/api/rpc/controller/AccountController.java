@@ -123,7 +123,7 @@ public class AccountController {
 
     @RpcMethod("getAccountTxs")
     public RpcResult getAccountTxs(List<Object> params) {
-        VerifyUtils.verifyParams(params, 7);
+//        VerifyUtils.verifyParams(params, 7);
         int chainId, assetChainId, assetId, pageNumber, pageSize, type;
         String address;
         long startHeight, endHeight;
