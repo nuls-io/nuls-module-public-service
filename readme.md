@@ -1,4 +1,4 @@
-# Module Description
+# NULS2.0 Public Service Module
 
 This is NULS2.0 provides external data query function RPC Interface. 
 
@@ -32,7 +32,7 @@ connectTimeOut=30000
 ## Contribute to This Module
 Click Star and Fork to start contributing improvements to this module.
 Hope more contributors can submit improvement suggestions and bug reports here.
-Issues: https://github.com/nuls-io/nuls-v2/issues
+Issues: https://github.com/nuls-io/nuls-module-public-service/issues
 
 
 
@@ -54,6 +54,7 @@ You are welcome to contribute to NULS! We sincerely invite developers with rich 
 https://nuls.io/community
 
 Documentation：https://docs.nuls.io
+
 NULS Brand Assets: https://nuls.io/brand-assets
 
 
@@ -68,7 +69,7 @@ Modules added in the future may be release under different license, will specifi
 - Website: https://nuls.io
 - Twitter: https://twitter.com/nuls
 - Discord:https://discord.gg/aRCwbj47WN
-- Telegram: https://t.me/Nulsio)
+- Telegram: https://t.me/Nulsio
 - Medium: https://nuls.medium.com
 - Forum: https://forum.nuls.io
 - GitHub: https://github.com/nuls-io
