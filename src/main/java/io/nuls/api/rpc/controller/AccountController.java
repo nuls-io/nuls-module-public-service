@@ -205,7 +205,7 @@ public class AccountController {
     }
 
     /**
-     * Query account regular transfer and cross chain transfer transactions
+     * 查询账户普通转账和跨链转账交易
      *
      * @param params
      * @return
@@ -416,7 +416,7 @@ public class AccountController {
             BlockHoleAddress = AddressTool.getAddressString(HexUtil.decode("000000000000000000000000000000000000000000000000000000000000000000"), chainId);
         }
         if (address.equals(BlockHoleAddress)) {
-            //Special handling of black hole addresses
+            //黑洞地址特殊处理
             accountInfo.setAlias("BlockHoleAddress");
             accountInfo.setBalance(BigInteger.ZERO);
             accountInfo.setTotalBalance(BigInteger.ZERO);

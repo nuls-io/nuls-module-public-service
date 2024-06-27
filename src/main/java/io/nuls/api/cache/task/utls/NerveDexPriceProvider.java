@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * @Author: zhoulijun
  * @Time: 2020/8/10 17:49
- * @Description: Function Description
+ * @Description: 功能描述
  */
 @Component
 public class NerveDexPriceProvider extends BasePriceProvider {
@@ -35,7 +35,7 @@ public class NerveDexPriceProvider extends BasePriceProvider {
             }
             return new BigDecimal(res);
         } catch (Throwable e) {
-            LoggerUtil.commonLog.error("call{}Interface acquisition{}Price failure", url, symbol, e);
+            LoggerUtil.commonLog.error("调用{}接口获取{}价格失败", url, symbol, e);
             return BigDecimal.ZERO;
         }
 

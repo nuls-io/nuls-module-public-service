@@ -236,7 +236,7 @@ public class MongoChainAssetService implements ChainAssetService {
             Document document = mongoDBService.findOne(CHAIN_ASSET_TABLE, Filters.eq("_id", assetKey));
             boolean insert = false;
             if (null == document) {
-                //If it does not exist, then
+                //如果不存在，则
                 AssetInfo info = getAssetRegInfo(chainId, assetKey);
                 if (null == info) {
                     System.out.println();
@@ -318,7 +318,7 @@ public class MongoChainAssetService implements ChainAssetService {
             assetInfo.setNulsChainSupply(nulsChainSupply.toString());
             long nowTime = System.currentTimeMillis();
             if (changeDay(assetInfo.getAddressesTime(), nowTime)) {
-                //If it is not the same day as last time, record the last quantity as yesterday's quantity
+                //如果和上次不是同一天，则记录上次的数量为昨天数量
                 assetInfo.setAddressesYesterday(assetInfo.getAddresses());
             }
             assetInfo.setAddresses(docList.size());

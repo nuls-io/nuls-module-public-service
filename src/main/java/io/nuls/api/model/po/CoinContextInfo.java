@@ -25,11 +25,11 @@ public class CoinContextInfo {
 
     private long txCount;
 
-//    Current average block reward
+//    当前平均区块奖励
     private long blockRewardBeforeDeflation;
-    //Average block reward after production reduction
+    //减产后平均区块奖励
     private long blockRewardAfterDeflation;
-//    next deflation timeNext inspection time
+//    next deflation time下次检查时间
     private long nextDeflationTime;
 
     private List<DestroyInfo> destroyInfoList;

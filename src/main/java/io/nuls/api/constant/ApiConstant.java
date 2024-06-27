@@ -23,22 +23,22 @@ package io.nuls.api.constant;
 import java.math.BigInteger;
 
 /**
- * constant
+ * 常量
  *
  * @author captain
  * @version 1.0
- * @date 19-1-22 afternoon3:34
+ * @date 19-1-22 下午3:34
  */
 public interface ApiConstant {
 
 
     /**
-     * Module configuration file name
+     * 模块配置文件名称
      * Module configuration file name.
      */
     String MODULES_CONFIG_FILE = "module.json";
     /**
-     * chainID
+     * 链ID
      */
     String CHAIN_ID = "chainId";
 
@@ -49,72 +49,72 @@ public interface ApiConstant {
     String DB_MODULE_CONFIG = "api-config";
 
     /**
-     * Default scan package path
+     * 默认扫描包路径
      */
     String DEFAULT_SCAN_PACKAGE = "io.nuls";
 
     /**
-     * log level
+     * 日志级别
      */
     String LOG_LEVEL = "logLevel";
 
-    //Yellow card punishment
+    //黄牌惩罚
     int PUBLISH_YELLOW = 1;
-    //Red card punishment
+    //红牌惩罚
     int PUBLISH_RED = 2;
 
-    //Attempting to fork
+    //尝试分叉
     int TRY_FORK = 1;
-    //Package Double Flower Trading
+    //打包双花交易
     int DOUBLE_SPEND = 2;
-    //Too many yellow card punishments
+    //太多黄牌惩罚
     int TOO_MUCH_YELLOW_PUNISH = 3;
 
-    //Commission consensus
+    //委托共识
     int JOIN_CONSENSUS = 0;
-    //Cancel delegation consensus
+    //取消委托共识
     int CANCEL_CONSENSUS = 1;
-    //Delete consensus node
+    //删除共识节点
     int STOP_AGENT = 2;
 
-    //Successfully created contract
+    //创建合约成功
     int CONTRACT_STATUS_NORMAL = 0;
-    //Contract creation failed
+    //创建合约失败
     int CONTRACT_STATUS_FAIL = -1;
 
-    //Contract code under review
+    //合约代码正在审核中
     int CONTRACT_STATUS_APPROVING = 1;
-    //Contract code review passed
+    //合约代码审核通过
     int CONTRACT_STATUS_PASSED = 2;
-    //The contract has expired
+    //合约已失效
     int CONTRACT_STATUS_DELETE = 3;
 
-    //Time height boundary
+    //时间高度分界线
     long BlOCK_HEIGHT_TIME_DIVIDE = 1000000000000L;
-    //Highly frozen type
+    //高度冻结类型
     int FREEZE_HEIGHT_LOCK_TYPE = 1;
-    //Time freeze type
+    //时间冻结类型
     int FREEZE_TIME_LOCK_TYPE = 2;
-    //Consensus lock freeze type
+    //共识锁定冻结类型
     int FREEZE_CONSENSUS_LOCK_TYPE = 3;
 
-    //There is no error code in the contract
+    //合约不存在错误码
     int CONTRACT_NOT_EXIST = 100002;
-    //Asset transfer out type
+    //资产转出类型
     int TRANSFER_FROM_TYPE = -1;
-    //Asset transfer type
+    //资产转入类型
     int TRANSFER_TO_TYPE = 1;
 
-    //Unconfirmed transaction
+    //未确认交易
     int TX_UNCONFIRM = 0;
-    //Confirmed transaction
+    //已确认交易
     int TX_CONFIRM = 1;
 
     int ENABLE = 1;
 
     int DISABLE = 0;
 
-    //Set alias amount
+    //设置别名金额
     BigInteger ALIAS_AMOUNT = BigInteger.valueOf(100000000L);
 
     long CROSS_CHAIN_GASLIMIT = 300000;

@@ -128,33 +128,33 @@ public class TransactionInfo {
         if (type == TxType.COIN_BASE || type == TxType.YELLOW_PUNISH || type == TxType.RED_PUNISH ||
                 type == TxType.CONTRACT_RETURN_GAS || type == TxType.CONTRACT_STOP_AGENT || type == TxType.CONTRACT_CANCEL_DEPOSIT ||
                 type == TxType.CONTRACT_CREATE_AGENT || type == TxType.CONTRACT_DEPOSIT) {
-            //There is no transaction fee for system transactions
+            //系统交易没有手续费
             feeInfo = new FeeInfo(assetInfo.getChainId(), assetInfo.getAssetId(), assetInfo.getSymbol());
 //        } else if (type == TxType.CROSS_CHAIN) {
-//            //Retrieve the transfer chain and receive chainid
+//            //取出转出链和接收链的id
 //            int fromChainId = AddressTool.getChainIdByAddress(coinFroms.get(0).getAddress());
 //            int toChainId = AddressTool.getChainIdByAddress(coinTos.get(0).getAddress());
 //
-//            //If the current chain isNULSMain chain, transaction fees are collected from the main assets of the main networkNULS
+//            //如果当前链是NULS主链，手续费是收取主网主资产NULS
 //            if (chainId == ApiContext.mainChainId) {
 //                feeInfo = new FeeInfo(ApiContext.mainChainId, ApiContext.mainAssetId, ApiContext.mainSymbol);
 //                if (toChainId == ApiContext.mainChainId) {
-//                    //If the receiving address is the main chain,Then chargeNULSof100%As a handling fee
+//                    //如果接收地址是主链,则收取NULS的100%作为手续费
 //                    BigInteger feeValue = calcFeeValue(ApiContext.mainChainId, ApiContext.mainAssetId);
 //                    feeInfo.setValue(feeValue);
 //                } else {
-//                    //Other situations, main chain chargesNULSof60%As a handling fee
+//                    //其他情况，主链收取NULS的60%作为手续费
 //                    BigInteger feeValue = calcFeeValue(ApiContext.mainChainId, ApiContext.mainAssetId);
 //                    feeValue = feeValue.multiply(new BigInteger("60")).divide(new BigInteger("100"));
 //                    feeInfo.setValue(feeValue);
 //                }
-//            } else {                        //If the current chain is notNULSMain chain
-//                //If the asset is initiated from this chain, the default asset of this chain will be charged as a handling fee
+//            } else {                        //如果当前链不是NULS主链
+//                //如果资产是从本链发起的，则收取本链的默认资产作为手续费
 //                if (fromChainId == chainId) {
 //                    feeInfo = new FeeInfo(assetInfo.getChainId(), assetInfo.getAssetId(), assetInfo.getSymbol());
 //                    feeInfo.setValue(calcFeeValue(assetInfo.getChainId(), assetInfo.getAssetId()));
 //                } else {
-//                    //If this chain is the target chain for receiving transfer transactions, the main network will be chargedNULSAssets40%As a handling fee
+//                    //如果本链是接收转账交易的目标链，则收取主网NULS资产的40%作为手续费
 //                    feeInfo = new FeeInfo(ApiContext.mainChainId, ApiContext.mainAssetId, ApiContext.mainSymbol);
 //                    BigInteger feeValue = calcFeeValue(ApiContext.mainChainId, ApiContext.mainAssetId);
 //                    feeValue = feeValue.multiply(new BigInteger("40")).divide(new BigInteger("100"));
@@ -162,7 +162,7 @@ public class TransactionInfo {
 //                }
 //            }
         } else if (type == TxType.REGISTER_AGENT || type == TxType.DEPOSIT || type == TxType.CANCEL_DEPOSIT || type == TxType.STOP_AGENT) {
-            //If it is a consensus related transaction, a handling fee for consensus configuration will be charged
+            //如果是共识相关的交易，收取共识配置的手续费
             assetInfo = CacheManager.getRegisteredAsset(DBUtil.getAssetKey(configInfo.getChainId(), configInfo.getAwardAssetId()));
             feeInfo = new FeeInfo(assetInfo.getChainId(), assetInfo.getAssetId(), assetInfo.getSymbol());
             BigInteger feeValue = calcFeeValue(assetInfo.getChainId(), assetInfo.getAssetId());
@@ -182,7 +182,7 @@ public class TransactionInfo {
                 feeInfo.setValue(feeValue);
             }
         } else {
-            //Other types of transactions,Default asset handling fee for removing this chain
+            //其他类型的交易,去本链默认资产手续费
             feeInfo = new FeeInfo(assetInfo.getChainId(), assetInfo.getAssetId(), assetInfo.getSymbol());
             feeInfo.setValue(calcFeeValue(assetInfo.getChainId(), assetInfo.getAssetId()));
         }

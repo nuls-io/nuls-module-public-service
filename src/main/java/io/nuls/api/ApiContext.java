@@ -102,19 +102,19 @@ public class ApiContext {
     public static boolean syncCoinBase;
 
     public static List<String> syncAddress = new ArrayList<>();
-    //Developer node address
+    //开发者节点地址
     public static Set<String> DEVELOPER_NODE_ADDRESS = new HashSet<>();
-    //Ambassador Node Address
+    //大使节点地址
     public static Set<String> AMBASSADOR_NODE_ADDRESS = new HashSet<>();
-    //Mapping address
+    //映射地址
     public static Set<String> MAPPING_ADDRESS = new HashSet<>();
-    //Business address
+    //商务地址
     public static Set<String> BUSINESS_ADDRESS = new HashSet<>();
-    //Team address
+    //团队地址
     public static String TEAM_ADDRESS = "";
-    //Community address
+    //社区地址
     public static Set<String> COMMUNITY_ADDRESS = new HashSet<>();
-    //Destroy address public key
+    //销毁地址公钥
     public static byte[] blackHolePublicKey;
 
     public static List<MiniBlockHeaderInfo> blockList;

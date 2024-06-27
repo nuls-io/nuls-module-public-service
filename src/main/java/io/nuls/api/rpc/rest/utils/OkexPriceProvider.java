@@ -48,14 +48,14 @@ public class OkexPriceProvider extends BasePriceProvider {
         try {
             Map<String, Object> data = httpRequest(whole);
             if (null == data) {
-                LoggerUtil.commonLog.warn("Failed to retrieve fromokexget data");
+                LoggerUtil.commonLog.warn("未能从okex获取数据");
                 return BigDecimal.ZERO;
             }
             BigDecimal res = new BigDecimal((String) data.get("last"));
-            LoggerUtil.commonLog.info("Okex Obtaining transaction pairs[{}]price:{}", symbol.toUpperCase(), res);
+            LoggerUtil.commonLog.info("Okex 获取到交易对[{}]价格:{}", symbol.toUpperCase(), res);
             return res;
         } catch (Throwable e) {
-            LoggerUtil.commonLog.error("Okex, Calling interfaces {}, symbol:{} Failed to obtain price", whole, symbol);
+            LoggerUtil.commonLog.error("Okex, 调用接口 {}, symbol:{} 获取价格失败", whole, symbol);
             return null;
         }
     }

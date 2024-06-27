@@ -24,30 +24,30 @@ package io.nuls.api.model.rpc;
  * @author Niels
  */
 public enum RpcErrorCode {
-    // Wrong parameters
+    // 参数不对
     PARAMS_ERROR("1000", "Parameters is wrong!"),
 
-    // Contract not verified
+    // 合约未验证
     CONTRACT_NOT_VALIDATION_ERROR("100", "Contract code not certified!"),
 
-    // Contract verified
+    // 合约已验证
     CONTRACT_VALIDATION_ERROR("101", "The contract code has been certified!"),
 
-    // Contract verification failed
+    // 合约验证失败
     CONTRACT_VALIDATION_FAILED("102", "Contract verification failed."),
 
-    //Data not found
+    //数据未找到
     DATA_NOT_EXISTS("404", "Data not found!"),
 
-    //Transaction parsing error
+    //交易解析错误
     TX_PARSE_ERROR("999", "Transaction parse error!"),
 
-    //Script execution error
+    //脚本执行错误
     TX_SHELL_ERROR("755", "Shell execute error!"),
 
-    //Unknown system error
+    //系统未知错误
     CHAIN_NOT_READY("10001", "chain not ready!"),
-    //Unknown system error
+    //系统未知错误
     SYS_UNKNOWN_EXCEPTION("10002", "System unknown error!");
 
     private String code;

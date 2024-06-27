@@ -27,20 +27,20 @@ public class AddressType {
 
 
     /**
-     * Multi signature address
+     * 多重签名地址
      * contract address type
      */
     public static byte P2SH_ADDRESS_TYPE = 3;
 
     /**
-     * The default address type, a chain can contain several address types, which are included in the address
+     * 默认的地址类型，一条链可以包含几种地址类型，地址类型包含在地址中
      * The default address type, a chain can contain several address types, and the address type is contained in the address.
      */
     public static byte DEFAULT_ADDRESS_TYPE = 1;
 
 
     /**
-     * Smart contract address type
+     * 智能合约地址类型
      * contract address type
      */
     public static byte CONTRACT_ADDRESS_TYPE = 2;
