@@ -158,6 +158,8 @@ public class MongoDBService implements InitializingBean {
                     .connectTimeout(ApiContext.connectTimeOut)
                     .build();
             ServerAddress serverAddress = new ServerAddress(ApiContext.databaseUrl, ApiContext.databasePort);
+            LoggerUtil.commonLog.info("------start connect mongodb :"  + serverAddress);
+
             MongoClient mongoClient = new MongoClient(serverAddress, options);
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DATABASE_NAME);
 

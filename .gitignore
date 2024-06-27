@@ -130,3 +130,4 @@ dev.md
 .package-version
 module/nuls-ledger/.temp
 outer
+*.w
