@@ -39,7 +39,7 @@ public class AnalysisHandler {
 
     /**
      * Convert block information to blockInfo information
-     * takeblockInformation conversion toblockInfoinformation
+     * 将block信息转换为blockInfo信息
      *
      * @param blockHex
      * @param chainId
@@ -55,7 +55,7 @@ public class AnalysisHandler {
         BlockHeaderInfo blockHeader = toBlockHeaderInfo(block.getHeader(), chainId);
         blockHeader.setSize(bytes.length);
         blockHeader.setTxHashList(new ArrayList<>());
-        //Extracting transactions related to smart contractshash, query contract execution results
+        //提取智能合约相关交易的hash，查询合约执行结果
         //Extract the hash of smart contract related transactions and query the contract execution results
         List<String> contactHashList = new ArrayList<>();
         if (ApiContext.isRunSmartContract) {
@@ -86,7 +86,7 @@ public class AnalysisHandler {
                 resultInfoMap = result.getData();
             }
         }
-        //A successfully executed smart contract may generate internal transactions within the system, and the serialized information of internal transactions is stored in the execution results,Reverse the sequence of internal transactions and parse them together
+        //执行成功的智能合约可能会产生系统内部交易，内部交易的序列化信息存放在执行结果中,将内部交易反序列后，一起解析
         //A successful intelligent contract execution may result in system internal trading.
         // The serialized information of internal trading is stored in the execution result, and the internal trading is reversed and parsed together
 //        LoggerUtil.commonLog.warn("-=-=-=-{}",JSONUtils.obj2json(resultInfoMap));
@@ -104,11 +104,11 @@ public class AnalysisHandler {
             }
         }
         blockInfo.setTxList(toTxs(chainId, block.getTxs(), blockHeader, resultInfoMap));
-        //calculatecoinBasereward
+        //计算coinBase奖励
         blockHeader.setReward(calcCoinBaseReward(chainId, blockInfo.getTxList().get(0)));
-        //Calculate total handling fee
+        //计算总手续费
         blockHeader.setTotalFee(calcFee(blockInfo.getTxList(), chainId));
-        //Recalculate the number of transactions packaged in blocks
+        //重新计算区块打包的交易个数
         blockHeader.setTxCount(blockInfo.getTxList().size());
         blockInfo.setHeader(blockHeader);
         return blockInfo;
@@ -124,7 +124,7 @@ public class AnalysisHandler {
         blockHeader.setSize(bytes.length);
         blockHeader.setTxHashList(new ArrayList<>());
 
-        //A successfully executed smart contract may generate internal transactions within the system, and the serialized information of internal transactions is stored in the execution results,Reverse the sequence of internal transactions and parse them together
+        //执行成功的智能合约可能会产生系统内部交易，内部交易的序列化信息存放在执行结果中,将内部交易反序列后，一起解析
         //A successful intelligent contract execution may result in system internal trading.
         // The serialized information of internal trading is stored in the execution result, and the internal trading is reversed and parsed together
         if (resultInfoMap != null) {
@@ -140,11 +140,11 @@ public class AnalysisHandler {
             }
         }
         blockInfo.setTxList(toTxs(chainId, block.getTxs(), blockHeader, resultInfoMap));
-        //calculatecoinBasereward
+        //计算coinBase奖励
         blockHeader.setReward(calcCoinBaseReward(chainId, blockInfo.getTxList().get(0)));
-        //Calculate total handling fee
+        //计算总手续费
         blockHeader.setTotalFee(calcFee(blockInfo.getTxList(), chainId));
-        //Recalculate the number of transactions packaged in blocks
+        //重新计算区块打包的交易个数
         blockHeader.setTxCount(blockInfo.getTxList().size());
         blockInfo.setHeader(blockHeader);
         return blockInfo;
@@ -168,7 +168,7 @@ public class AnalysisHandler {
         info.setAgentVersion(extendsData.getBlockVersion());
         info.setMainVersion(extendsData.getMainVersion());
         info.setRoundStartTime(extendsData.getRoundStartTime());
-        //Is it a block packaged by a seed node
+        //是否是种子节点打包的区块
         ApiCache apiCache = CacheManager.getCache(chainId);
         if (apiCache.getChainInfo().getSeeds().contains(info.getPackingAddress()) || info.getHeight() == 0) {
             info.setSeedPacked(true);
@@ -262,7 +262,7 @@ public class AnalysisHandler {
             resultInfo = resultInfoMap.get(info.getHash());
         }
         if (resultInfo == null && tx.getType() == 16) {
-            throw new Exception("-----No smart contract execution results found during contract execution transactionhash: " + tx.getHash());
+            throw new Exception("-----执行合约未查询到智能合约执行结果 交易hash: " + tx.getHash());
         }
         if (resultInfo == null) {
             if (info.getType() == TxType.YELLOW_PUNISH) {
@@ -342,7 +342,7 @@ public class AnalysisHandler {
         } else if (tx.getType() == TxType.CALL_CONTRACT) {
             return toContractCallInfo(chainId, tx);
         } else if (tx.getType() == TxType.CROSS_CHAIN) {
-            // add by pierre at 2019-12-23 Special cross chain transfer transactions, transferring from parallel chains to the main networkNRC20asset
+            // add by pierre at 2019-12-23 特殊跨链转账交易，从平行链跨链转回主网的NRC20资产
             return toContractCallInfoForCrossChain(chainId, tx);
             // end code by pierre
         } else if (tx.getType() == TxType.DELETE_CONTRACT) {
@@ -578,7 +578,7 @@ public class AnalysisHandler {
             throw new NulsException(CommonCodeConstanst.DATA_PARSE_ERROR);
         }
 
-        //Before querying the details of the smart contract, first check whether the execution result of creating the smart contract was successful
+        //查询智能合约详情之前，先查询创建智能合约的执行结果是否成功
         if (tx.getStatus() == TxStatusEnum.CONFIRMED) {
             Result<ContractResultInfo> result = WalletRpcHandler.getContractResultInfo(chainId, callInfo.getCreateTxHash());
             callInfo.setResultInfo(result.getData());
@@ -598,7 +598,7 @@ public class AnalysisHandler {
 
     public static ContractCallInfo toContractCallInfoForCrossChain(int chainId, Transaction tx) throws NulsException {
         ContractResultInfo contractResultInfo = null;
-        //Before querying the details of the smart contract, first check whether the execution result of creating the smart contract was successful
+        //查询智能合约详情之前，先查询创建智能合约的执行结果是否成功
         if (tx.getStatus() == TxStatusEnum.CONFIRMED) {
             try {
                 Result<ContractResultInfo> result = WalletRpcHandler.getContractResultInfo(chainId, tx.getHash().toHex());
@@ -683,7 +683,7 @@ public class AnalysisHandler {
             throw new NulsException(CommonCodeConstanst.DATA_PARSE_ERROR);
         }
         callInfo.setResultInfo(resultInfo);
-        // add by pierre at 2022/6/27 Analyze internal contract creation
+        // add by pierre at 2022/6/27 解析内部创建合约
         List<ContractInternalCreateInfo> internalCreates = resultInfo.getInternalCreates();
         if (!internalCreates.isEmpty()) {
             Map<String, ContractInfo> contractInfoMap = new HashMap<>();
@@ -740,7 +740,7 @@ public class AnalysisHandler {
         if (directPayableByOtherAsset != null) {
             contractInfo.setDirectPayableByOtherAsset(directPayableByOtherAsset);
         }
-        // nrc1155data
+        // nrc1155数据
         boolean isNrc1155 = contractInfo.getTokenType() == TOKEN_TYPE_NRC1155;
         if (isNrc1155) {
             contractInfo.setUri((String) map.get("tokenUri"));
@@ -1078,7 +1078,7 @@ public class AnalysisHandler {
         if (coinBaseTx.getCoinTos() == null) {
             return reward;
         }
-        //Rewards are only calculated for consensus assets in this chain
+        //奖励只计算本链的共识资产
         AssetInfo assetInfo = CacheManager.getCacheChain(chainId).getDefaultAsset();
         for (CoinToInfo coinTo : coinBaseTx.getCoinTos()) {
             if (coinTo.getChainId() == assetInfo.getChainId() || coinTo.getAssetsId() == assetInfo.getAssetId()) {
@@ -1090,7 +1090,7 @@ public class AnalysisHandler {
 
     public static BigInteger calcFee(List<TransactionInfo> txs, int chainId) {
         BigInteger fee = BigInteger.ZERO;
-        //The handling fee only calculates the consensus assets of this chain
+        //手续费只计算本链的共识资产
         AssetInfo assetInfo = CacheManager.getCacheChain(chainId).getDefaultAsset();
         for (int i = 1; i < txs.size(); i++) {
             FeeInfo feeInfo = txs.get(i).getFee();

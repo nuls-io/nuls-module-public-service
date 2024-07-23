@@ -40,7 +40,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Node information class
+ * 节点信息类
  * Node information class
  *
  * @author tag
@@ -49,84 +49,84 @@ import java.util.Set;
 public class Agent extends BaseNulsData {
 
     /**
-     * Node address
+     * 节点地址
      * agent address
      **/
     private byte[] agentAddress;
 
     /**
-     * Packaging address
+     * 打包地址
      * packing address
      **/
     private byte[] packingAddress;
 
     /**
-     * Reward Address
+     * 奖励地址
      * reward address
      */
     private byte[] rewardAddress;
 
     /**
-     * Margin
+     * 保证金
      * deposit
      */
     private BigInteger deposit;
 
     /**
-     * commission rate
+     * 佣金比例
      * commission rate
      */
     private byte commissionRate;
 
     /**
-     * Creation time
+     * 创建时间
      * create time
      **/
     private transient long time;
 
     /**
-     * Block height
+     * 所在区块高度
      * block height
      */
     private transient long blockHeight = -1L;
 
     /**
-     * The height of the block where the node is deregistered is located
+     * 该节点注销所在区块高度
      * Block height where the node logs out
      */
     private transient long delHeight = -1L;
 
     /**
-     * 0:Pending consensus unConsensus, 1:In consensus consensus
+     * 0:待共识 unConsensus, 1:共识中 consensus
      */
     private transient int status;
 
     /**
-     * Reputation value
+     * 信誉值
      * credit value
      */
     private transient double creditVal;
 
     /**
-     * Total entrusted amount
+     * 总委托金额
      * Total amount entrusted
      */
     private transient BigInteger totalDeposit = BigInteger.ZERO;
 
     /**
-     * transactionHASH
+     * 交易HASH
      * transaction hash
      */
     private transient NulsHash txHash;
 
     /**
-     * Number of participants in consensus
+     * 参与共识人数
      * Participation in consensus
      */
     private transient int memberCount;
 
     /**
-     * Aliases are not serialized
+     * 别名不序列化
      * Aliases not serialized
      */
     private transient String alais;

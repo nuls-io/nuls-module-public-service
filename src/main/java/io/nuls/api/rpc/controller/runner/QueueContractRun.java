@@ -60,15 +60,15 @@ public class QueueContractRun implements Runnable {
                 Transaction tx = new Transaction();
                 tx.parse(new NulsByteBuffer(RPCUtil.decode(txHex)));
                 TransactionInfo txInfo = AnalysisHandler.toTransaction(chainId, tx, ApiContext.protocolVersion);
-                LoggerUtil.commonLog.info("Queued Broadcast Designated Contract Transactions[{}]success", txInfo.getHash());
+                LoggerUtil.commonLog.info("排队广播指定合约交易[{}]成功", txInfo.getHash());
                 txService.saveUnConfirmTx(chainId, txInfo, txHex);
-                // dormancy10second
+                // 休眠10秒
                 TimeUnit.SECONDS.sleep(10);
                 return;
             }
-            LoggerUtil.commonLog.error("Queued broadcast specified contract transaction failed, detailed: {}", result.toString());
+            LoggerUtil.commonLog.error("排队广播指定合约交易失败, 详细: {}", result.toString());
         } catch (Exception e) {
-            LoggerUtil.commonLog.error("Queued broadcast specified contract transaction failed", e);
+            LoggerUtil.commonLog.error("排队广播指定合约交易失败", e);
         }
     }
 }

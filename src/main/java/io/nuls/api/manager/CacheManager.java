@@ -12,15 +12,15 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CacheManager {
 
     /**
-     * Cache data for each current node's running chain
+     * 缓存每条当前节点运行链的数据
      */
     private static Map<Integer, ApiCache> apiCacheMap = new ConcurrentHashMap<>();
     /**
-     * Cache all registered cross chain chain information
+     * 缓存所有已注册跨链的链信息
      */
     private static Map<Integer, ChainInfo> chainInfoMap = new ConcurrentHashMap<>();
     /**
-     * Cache all registered cross chain asset information
+     * 缓存所有已注册跨链的资产信息
      */
     private static Map<String, AssetInfo> assetInfoMap = new ConcurrentHashMap<>();
 

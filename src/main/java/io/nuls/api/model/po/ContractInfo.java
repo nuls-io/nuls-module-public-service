@@ -27,14 +27,14 @@ public class ContractInfo extends TxDataInfo {
 
     private String errorMsg;
 
-    //tokentype, 0 - wrongtoken, 1 - NRC20, 2 - NRC721, 3 - NRC1155
+    //token类型, 0 - 非token, 1 - NRC20, 2 - NRC721, 3 - NRC1155
     private int tokenType;
 
-    private boolean isNrc20;//Is it supportedNRC20protocol(0-no、1-yes)
+    private boolean isNrc20;//是否支持NRC20协议(0-否、1-是)
 
     private boolean isDirectPayable;
 
-    private int status; // -1,Execution failed,0Unauthenticated 1Under review 2Through verification 3 Removed
+    private int status; // -1,执行失败，0未认证 1正在审核 2通过验证 3 已删除
 
     private long certificationTime;
 
@@ -48,7 +48,7 @@ public class ContractInfo extends TxDataInfo {
 
     private List<ContractMethod> methods;
 
-    //The following fields are forNRC20Contract specific
+    //以下字段，为NRC20合约特有
     private String tokenName;
 
     private String symbol;

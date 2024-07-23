@@ -160,10 +160,10 @@ public class StatisticalTask implements Runnable {
     public static double getDeflationRatio(double month) {
         DateFormat dft = new SimpleDateFormat("yyyy-MM-dd");
         try {
-            Date star = dft.parse("2020-07-12");//start time
+            Date star = dft.parse("2020-07-12");//开始时间
             Long starTime = star.getTime();
             Long endTime = new Date().getTime();
-            Long num = endTime - starTime;//The number of milliseconds between timestamps
+            Long num = endTime - starTime;//时间戳相差的毫秒数
             long days = num / 24 / 60 / 60 / 1000;
             BigDecimal value = BigDecimal.valueOf(0.996).pow((int) (days/30));
             return DoubleUtils.mul(month,value);

@@ -10,21 +10,21 @@ import io.nuls.core.rpc.model.ModuleE;
 public class ApiConfig implements ModuleConfig {
 
     /**
-     * Encoding method
+     * 编码方式
      */
     private String encoding;
     /**
-     * language
+     * 语言
      */
     private String language;
 
     /**
-     * databaseUrladdress
+     * 数据库Url地址
      */
     private String databaseUrl;
 
     /**
-     * Database port number
+     * 数据库端口号
      */
     private int databasePort;
 

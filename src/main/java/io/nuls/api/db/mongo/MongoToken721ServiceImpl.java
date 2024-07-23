@@ -148,10 +148,10 @@ public class MongoToken721ServiceImpl implements Token721Service {
         for (Nrc721TokenIdInfo tokenIdInfo : tokenIdInfos) {
             String tokenKey = tokenIdInfo.getKey();
             if (tokenIdInfo.getTime() != null) {
-                // Coinmaking
+                // 造币
                 boolean notExist = insertKeys.add(tokenKey);
                 if (!notExist) {
-                    // Exists, skipping
+                    // 已存在，跳过
                     Document document = insertDocuments.get(tokenKey);
                     document.put("owner", tokenIdInfo.getOwner());
                     continue;
@@ -164,7 +164,7 @@ public class MongoToken721ServiceImpl implements Token721Service {
                     //modelList.add(new InsertOneModel(document));
                 }
             } else if (tokenIdInfo.getOwner() != null) {
-                // Transfer
+                // 转账
                 Bson query = Filters.eq("_id", tokenKey);
                 Document currentDocument = mongoDBService.findOne(TOKEN721_IDS_TABLE + chainId, query);
                 if (currentDocument != null) {
@@ -175,7 +175,7 @@ public class MongoToken721ServiceImpl implements Token721Service {
                     document.put("owner", tokenIdInfo.getOwner());
                 }
             } else {
-                // Destruction
+                // 销毁
                 modelList.add(new DeleteOneModel<>(Filters.eq("_id", tokenKey)));
             }
         }
@@ -201,10 +201,10 @@ public class MongoToken721ServiceImpl implements Token721Service {
         for (Nrc721TokenIdInfo tokenIdInfo : tokenIdInfos) {
             String tokenKey = tokenIdInfo.getKey();
             if (tokenIdInfo.getTime() != null) {
-                // Destroy rollback
+                // 销毁回滚
                 boolean notExist = insertKeys.add(tokenKey);
                 if (!notExist) {
-                    // Exists, skipping
+                    // 已存在，跳过
                     Document document = insertDocuments.get(tokenKey);
                     document.put("owner", tokenIdInfo.getOwner());
                     continue;
@@ -217,7 +217,7 @@ public class MongoToken721ServiceImpl implements Token721Service {
                     //modelList.add(new InsertOneModel(document));
                 }
             } else if (tokenIdInfo.getOwner() != null) {
-                // Transfer rollbacktokenOwner of
+                // 转账回滚token的拥有者
                 Bson query = Filters.eq("_id", tokenKey);
                 Document currentDocument = mongoDBService.findOne(TOKEN721_IDS_TABLE + chainId, query);
                 if (currentDocument != null) {
@@ -228,7 +228,7 @@ public class MongoToken721ServiceImpl implements Token721Service {
                     document.put("owner", tokenIdInfo.getOwner());
                 }
             } else {
-                // Coin rollback
+                // 造币回滚
                 modelList.add(new DeleteOneModel<>(Filters.eq("_id", tokenKey)));
             }
         }

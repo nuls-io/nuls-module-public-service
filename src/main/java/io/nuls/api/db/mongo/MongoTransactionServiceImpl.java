@@ -86,14 +86,14 @@ public class MongoTransactionServiceImpl implements TransactionService, Initiali
         }
     }
 
-    //tx_tableStore only the most recent10010000 pieces of data
+    //tx_table只存储最近100万条数据
     public void saveTxList(int chainId, List<TransactionInfo> txList) {
         if (txList.isEmpty()) {
             return;
         }
         long time1, time2;
         time1 = System.currentTimeMillis();
-//        //When the transaction record table exceeds100When there are ten thousand records, first delete the record that needs to be saved at the beginning
+//        //当交易记录表超过100万条时，首先删除要最开始保存的记录
 //        totalCount += txList.size();
 //        if (totalCount > 1000000) {
 //            int deleteCount = (int) (totalCount - 1000000);
@@ -387,7 +387,7 @@ public class MongoTransactionServiceImpl implements TransactionService, Initiali
 
 
     /**
-     * This implementation method is less efficient
+     * 这种实现方式，效率低些
      * @param chainId
      * @param txHashList
      */
@@ -413,7 +413,7 @@ public class MongoTransactionServiceImpl implements TransactionService, Initiali
 //    }
 
     /**
-     * This implementation method is more efficient
+     * 这种实现方式，效率高些
      *
      * @param chainId
      * @param txHashList
@@ -562,7 +562,7 @@ public class MongoTransactionServiceImpl implements TransactionService, Initiali
 
     private void processStopAgentTx(int chainId, TransactionInfo tx, Set<TxRelationInfo> txRelationInfoSet) {
         CoinToInfo agentOutput = null;
-        //Processing proxy node address related data
+        //处理代理节点地址相关数据
         for (CoinToInfo output : tx.getCoinTos()) {
             if (output.getLockTime() > 0) {
                 agentOutput = output;
@@ -571,7 +571,7 @@ public class MongoTransactionServiceImpl implements TransactionService, Initiali
         }
         BalanceInfo balanceInfo = WalletRpcHandler.getAccountBalance(chainId, agentOutput.getAddress(), agentOutput.getChainId(), agentOutput.getAssetsId());
         txRelationInfoSet.add(new TxRelationInfo(agentOutput, tx, tx.getFee().getValue(), balanceInfo.getTotalBalance()));
-        //Processing address related data for other commissions
+        //处理其他委托的地址相关数据
         for (int i = 0; i < tx.getCoinTos().size(); i++) {
             CoinToInfo output = tx.getCoinTos().get(i);
             if (!output.getAddress().equals(agentOutput.getAddress())) {

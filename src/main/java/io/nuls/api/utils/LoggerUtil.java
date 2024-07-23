@@ -29,12 +29,12 @@ import io.nuls.core.log.logback.LoggerBuilder;
 import io.nuls.core.log.logback.NulsLogger;
 
 /**
- * Logging tool class
+ * 日志工具类
  * Logging utility class
  *
  * @author captain
  * @version 1.0
- * @date 19-1-25 morning11:40
+ * @date 19-1-25 上午11:40
  */
 public class LoggerUtil {
 

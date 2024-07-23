@@ -27,7 +27,7 @@ package io.nuls.api.constant.config;
 import java.io.Serializable;
 
 /**
- * Module configuration class
+ * 模块配置类
  * Module Configuration Class
  *
  * @author vivi

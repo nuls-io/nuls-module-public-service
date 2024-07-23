@@ -97,7 +97,7 @@ public class MongoChainServiceImpl implements ChainService {
         }
         for (ChainInfo chainInfo : chainInfoList) {
             if (chainInfo.isNew()) {
-                //It is possible that newly registered chains will occupy chains that have been deregisteredIDTherefore, it is necessary to re query here
+                //有可能新注册的链会占用已注销链的链ID，因此在这里需要重新查询一下
                 ChainInfo chain = getChainInfo(chainInfo.getChainId());
                 if (chain == null) {
                     addChainInfo(chainInfo);
@@ -116,7 +116,7 @@ public class MongoChainServiceImpl implements ChainService {
             return;
         }
         for (ChainInfo chainInfo : chainInfoList) {
-            //Cached Chain,Data not cleared
+            //缓存的链,数据不清空
             if (CacheManager.getCacheChain(chainInfo.getChainId()) != null) {
                 continue;
             }
