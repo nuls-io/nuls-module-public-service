@@ -1,5 +1,6 @@
 package io.nuls.api.manager;
 
+import io.nuls.api.ApiContext;
 import io.nuls.api.cache.ApiCache;
 import io.nuls.api.model.po.AssetInfo;
 import io.nuls.api.model.po.ChainConfigInfo;
@@ -8,6 +9,8 @@ import io.nuls.api.model.po.CoinContextInfo;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static io.nuls.api.constant.ApiConstant.ENABLE;
 
 public class CacheManager {
 
@@ -82,7 +85,29 @@ public class CacheManager {
     }
 
     public static AssetInfo getRegisteredAsset(String key) {
-        return assetInfoMap.get(key);
+        AssetInfo info = assetInfoMap.get(key);
+        if (null != info) {
+            return info;
+        }
+        if ("2-201".equals(key)) {
+            info = new AssetInfo();
+            info.setChainId(2);
+            info.setAssetId(201);
+            info.setSymbol("BTC");
+            info.setDecimals(8);
+            info.setStatus(ENABLE);
+            return info;
+        }
+        if ("2-202".equals(key)) {
+            info = new AssetInfo();
+            info.setChainId(2);
+            info.setAssetId(202);
+            info.setSymbol("ETH");
+            info.setDecimals(18);
+            info.setStatus(ENABLE);
+            return info;
+        }
+        return null;
     }
 
     public static Map<Integer, ChainInfo> getChainInfoMap() {
