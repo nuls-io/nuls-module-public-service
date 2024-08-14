@@ -66,7 +66,7 @@ public class FeeUtils {
                     "        \"scFeeFoefficient\": \"0.0001\"\n" +
                     "    },\n" +
                     "    {\n" +
-                    "        \"assetId\": \"9-202\",\n" +
+                    "        \"assetId\": \"2-202\",\n" +
                     "        \"symbol\": \"ETH\",\n" +
                     "        \"decimals\": 18,\n" +
                     "        \"feePerKB\": \"100000000000000\",\n" +
