@@ -5,6 +5,7 @@ import io.nuls.api.analysis.WalletRpcHandler;
 import io.nuls.api.cache.ApiCache;
 import io.nuls.api.cache.ChainAssetCache;
 import io.nuls.api.constant.AddressType;
+import io.nuls.api.constant.PublicServiceConstant;
 import io.nuls.api.db.*;
 import io.nuls.api.exception.JsonRpcException;
 import io.nuls.api.manager.CacheManager;
@@ -431,5 +432,19 @@ public class ChainController {
         map.put("destroy", AssetTool.toCoinString(coinContextInfo.getDestroy()) + "");
         map.put("list", coinContextInfo.getDestroyInfoList());
         return RpcResult.success(map);
+    }
+
+    @RpcMethod("getChainFeeSetting")
+    public RpcResult getChainFeeSetting(List<Object> params) {
+        int chainId;
+        try {
+            chainId = (int) params.get(0);
+        } catch (Exception e) {
+            return RpcResult.paramError("[chainId] is inValid");
+        }
+        if (chainId == 1) {
+            return RpcResult.success(PublicServiceConstant.MAIN_NET_SETTING);
+        }
+        return RpcResult.success(PublicServiceConstant.TEST_NET_SETTING);
     }
 }

@@ -27,48 +27,48 @@ import io.nuls.api.constant.config.ConfigBean;
 import java.util.Map;
 
 /**
- * Configuration Information Storage Management Class
+ * 配置信息存储管理类
  * Configuration Information Storage Management Class
  *
  * @author captain
  * @version 1.0
- * @date 19-1-25 afternoon3:02
+ * @date 19-1-25 下午3:02
  */
 public interface ConfigStorageService {
     /**
-     * Save configuration information for the specified chain
+     * 保存指定链的配置信息
      * Save configuration information for the specified chain
      *
-     * @param configBean Configuration class/config bean
-     * @param chainID    chainID/chain id
-     * @return Whether the save was successful/Is preservation successful?
+     * @param configBean 配置类/config bean
+     * @param chainID    链ID/chain id
+     * @return 保存是否成功/Is preservation successful?
      * @throws
      */
     boolean save(int chainID, ConfigBean configBean) throws Exception;
 
     /**
-     * Query the configuration information of a certain chain
+     * 查询某条链的配置信息
      * Query the configuration information of a chain
      *
-     * @param chainID chainID/chain id
-     * @return Configuration Information Class/config bean
+     * @param chainID 链ID/chain id
+     * @return 配置信息类/config bean
      */
     ConfigBean get(int chainID);
 
     /**
-     * Delete configuration information for a certain chain
+     * 删除某条链的配置信息
      * Delete configuration information for a chain
      *
-     * @param chainID chainID/chain id
-     * @return Whether the deletion was successful/Delete success
+     * @param chainID 链ID/chain id
+     * @return 删除是否成功/Delete success
      */
     boolean delete(int chainID) throws Exception;
 
     /**
-     * Obtain all chain information of the current node
+     * 获取当前节点所有的链信息
      * Get all the chain information of the current node
      *
-     * @return Node Information List/Node information list
+     * @return 节点信息列表/Node information list
      */
     Map<Integer, ConfigBean> getList();
 }

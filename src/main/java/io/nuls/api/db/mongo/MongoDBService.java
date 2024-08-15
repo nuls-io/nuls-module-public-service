@@ -83,7 +83,6 @@ public class MongoDBService implements InitializingBean {
 //    public void doit(){
 //        try {
 //            Log.info("connect mongodb");
-//            String DB_NAME = StringUtils.isBlank(apiConfig.getDbName()) ? DATABASE_NAME : apiConfig.getDbName();
 //            long time1, time2;
 //            time1 = System.currentTimeMillis();
 //            System.setProperty("DEBUG.MONGO", "true");
@@ -105,7 +104,7 @@ public class MongoDBService implements InitializingBean {
 //                            .readPreference(ReadPreference.secondaryPreferred())
 //                            .applyToSslSettings(builder ->
 //                                    builder.enabled(false))
-//                            .credential(MongoCredential.createCredential(username, DATABASE_NAME, password.toCharArray()))
+////                            .credential(MongoCredential.createCredential(username, DATABASE_NAME, password.toCharArray()))
 ////                            .applyToConnectionPoolSettings(builder ->
 ////                                    builder.maxSize(10))
 ////                            .applyToConnectionPoolSettings(builder ->
@@ -159,6 +158,8 @@ public class MongoDBService implements InitializingBean {
                     .connectTimeout(ApiContext.connectTimeOut)
                     .build();
             ServerAddress serverAddress = new ServerAddress(ApiContext.databaseUrl, ApiContext.databasePort);
+            LoggerUtil.commonLog.info("------start connect mongodb :"  + serverAddress);
+
             MongoClient mongoClient = new MongoClient(serverAddress, options);
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DATABASE_NAME);
 
@@ -253,7 +254,7 @@ public class MongoDBService implements InitializingBean {
         MongoCursor<Document> documentMongoCursor = null;
         List<Document> list = null;
         try {
-            LoggerUtil.commonLog.info(" {}", collName);
+//            LoggerUtil.commonLog.info(" {}", collName);
             MongoCollection<Document> collection = getCollection(collName);
 
 //            LoggerUtil.commonLog.info(" db-get", collName);
@@ -313,7 +314,6 @@ public class MongoDBService implements InitializingBean {
                 documentMongoCursor.close();
             }
         }
-        LoggerUtil.commonLog.info("Query {} == {}", collName, list.size());
         return list;
     }
 

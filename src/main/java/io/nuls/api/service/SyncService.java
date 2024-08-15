@@ -61,51 +61,51 @@ public class SyncService {
     @Autowired
     private ChainAssetService chainAssetService;
 
-    //Record the balance changes of the accounts involved in each block packaging transaction
+    //记录每个区块打包交易涉及到的账户的余额变动
     private Map<String, AccountInfo> accountInfoMap = new HashMap<>();
-    //Record asset changes for each account
+    //记录每个账户的资产变动
     private Map<String, AccountLedgerInfo> accountLedgerInfoMap = new HashMap<>();
-    //Record the changes of each block proxy node
+    //记录每个区块代理节点的变化
     private List<AgentInfo> agentInfoList = new ArrayList<>();
-    //Record the relationship between each block transaction and account address
+    //记录每个区块交易和账户地址的关系
     private Set<TxRelationInfo> txRelationInfoSet = new HashSet<>();
-    //Record the relationship between each cross chain transaction and account address
+    //记录每个跨链交易和账户地址的关系
     private Set<CrossTxRelationInfo> crossTxRelationInfoSet = new HashSet<>();
-    //Record alias information for each block setting
+    //记录每个区块设置别名信息
     private List<AliasInfo> aliasInfoList = new ArrayList<>();
-    //Record the information of each block delegation consensus
+    //记录每个区块委托共识的信息
     private List<DepositInfo> depositInfoList = new ArrayList<>();
-    //Record the red and yellow card information for each block
+    //记录每个区块的红黄牌信息
     private List<PunishLogInfo> punishLogList = new ArrayList<>();
 
     private List<CoinDataInfo> coinDataList = new ArrayList<>();
-    //Record the newly created smart contract information for each block
+    //记录每个区块新创建的智能合约信息
     private Map<String, ContractInfo> contractInfoMap = new HashMap<>();
-    //Record the execution results of smart contracts
+    //记录智能合约执行结果
     private List<ContractResultInfo> contractResultList = new ArrayList<>();
-    //Record transaction information related to smart contracts
+    //记录智能合约相关的交易信息
     private List<ContractTxInfo> contractTxInfoList = new ArrayList<>();
-    //Record the accounts related to each block smart contracttokeninformation
+    //记录每个区块智能合约相关的账户token信息
     private Map<String, AccountTokenInfo> accountTokenMap = new HashMap<>();
-    //Record the accounts related to each block smart contracttoken721information
+    //记录每个区块智能合约相关的账户token721信息
     private Map<String, AccountToken721Info> accountToken721Map = new HashMap<>();
-    //Record the accounts related to each block smart contracttoken1155information
+    //记录每个区块智能合约相关的账户token1155信息
     private Map<String, AccountToken1155Info> accountToken1155Map = new HashMap<>();
-    //Record contractsnrc1155oftokenIdinformation, key=contractAddress+tokenId
+    //记录合约nrc1155的tokenId信息, key=contractAddress+tokenId
     private Map<String, Nrc1155TokenIdInfo> nrc1155TokenIdMap = new HashMap<>();
-    //Record contractsnrc20Transfer information
+    //记录合约nrc20转账信息
     private List<TokenTransfer> tokenTransferList = new ArrayList<>();
-    //Record contractsnrc721Transfer information
+    //记录合约nrc721转账信息
     private List<Token721Transfer> token721TransferList = new ArrayList<>();
-    //Record contractsnrc1155Transfer information
+    //记录合约nrc1155转账信息
     private List<Token1155Transfer> token1155TransferList = new ArrayList<>();
-    //Record contractsnrc721Coinage information
+    //记录合约nrc721造币信息
     private List<Nrc721TokenIdInfo> token721IdList = new ArrayList<>();
-    //Record chain information
+    //记录链信息
     private List<ChainInfo> chainInfoList = new ArrayList<>();
     private Map<String, ChainAssetTx> chainAssetTxMap = new HashMap<>();
     private Set<String> chainAssetCountList = new HashSet<>();
-    //Filter duplicate addresses in each transaction during processing
+    //处理每个交易时，过滤交易中的重复地址
     Set<String> addressSet = new HashSet<>();
 
     public SyncInfo getSyncInfo(int chainId) {
@@ -122,11 +122,11 @@ public class SyncService {
         long time1, time2;
         time1 = System.currentTimeMillis();
         findAddProcessAgentOfBlock(chainId, blockInfo);
-        //Processing transactions
+        //处理交易
         processTxs(chainId, blockInfo.getTxList());
-        //Processing transactions
+        //处理交易
         roundManager.process(chainId, blockInfo);
-        //Save data
+        //保存数据
         save(chainId, blockInfo);
 
         ApiCache apiCache = CacheManager.getCache(chainId);
@@ -140,7 +140,7 @@ public class SyncService {
 
 
     /**
-     * Find the current block node and process relevant information
+     * 查找当前出块节点并处理相关信息
      * Find the current outbound node and process related information
      *
      * @return
@@ -149,7 +149,7 @@ public class SyncService {
         BlockHeaderInfo headerInfo = blockInfo.getHeader();
         AgentInfo agentInfo;
         if (headerInfo.isSeedPacked()) {
-            //If it is a block packaged by a seed node, create a new oneAgentInfoObject, temporary use
+            //如果是种子节点打包的区块，则创建一个新的AgentInfo对象，临时使用
             //If it is a block packed by the seed node, create a new AgentInfo object for temporary use.
             agentInfo = new AgentInfo();
             agentInfo.setPackingAddress(headerInfo.getPackingAddress());
@@ -157,7 +157,7 @@ public class SyncService {
             agentInfo.setRewardAddress(agentInfo.getPackingAddress());
             headerInfo.setByAgentInfo(agentInfo);
         } else {
-            //Based on the packaging address of the block header, query the node information of the packaging node and modify relevant statistical data
+            //根据区块头的打包地址，查询打包节点的节点信息，修改相关统计数据
             //According to the packed address of the block header, query the node information of the packed node, and modify related statistics.
             agentInfo = this.queryAgentInfo(chainId, headerInfo.getPackingAddress(), 3);
             agentInfo.setTotalPackingCount(agentInfo.getTotalPackingCount() + 1);
@@ -172,7 +172,7 @@ public class SyncService {
     }
 
     /**
-     * Record the rewards for the current block, the proxy node itself, and the principal separately
+     * 分别记录当前块，代理节点自己的和委托人的奖励
      * Record the current block, the agent node's own and the principal's reward
      *
      * @param agentInfo
@@ -187,7 +187,7 @@ public class SyncService {
         AssetInfo assetInfo = CacheManager.getCacheChain(chainId).getDefaultAsset();
         BigInteger agentReward = BigInteger.ZERO, otherReward = BigInteger.ZERO;
         for (CoinToInfo output : list) {
-            //Rewards are only calculated for consensus assets in this chain
+            //奖励只计算本链的共识资产
             if (output.getChainId() == assetInfo.getChainId() && output.getAssetsId() == assetInfo.getAssetId()) {
                 if (output.getAddress().equals(agentInfo.getRewardAddress())) {
                     agentReward = agentReward.add(output.getAmount());
@@ -202,7 +202,7 @@ public class SyncService {
     }
 
     /**
-     * Handle various transactions
+     * 处理各种交易
      *
      * @param txs
      */
@@ -240,7 +240,7 @@ public class SyncService {
                 processDeleteContract(chainId, tx);
             } else if (tx.getType() == TxType.CROSS_CHAIN) {
                 processCrossTransferTx(chainId, tx);
-                // add by pierre at 2019-12-23 Special cross chain transfer transactions, transferring from parallel chains to the main networkNRC20asset
+                // add by pierre at 2019-12-23 特殊跨链转账交易，从平行链跨链转回主网的NRC20资产
                 processCrossTransferTxForNRC20TransferBack(chainId, tx);
                 // end code by pierre
             } else if (tx.getType() == TxType.REGISTER_CHAIN_AND_ASSET) {
@@ -309,11 +309,11 @@ public class SyncService {
         for (CoinToInfo output : tx.getCoinTos()) {
             addressSet.add(output.getAddress());
             calcBalance(chainId, output);
-            //The data and contract returns of Genesis Block do not calculate consensus rewards
+            //创世块的数据和合约返还不计算共识奖励
             if (tx.getHeight() == 0) {
                 continue;
             }
-            //When the reward is the main asset of this chain, the cumulative reward amount
+            //奖励是本链主资产的时候，累计奖励金额
             if (output.getChainId() == assetInfo.getChainId() && output.getAssetsId() == assetInfo.getAssetId()) {
                 AccountInfo accountInfo = this.queryAccountInfo(chainId, output.getAddress());
                 accountInfo.setTotalReward(accountInfo.getTotalReward().add(output.getAmount()));
@@ -375,7 +375,7 @@ public class SyncService {
 
         if (tx.getCoinFroms() != null) {
             for (CoinFromInfo input : tx.getCoinFroms()) {
-                //If the address is not the address of this chain, it will not participate in calculation and storage
+                //如果地址不是本链的地址，不参与计算与存储
                 if (chainId != AddressTool.getChainIdByAddress(input.getAddress())) {
                     continue;
                 }
@@ -386,7 +386,7 @@ public class SyncService {
                 crossTxRelationInfoSet.add(new CrossTxRelationInfo(input, tx, assetInfo.getDecimals()));
 
                 if (assetInfo.getChainId() != ApiContext.defaultChainId) {
-                    //After the asset is transferred out across chains, modify the total balance of the asset in this chain
+                    //资产跨链转出后，修改资产在本链的总余额
                     ChainInfo chainInfo = this.queryChainInfo(assetInfo.getChainId());
                     if (chainInfo != null) {
                         AssetInfo asset = chainInfo.getDefaultAsset();
@@ -406,7 +406,7 @@ public class SyncService {
         boolean nrc20CrossTransferBack = tx.getTxData() != null && tx.getTxData() instanceof ContractCallInfo;
         if (tx.getCoinTos() != null) {
             for (CoinToInfo output : tx.getCoinTos()) {
-                //If the address is not the address of this chain, it will not participate in calculation and storage
+                //如果地址不是本链的地址，不参与计算与存储
                 if (chainId != AddressTool.getChainIdByAddress(output.getAddress())) {
                     continue;
                 }
@@ -419,7 +419,7 @@ public class SyncService {
                     AssetInfo assetInfo = CacheManager.getRegisteredAsset(output.getAssetKey());
                     crossTxRelationInfoSet.add(new CrossTxRelationInfo(output, tx, assetInfo.getDecimals()));
 
-                    //After cross chain transfer of assets, modify the total balance of assets in this chain
+                    //资产跨链转入后，修改资产在本链的总余额
                     if (assetInfo.getChainId() != ApiContext.defaultChainId) {
                         ChainInfo chainInfo = this.queryChainInfo(assetInfo.getChainId());
                         if (chainInfo != null) {
@@ -449,7 +449,7 @@ public class SyncService {
 
         if (tx.getCoinFroms() != null) {
             for (CoinFromInfo input : tx.getCoinFroms()) {
-                //If the address is not the address of this chain, it will not participate in calculation and storage
+                //如果地址不是本链的地址，不参与计算与存储
                 if (chainId != AddressTool.getChainIdByAddress(input.getAddress())) {
                     continue;
                 }
@@ -465,7 +465,7 @@ public class SyncService {
 
         if (tx.getCoinTos() != null) {
             for (CoinToInfo output : tx.getCoinTos()) {
-                //If the address is not the address of this chain, it will not participate in calculation and storage
+                //如果地址不是本链的地址，不参与计算与存储
                 if (chainId != AddressTool.getChainIdByAddress(output.getAddress())) {
                     continue;
                 }
@@ -532,7 +532,7 @@ public class SyncService {
         AgentInfo agentInfo = (AgentInfo) tx.getTxData();
         agentInfo.setNew(true);
         accountInfo.setConsensusLock(accountInfo.getConsensusLock().add(agentInfo.getDeposit()));
-        //queryagentHas the node been set with an alias
+        //查询agent节点是否设置过别名
         AliasInfo aliasInfo = aliasService.getAliasByAddress(chainId, agentInfo.getAgentAddress());
         if (aliasInfo != null) {
             agentInfo.setAgentAlias(aliasInfo.getAlias());
@@ -567,7 +567,7 @@ public class SyncService {
         AccountLedgerInfo ledgerInfo = calcBalance(chainId, input.getChainId(), input.getAssetsId(), accountInfo, tx.getFee().getValue());
         txRelationInfoSet.add(new TxRelationInfo(input, tx, tx.getFee().getValue(), ledgerInfo.getTotalBalance()));
 
-        //Query delegation records and generate corresponding delegation cancellation information
+        //查询委托记录，生成对应的取消委托信息
         DepositInfo cancelInfo = (DepositInfo) tx.getTxData();
         DepositInfo depositInfo = depositService.getDepositInfoByKey(chainId, DBUtil.getDepositKey(cancelInfo.getTxHash(), accountInfo.getAddress()));
         accountInfo.setConsensusLock(accountInfo.getConsensusLock().subtract(depositInfo.getAmount()));
@@ -600,14 +600,14 @@ public class SyncService {
         AccountLedgerInfo ledgerInfo;
         CoinToInfo output;
         addressSet.clear();
-        //Handle the locking amounts for each user, especially the addresses for creating nodes that require special handling
+        //处理各个用户的锁定金额，尤其是创建节点的地址要特殊处理
         for (int i = 0; i < tx.getCoinTos().size(); i++) {
             output = tx.getCoinTos().get(i);
             accountInfo = this.queryAccountInfo(chainId, output.getAddress());
             if (!addressSet.contains(output.getAddress())) {
                 accountInfo.setTxCount(accountInfo.getTxCount() + 1);
             }
-            //lockTime > 0 This oneoutputThe amount is the deposit for the node
+            //lockTime > 0 这条output的金额就是节点的保证金
             if (output.getLockTime() > 0) {
                 accountInfo.setConsensusLock(accountInfo.getConsensusLock().subtract(agentInfo.getDeposit()));
                 ledgerInfo = calcBalance(chainId, output.getChainId(), output.getAssetsId(), accountInfo, tx.getFee().getValue());
@@ -624,7 +624,7 @@ public class SyncService {
             addressSet.add(output.getAddress());
         }
 
-        //Query all delegates under the current node and generate a record of delegation cancellation
+        //查询所有当前节点下的委托，生成取消委托记录
         List<DepositInfo> depositInfos = depositService.getDepositListByAgentHash(chainId, agentInfo.getTxHash());
         for (DepositInfo depositInfo : depositInfos) {
             DepositInfo cancelDeposit = new DepositInfo();
@@ -659,14 +659,14 @@ public class SyncService {
         AccountLedgerInfo ledgerInfo;
         CoinToInfo output;
         addressSet.clear();
-        //Handle the locking amounts for each user, especially the addresses for creating nodes that require special handling
+        //处理各个用户的锁定金额，尤其是创建节点的地址要特殊处理
         for (int i = 0; i < tx.getCoinTos().size(); i++) {
             output = tx.getCoinTos().get(i);
             accountInfo = this.queryAccountInfo(chainId, output.getAddress());
             if (!addressSet.contains(output.getAddress())) {
                 accountInfo.setTxCount(accountInfo.getTxCount() + 1);
             }
-            //lockTime > 0 This oneoutputThe amount is the deposit for the node
+            //lockTime > 0 这条output的金额就是节点的保证金
             if (output.getLockTime() > 0) {
                 accountInfo.setConsensusLock(accountInfo.getConsensusLock().subtract(agentInfo.getDeposit()));
                 ledgerInfo = calcBalance(chainId, output.getChainId(), output.getAssetsId(), accountInfo, tx.getFee().getValue());
@@ -683,7 +683,7 @@ public class SyncService {
             addressSet.add(output.getAddress());
         }
 
-        //Query all delegates under the current node and generate a record of delegation cancellation
+        //查询所有当前节点下的委托，生成取消委托记录
         List<DepositInfo> depositInfos = depositService.getDepositListByAgentHash(chainId, agentInfo.getTxHash());
         for (DepositInfo depositInfo : depositInfos) {
             DepositInfo cancelDeposit = new DepositInfo();
@@ -727,14 +727,14 @@ public class SyncService {
     public void processRedPunishTx(int chainId, TransactionInfo tx) {
         PunishLogInfo redPunish = (PunishLogInfo) tx.getTxData();
         punishLogList.add(redPunish);
-        //Find the punished node based on the red card
+        //根据红牌找到被惩罚的节点
         AgentInfo agentInfo = this.queryAgentInfo(chainId, redPunish.getAddress(), 2);
         agentInfo.setDeleteHash(tx.getHash());
         agentInfo.setDeleteHeight(tx.getHeight());
         agentInfo.setStatus(ApiConstant.STOP_AGENT);
         agentInfo.setNew(false);
 
-        //The handling of account balances and locked amounts for red card penalties is similar to stopping consensus nodes
+        //红牌惩罚的账户余额和锁定金额的处理和停止共识节点类似
         AccountInfo accountInfo;
         AccountLedgerInfo ledgerInfo;
         CoinToInfo output = null;
@@ -745,7 +745,7 @@ public class SyncService {
             if (!addressSet.contains(output.getAddress())) {
                 accountInfo.setTxCount(accountInfo.getTxCount() + 1);
             }
-            //lockTime > 0 This oneoutputThe amount is the deposit for the node
+            //lockTime > 0 这条output的金额就是节点的保证金
             if (output.getLockTime() > 0) {
                 accountInfo.setConsensusLock(accountInfo.getConsensusLock().subtract(agentInfo.getDeposit()));
                 ledgerInfo = calcBalance(chainId, output.getChainId(), output.getAssetsId(), accountInfo, tx.getFee().getValue());
@@ -761,11 +761,11 @@ public class SyncService {
             }
             addressSet.add(output.getAddress());
         }
-        //The last record is the address where the node was created
+        //最后这条记录是创建节点的地址
         ledgerInfo = this.queryLedgerInfo(chainId, agentInfo.getAgentAddress(), output.getChainId(), output.getAssetsId());
         txRelationInfoSet.add(new TxRelationInfo(output, tx, BigInteger.ZERO, ledgerInfo.getTotalBalance()));
 
-        //Find the delegation list based on the node
+        //根据节点找到委托列表
         List<DepositInfo> depositInfos = depositService.getDepositListByAgentHash(chainId, agentInfo.getTxHash());
         if (!depositInfos.isEmpty()) {
             for (DepositInfo depositInfo : depositInfos) {
@@ -1112,9 +1112,9 @@ public class SyncService {
                 isBurn = true;
             }
             if (isMint) {
-                // Increase the total issuance amount
+                // 增加发行总量
                 contractInfo.setTotalSupply(new BigInteger(contractInfo.getTotalSupply()).add(BigInteger.ONE).toString());
-                // fromWhen empty, consider asNRC721Coinage
+                // from为空时，视为NRC721的造币
                 tokenIdInfo = new Nrc721TokenIdInfo(
                         contractAddress,
                         contractInfo.getTokenName(),
@@ -1125,12 +1125,12 @@ public class SyncService {
                         tokenTransfer.getToAddress()
                 );
             } else if (isBurn) {
-                // Reduce the total issuance amount
+                // 减少发行总量
                 contractInfo.setTotalSupply(new BigInteger(contractInfo.getTotalSupply()).subtract(BigInteger.ONE).toString());
-                // Destruction
+                // 销毁
                 tokenIdInfo = new Nrc721TokenIdInfo(contractAddress, null, null, tokenId, null, null, null);
             } else {
-                // updatetokenOwner of
+                // 更新token的拥有者
                 tokenIdInfo = new Nrc721TokenIdInfo(contractAddress, null, null, tokenId, null, null, tokenTransfer.getToAddress());
             }
             token721IdList.add(tokenIdInfo);
@@ -1178,7 +1178,7 @@ public class SyncService {
             tokenIdInfo = this.queryNrc1155TokenIdInfo(chainId, contractAddress, tokenId);
             if (isMint) {
                 if (tokenIdInfo == null) {
-                    // fromWhen empty, consider asNRC721Coinage
+                    // from为空时，视为NRC721的造币
                     Nrc1155Info nrc1155Info = CacheManager.getCache(chainId).getNrc1155Info(contractAddress);
                     tokenIdInfo = new Nrc1155TokenIdInfo(
                             contractAddress,
@@ -1329,7 +1329,7 @@ public class SyncService {
 
 
     /**
-     * After parsing the block and all transactions, store the data in the database
+     * 解析区块和所有交易后，将数据存储到数据库中
      * Store entity in the database after parsing the block and all transactions
      */
     public void save(int chainId, BlockInfo blockInfo) {
@@ -1339,95 +1339,95 @@ public class SyncService {
 
         SyncInfo syncInfo = chainService.saveNewSyncInfo(chainId, height, blockInfo.getHeader());
 
-        //Store block header information
+        //存储区块头信息
         time1 = System.currentTimeMillis();
         blockService.saveBLockHeaderInfo(chainId, blockInfo.getHeader());
-        //Store block serialization complete information
+        //存区块序列化完整信息
         blockService.saveBlockHexInfo(chainId, blockInfo.getBlockHexInfo());
 //        time2 = System.currentTimeMillis();
 //        System.out.println("-----------saveBlockHexInfo, use: " + (time2 - time1) );
 //        time1 = System.currentTimeMillis();
-        //Store transaction records
+        //存储交易记录
         txService.saveTxList(chainId, blockInfo.getTxList());
 //        time2 = System.currentTimeMillis();
 //        System.out.println("-----------saveTxList, use: " + (time2 - time1) );
 //        time1 = System.currentTimeMillis();
 
         // txService.saveCoinDataList(chainId, coinDataList);
-        //Store transaction and address relationship records
+        //存储交易和地址关系记录
         txService.saveTxRelationList(chainId, txRelationInfoSet);
 //        time2 = System.currentTimeMillis();
 //        System.out.println("-----------saveTxRelationList, use: " + (time2 - time1) );
 //        time1 = System.currentTimeMillis();
-        //Store cross chain transactions and address relationship records
+        //存储跨链交易和地址关系记录
         txService.saveCrossTxRelationList(chainId, crossTxRelationInfoSet);
 
-        //Store alias records
+        //存储别名记录
         aliasService.saveAliasList(chainId, aliasInfoList);
 //        time2 = System.currentTimeMillis();
 //        System.out.println("-----------saveAliasList, use: " + (time2 - time1) );
 //        time1 = System.currentTimeMillis();
 
-        //Store red and yellow card punishment records
+        //存储红黄牌惩罚记录
         punishService.savePunishList(chainId, punishLogList);
 //        time2 = System.currentTimeMillis();
 //        System.out.println("-----------savePunishList, use: " + (time2 - time1) );
 //        time1 = System.currentTimeMillis();
 
-        //Storage delegation/Cancel delegated records
+        //存储委托/取消委托记录
         depositService.saveDepositList(chainId, depositInfoList);
 //        time2 = System.currentTimeMillis();
 //        System.out.println("-----------saveDepositList, use: " + (time2 - time1) );
 //        time1 = System.currentTimeMillis();
 
-        //Store smart contract transaction relationship records
+        //存储智能合约交易关系记录
         contractService.saveContractTxInfos(chainId, contractTxInfoList);
 //        time2 = System.currentTimeMillis();
 //        System.out.println("-----------saveContractTxInfos, use: " + (time2 - time1) );
 //        time1 = System.currentTimeMillis();
 
-        //Store smart contract result records
+        //存储智能合约结果记录
         contractService.saveContractResults(chainId, contractResultList);
 //        time2 = System.currentTimeMillis();
 //        System.out.println("-----------saveContractResults, use: " + (time2 - time1) );
 //        time1 = System.currentTimeMillis();
 
-        //storagetokenTransfer information
+        //存储token转账信息
         tokenService.saveTokenTransfers(chainId, tokenTransferList);
 
-        //storagetoken721Transfer information
+        //存储token721转账信息
         token721Service.saveTokenTransfers(chainId, token721TransferList);
 
-        //storagetoken1155Transfer information
+        //存储token1155转账信息
         token1155Service.saveTokenTransfers(chainId, token1155TransferList);
 //        time2 = System.currentTimeMillis();
 //        System.out.println("-----------saveTokenTransfers, use: " + (time2 - time1) );
 //        time1 = System.currentTimeMillis();
 
-        //Storage chain information
+        //存储链信息
         chainService.saveChainList(chainInfoList);
 //        time2 = System.currentTimeMillis();
 //        System.out.println("-----------saveChainList, use: " + (time2 - time1) );
 //        time1 = System.currentTimeMillis();
 
         /*
-            Tables related to statistics are stored at the end for easy rollback
+            涉及到统计类的表放在最后来存储，便于回滚
          */
-        //Storage consensus node list
+        //存储共识节点列表
         syncInfo.setStep(10);
         chainService.updateStep(syncInfo);
         agentService.saveAgentList(chainId, agentInfoList);
 //        time2 = System.currentTimeMillis();
 //        System.out.println("-----------saveAgentList, use: " + (time2 - time1) );
 //        time1 = System.currentTimeMillis();
-        //Storage account asset information
+        //存储账户资产信息
         syncInfo.setStep(20);
         chainService.updateStep(syncInfo);
         ledgerService.saveLedgerList(chainId, accountLedgerInfoMap);
 //        time2 = System.currentTimeMillis();
 //        System.out.println("-----------saveLedgerList, use: " + (time2 - time1));
 //        time1 = System.currentTimeMillis();
-        //Storage of smart contract information table
+        //存储智能合约信息表
         syncInfo.setStep(30);
         chainService.updateStep(syncInfo);
         contractService.saveContractInfos(chainId, contractInfoMap);
@@ -1435,7 +1435,7 @@ public class SyncService {
 //        System.out.println("-----------saveContractInfos, use: " + (time2 - time1) );
 //        time1 = System.currentTimeMillis();
 
-        //Storage accounttokeninformation
+        //存储账户token信息
         syncInfo.setStep(40);
         chainService.updateStep(syncInfo);
         tokenService.saveAccountTokens(chainId, accountTokenMap);
@@ -1443,7 +1443,7 @@ public class SyncService {
 //        System.out.println("-----------saveAccountTokens, use: " + (time2 - time1) );
 //        time1 = System.currentTimeMillis();
 
-        //Storage account information table
+        //存储账户信息表
         syncInfo.setStep(50);
         chainService.updateStep(syncInfo);
         accountService.saveAccounts(chainId, accountInfoMap);
@@ -1451,22 +1451,22 @@ public class SyncService {
 //        System.out.println("-----------saveAccounts, use: " + (time2 - time1) );
 //        time1 = System.currentTimeMillis();
 
-        //Storage accounttoken721information
+        //存储账户token721信息
         syncInfo.setStep(60);
         chainService.updateStep(syncInfo);
         token721Service.saveAccountTokens(chainId, accountToken721Map);
 
-        //storagetoken721Coinage information
+        //存储token721造币信息
         syncInfo.setStep(70);
         chainService.updateStep(syncInfo);
         token721Service.saveTokenIds(chainId, token721IdList);
 
-        //Storage accounttoken1155information
+        //存储账户token1155信息
         syncInfo.setStep(80);
         chainService.updateStep(syncInfo);
         token1155Service.saveAccountTokens(chainId, accountToken1155Map);
 
-        //storagetoken1155 tokenIdinformation
+        //存储token1155 tokenId信息
         syncInfo.setStep(90);
         chainService.updateStep(syncInfo);
         token1155Service.saveTokenIds(chainId, nrc1155TokenIdMap);
@@ -1475,7 +1475,7 @@ public class SyncService {
         chainService.updateStep(syncInfo);
         this.chainAssetService.save(chainId, this.chainAssetTxMap, this.chainAssetCountList);
 
-        //Complete parsing
+        //完成解析
         syncInfo.setStep(100);
         chainService.updateStep(syncInfo);
     }

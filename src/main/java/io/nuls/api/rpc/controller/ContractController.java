@@ -1031,7 +1031,7 @@ public class ContractController {
     }
 
     /**
-     * Upload contract codejarpackage
+     * 上传合约代码jar包
      */
     @RpcMethod("uploadContractJar")
     public RpcResult upload(List<Object> params) throws NulsException {
@@ -1059,7 +1059,7 @@ public class ContractController {
     }
 
     /**
-     * Get contract code constructor
+     * 获取合约代码构造函数
      */
     @RpcMethod("getContractConstructor")
     public RpcResult getContractConstructor(List<Object> params) throws NulsException {
@@ -1092,7 +1092,7 @@ public class ContractController {
 
 
     /**
-     * Obtain contract method information
+     * 获取合约方法信息
      *
      * @param params
      * @return
@@ -1160,7 +1160,7 @@ public class ContractController {
 
 
     /**
-     * Obtain contract method parameter types
+     * 获取合约方法参数类型
      */
     @RpcMethod("getContractMethodArgsTypes")
     public RpcResult getContractMethodArgsTypes(List<Object> params) {
@@ -1184,7 +1184,7 @@ public class ContractController {
     }
 
     /**
-     * Verify contract creation
+     * 验证创建合约
      *
      * @param params
      * @return
@@ -1238,7 +1238,7 @@ public class ContractController {
     }
 
     /**
-     * Verify Call Contract
+     * 验证调用合约
      *
      * @param params
      * @return
@@ -1316,7 +1316,7 @@ public class ContractController {
     }
 
     /**
-     * Verify deletion of contract
+     * 验证删除合约
      *
      * @param params
      * @return
@@ -1343,7 +1343,7 @@ public class ContractController {
     }
 
     /**
-     * Estimating the creation of contract transactionsgas
+     * 预估创建合约交易的gas
      *
      * @param params
      * @return
@@ -1395,7 +1395,7 @@ public class ContractController {
     }
 
     /**
-     * Estimated call to contract transactiongas
+     * 预估调用合约交易的gas
      *
      * @param params
      * @return
@@ -1474,7 +1474,7 @@ public class ContractController {
     }
 
     /**
-     * Call the contract not on chain method
+     * 调用合约不上链方法
      *
      * @param params
      * @return

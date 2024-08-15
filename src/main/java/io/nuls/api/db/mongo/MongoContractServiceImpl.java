@@ -32,7 +32,7 @@ public class MongoContractServiceImpl implements ContractService {
 
     @Override
     public void initCache() {
-        //cacheNRC20 tokeninformation
+        //缓存NRC20 token信息
 //        LoggerUtil.commonLog.info("contract cache 1 , {}", CacheManager.getApiCaches().size());
         for (ApiCache apiCache : CacheManager.getApiCaches().values()) {
 //            LoggerUtil.commonLog.info("contract cache 1,1 , {}", apiCache.getChainInfo().getChainId());

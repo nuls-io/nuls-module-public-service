@@ -21,68 +21,68 @@
 package io.nuls.api.constant;
 
 /**
- * Store interface commands provided externally
+ * 存储对外提供的接口命令
  *
  * @author captain
  * @version 1.0
- * @date 18-11-9 afternoon2:15
+ * @date 18-11-9 下午2:15
  */
 public interface CommandConstant {
 
-    //Obtain blocks based on block height
+    //根据区块高度获取区块
     String GET_BLOCK_BY_HEIGHT = "getBlockByHeight";
-    //Based on blockshashGet blocks
+    //根据区块hash获取区块
     String GET_BLOCK_BY_HASH = "getBlockByHash";
 
     String INFO = "info";
-    //Obtain account balance
+    //获取账户余额
     String GET_BALANCE = "getBalanceNonce";
     //
     String IS_ALAIS_USABLE= "ac_isAliasUsable";
-    //Obtain account lock list
+    //获取账户锁定列表
     String GET_FREEZE = "getFreezeList";
 
-    //Query transaction details
+    //查询交易详情
     String GET_TX = "tx_getTxClient";
-    //Transaction verification
+    //交易验证
     String TX_VALIEDATE = "tx_verifyTx";
-    //New transaction confirmation and broadcast
+    //新交易确认并广播
     String TX_NEWTX = "tx_newTx";
-    //Directly broadcast new transactions
+    //直接广播新交易
     String TX_BROADCAST = "tx_broadcast";
-    //Send cross chain transactions
+    //发送跨链交易
     String SEND_CROSS_TX = "newApiModuleCrossTx";
-    //Query node details
+    //查询节点详情
     String GET_AGENT = "cs_getAgentInfo";
-    //Obtain consensus configuration
+    //获取共识配置
     String GET_CONSENSUS_CONFIG = "cs_getConsensusConfig";
-    //Query smart contract details
+    //查询智能合约详情
     String CONTRACT_INFO = "sc_contract_info";
-    //Query smart contract execution results
+    //查询智能合约执行结果
     String CONTRACT_RESULT = "sc_contract_result";
-    //Query smart contract constructor
+    //查询智能合约构造函数
     String CONSTRUCTOR = "sc_constructor";
-    //Token Cross Chain System Contract Address
+    //代币跨链系统合约地址
     String GET_CROSS_TOKEN_SYSTEM_CONTRACT = "sc_get_cross_token_system_contract";
-    //Verify contract creation
+    //验证创建合约
     String VALIDATE_CREATE = "sc_validate_create";
-    //Verify Call Contract
+    //验证调用合约
     String VALIDATE_CALL = "sc_validate_call";
-    //Verify deletion of contract
+    //验证删除合约
     String VALIDATE_DELETE = "sc_validate_delete";
-    //Estimating the creation of contractsgas
+    //预估创建合约的gas
     String IMPUTED_CREATE_GAS = "sc_imputed_create_gas";
-    //Estimating the Call Contractgas
+    //预估调用合约的gas
     String IMPUTED_CALL_GAS = "sc_imputed_call_gas";
-    //Upload contract codejarpackage
+    //上传合约代码jar包
     String UPLOAD = "sc_upload";
-    //Get the collection of smart contract results
+    //获取智能合约结果集合
     String CONTRACT_RESULT_LIST = "sc_contract_result_list";
-    //Call the contract not on chain method
+    //调用合约不上链方法
     String INVOKE_VIEW = "sc_invoke_view";
-    //Query registered cross chain information
+    //查询已注册的跨链信息
     String GET_REGISTERED_CHAIN = "getRegisteredChainInfoList";
-    //Get Address Prefix Mapping Table
+    //获取地址前缀映射表
     String GET_ALL_ADDRESS_PREFIX = "ac_getAllAddressPrefix";
 
     String GET_BYZANTINE_COUNT = "getByzantineCount";
@@ -92,18 +92,18 @@ public interface CommandConstant {
     String PREVIEW_CALL = "sc_preview_call";
 
     /**
-     * Obtain asset information
+     * 获取资产信息
      */
     String CMD_GET_ASSET_BY_ID = "getAssetById";
 
     /**
-     * Acquiring contract assetsID
+     * 获取合约资产ID
      */
     String CMD_CHAIN_ASSET_CONTRACT_ASSETID = "getAssetContractAssetId";
     String CMD_CHAIN_LG_GET_ALL_ASSET = "lg_get_all_asset";
 
     /**
-     * Obtain cross chain asset registration information
+     * 获取跨链资产注册信息
      */
     String CMD_ASSET = "cm_asset";
 

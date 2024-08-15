@@ -29,7 +29,7 @@ public class DepositInfo extends TxDataInfo {
 
     @JsonIgnore
     private boolean isNew;
-    // 0 Join the consensus,1 Exit consensus
+    // 0 加入共识，1 退出共识
     private int type;
 
     public void copyInfoWithDeposit() {

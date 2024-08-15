@@ -44,7 +44,7 @@ public class MessageManager {
         executorService.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                //Just in case
+                //以防万一
                 if (messageMap.size() > 1000) {
                     messageMap.clear();
                 }

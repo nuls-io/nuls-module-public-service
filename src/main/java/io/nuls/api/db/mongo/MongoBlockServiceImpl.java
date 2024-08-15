@@ -148,7 +148,7 @@ public class MongoBlockServiceImpl implements BlockService {
         }
 
         long totalCount;
-        //Default browser homepage query , go directly to cache
+        //默认浏览器首页查询 ，直接走缓存
         if (chainId == apiConfig.getChainId() && pageIndex == 1 && pageSize == 15 &&
                 StringUtils.isBlank(packingAddress) && !filterEmptyBlocks) {
             totalCount = mongoDBService.getEstimateCount(BLOCK_HEADER_TABLE + chainId);

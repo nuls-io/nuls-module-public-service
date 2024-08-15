@@ -242,7 +242,7 @@ public class WalletRpcHandler {
         params.put(Constants.CHAIN_ID, chainId);
         params.put("contractAddress", contractInfo.getContractAddress());
         params.put("hash", contractInfo.getCreateTxHash());
-        //Before querying the details of the smart contract, first check whether the execution result of creating the smart contract was successful
+        //查询智能合约详情之前，先查询创建智能合约的执行结果是否成功
         Result<ContractResultInfo> result = getContractResultInfo(params);
         ContractResultInfo resultInfo = result.getData();
         contractInfo.setResultInfo(resultInfo);
@@ -799,7 +799,7 @@ public class WalletRpcHandler {
     }
 
     /**
-     * queryNRC20Assets ofID
+     * 查询NRC20的资产ID
      */
     public static Integer getAssetIdOfNRC20(String contractAddress) {
         try {
@@ -810,13 +810,13 @@ public class WalletRpcHandler {
             return assetId;
         } catch (NulsException e) {
             LoggerUtil.commonLog.error("", e);
-            Log.warn("queryNRC20assetIDabnormal, msg: {}", e.format());
+            Log.warn("查询NRC20资产ID异常, msg: {}", e.format());
             return null;
         }
     }
 
     /**
-     * Query whether it is a cross chain asset
+     * 查询是否为跨链资产
      */
     public static boolean isCrossAssets(int chainId, int assetId) {
         Map<String, Object> params = new HashMap(4);
@@ -827,7 +827,7 @@ public class WalletRpcHandler {
             return callResp.isSuccess();
         } catch (Exception e) {
             LoggerUtil.commonLog.error("", e);
-            Log.warn("Check if it is a cross chain asset exception, msg: {}", e.getMessage());
+            Log.warn("查询是否为跨链资产异常, msg: {}", e.getMessage());
             return false;
         }
     }
@@ -847,7 +847,7 @@ public class WalletRpcHandler {
             return list;
         } catch (NulsException e) {
             LoggerUtil.commonLog.error("", e);
-            Log.warn("queryNRC20assetIDabnormal, msg: {}", e.format());
+            Log.warn("查询NRC20资产ID异常, msg: {}", e.format());
             return null;
         }
     }

@@ -23,7 +23,7 @@ public class AgentInfo extends TxDataInfo {
     private double commissionRate;
 
     private long createTime;
-    // 0:Waiting for consensus,1:In the consensus,2:Exit consensus
+    // 0:待共识，1:共识中，2:退出共识
     private int status;
 
     private BigInteger totalDeposit;

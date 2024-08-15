@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 /**
  * @Author: zhoulijun
  * @Time: 2020-03-08 19:56
- * @Description: Function Description
+ * @Description: 功能描述
  */
 public interface PriceProvider {
 
