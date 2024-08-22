@@ -63,7 +63,9 @@ public class SyncBlockTask implements Runnable {
         try {
             SyncInfo syncInfo = syncService.getSyncInfo(chainId);
             if (syncInfo != null && !syncInfo.isFinish()) {
-                rollbackService.rollbackBlock(chainId, syncInfo.getBestHeight());
+                for(long i=syncInfo.getBestHeight();i>=10881526;i--) {
+                    rollbackService.rollbackBlock(chainId, i);
+                }
             }
         } catch (Exception e) {
             syncErrorCount++;
@@ -145,7 +147,7 @@ public class SyncBlockTask implements Runnable {
             return syncService.syncNewBlock(chainId, newBlock);
         } else if (localBestBlockHeader != null) {
             for(long i=localBestBlockHeader.getHeight();i>=10881526;i--) {
-                return rollbackService.rollbackBlock(chainId, i);
+                rollbackService.rollbackBlock(chainId, i);
             }
         }
         return false;
