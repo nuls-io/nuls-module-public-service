@@ -63,9 +63,7 @@ public class SyncBlockTask implements Runnable {
         try {
             SyncInfo syncInfo = syncService.getSyncInfo(chainId);
             if (syncInfo != null && !syncInfo.isFinish()) {
-                for(long i=syncInfo.getBestHeight();i>=10881526;i--) {
-                    rollbackService.rollbackBlock(chainId, i);
-                }
+                rollbackService.rollbackBlock(chainId, syncInfo.getBestHeight());
             }
         } catch (Exception e) {
             syncErrorCount++;
@@ -126,29 +124,21 @@ public class SyncBlockTask implements Runnable {
             LoggerUtil.commonLog.info("------localBestBlock:" + (nextHeight - 1));
             first = false;
         }
-//        //todo niels temp
-//        if(nextHeight > 13226635){
-//            System.exit(1);
-//        }
-//        Result<BlockInfo> result = WalletRpcHandler.getBlockInfo(chainId, nextHeight);
-//        if (result.isFailed()) {
-//            LoggerUtil.commonLog.info("------get block info failed: {},{}", chainId, nextHeight);
-//            return false;
-//        }
-//        BlockInfo newBlock = result.getData();
-//        if (null == newBlock) {
-//            Thread.sleep(5000L);
-////            LoggerUtil.commonLog.info("------block info is null: {},{}", chainId, nextHeight);
-//            return false;
-//        }
-        BlockInfo newBlock = new BlockInfo();
-        if (localBestBlockHeader.getHeight() < 10881526 && checkBlockContinuity(localBestBlockHeader, newBlock.getHeader())) {
-            System.exit(0);
+        Result<BlockInfo> result = WalletRpcHandler.getBlockInfo(chainId, nextHeight);
+        if (result.isFailed()) {
+            LoggerUtil.commonLog.info("------get block info failed: {},{}", chainId, nextHeight);
+            return false;
+        }
+        BlockInfo newBlock = result.getData();
+        if (null == newBlock) {
+            Thread.sleep(5000L);
+//            LoggerUtil.commonLog.info("------block info is null: {},{}", chainId, nextHeight);
+            return false;
+        }
+        if (checkBlockContinuity(localBestBlockHeader, newBlock.getHeader())) {
             return syncService.syncNewBlock(chainId, newBlock);
         } else if (localBestBlockHeader != null) {
-            for(long i=localBestBlockHeader.getHeight();i>=10881526;i--) {
-                rollbackService.rollbackBlock(chainId, i);
-            }
+            return rollbackService.rollbackBlock(chainId, localBestBlockHeader.getHeight());
         }
         return false;
     }
