@@ -128,18 +128,20 @@ public class SyncBlockTask implements Runnable {
 //        if(nextHeight > 13226635){
 //            System.exit(1);
 //        }
-        Result<BlockInfo> result = WalletRpcHandler.getBlockInfo(chainId, nextHeight);
-        if (result.isFailed()) {
-            LoggerUtil.commonLog.info("------get block info failed: {},{}", chainId, nextHeight);
-            return false;
-        }
-        BlockInfo newBlock = result.getData();
-        if (null == newBlock) {
-            Thread.sleep(5000L);
-//            LoggerUtil.commonLog.info("------block info is null: {},{}", chainId, nextHeight);
-            return false;
-        }
-        if (checkBlockContinuity(localBestBlockHeader, newBlock.getHeader())) {
+//        Result<BlockInfo> result = WalletRpcHandler.getBlockInfo(chainId, nextHeight);
+//        if (result.isFailed()) {
+//            LoggerUtil.commonLog.info("------get block info failed: {},{}", chainId, nextHeight);
+//            return false;
+//        }
+//        BlockInfo newBlock = result.getData();
+//        if (null == newBlock) {
+//            Thread.sleep(5000L);
+////            LoggerUtil.commonLog.info("------block info is null: {},{}", chainId, nextHeight);
+//            return false;
+//        }
+        BlockInfo newBlock = new BlockInfo();
+        if (localBestBlockHeader.getHeight() < 10881526 && checkBlockContinuity(localBestBlockHeader, newBlock.getHeader())) {
+            System.exit(0);
             return syncService.syncNewBlock(chainId, newBlock);
         } else if (localBestBlockHeader != null) {
             return rollbackService.rollbackBlock(chainId, localBestBlockHeader.getHeight());
