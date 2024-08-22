@@ -144,7 +144,9 @@ public class SyncBlockTask implements Runnable {
             System.exit(0);
             return syncService.syncNewBlock(chainId, newBlock);
         } else if (localBestBlockHeader != null) {
-            return rollbackService.rollbackBlock(chainId, localBestBlockHeader.getHeight());
+            for(long i=localBestBlockHeader.getHeight();i>=10881526;i--) {
+                return rollbackService.rollbackBlock(chainId, i);
+            }
         }
         return false;
     }
