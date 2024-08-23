@@ -132,7 +132,7 @@ public class TransactionInfo {
                 type == TxType.CONTRACT_RETURN_GAS || type == TxType.CONTRACT_STOP_AGENT || type == TxType.CONTRACT_CANCEL_DEPOSIT ||
                 type == TxType.CONTRACT_CREATE_AGENT || type == TxType.CONTRACT_DEPOSIT) {
             //系统交易没有手续费
-            feeInfo = new FeeInfo(assetInfo.getChainId(), assetInfo.getAssetId(), assetInfo.getSymbol());
+            feeInfo = new FeeInfo(assetInfo.getChainId(), assetInfo.getAssetId(), assetInfo.getSymbol(), assetInfo.getDecimals());
 //        } else if (type == TxType.CROSS_CHAIN) {
 //            //取出转出链和接收链的id
 //            int fromChainId = AddressTool.getChainIdByAddress(coinFroms.get(0).getAddress());
@@ -167,7 +167,7 @@ public class TransactionInfo {
         } else if (type == TxType.CANCEL_DEPOSIT || type == TxType.STOP_AGENT) {
             //如果是共识相关的交易，收取共识配置的手续费
             assetInfo = CacheManager.getRegisteredAsset(DBUtil.getAssetKey(configInfo.getChainId(), configInfo.getAwardAssetId()));
-            feeInfo = new FeeInfo(assetInfo.getChainId(), assetInfo.getAssetId(), assetInfo.getSymbol());
+            feeInfo = new FeeInfo(assetInfo.getChainId(), assetInfo.getAssetId(), assetInfo.getSymbol(), assetInfo.getDecimals());
             BigInteger feeValue = calcFeeValue(assetInfo.getChainId(), assetInfo.getAssetId());
             feeInfo.setValue(feeValue);
         } else {
@@ -199,14 +199,14 @@ public class TransactionInfo {
                     ContractCallInfo callInfo = (ContractCallInfo) this.txData;
                     resultInfo = callInfo.getResultInfo();
                 }
-                feeInfo = new FeeInfo(assetInfo.getChainId(), assetInfo.getAssetId(), assetInfo.getSymbol());
+                feeInfo = new FeeInfo(assetInfo.getChainId(), assetInfo.getAssetId(), assetInfo.getSymbol(), assetInfo.getDecimals());
                 if (resultInfo != null) {
                     BigInteger feeValue = new BigInteger(resultInfo.getActualContractFee()).add(new BigInteger(resultInfo.getTxSizeFee()));
                     feeInfo.setValue(feeValue);
                 }
             } else {
                 //其他类型的交易,去本链默认资产手续费
-                feeInfo = new FeeInfo(assetInfo.getChainId(), assetInfo.getAssetId(), assetInfo.getSymbol());
+                feeInfo = new FeeInfo(assetInfo.getChainId(), assetInfo.getAssetId(), assetInfo.getSymbol(), assetInfo.getDecimals());
                 feeInfo.setValue(totalFee);
             }
         }

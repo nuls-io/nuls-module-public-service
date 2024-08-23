@@ -11,16 +11,18 @@ public class FeeInfo {
     private String symbol;
 
     private BigInteger value;
+    private int decimals;
 
     public FeeInfo() {
 
     }
 
-    public FeeInfo(int chainId, int assetId, String symbol) {
+    public FeeInfo(int chainId, int assetId, String symbol, int decimals) {
         this.chainId = chainId;
         this.assetId = assetId;
         this.symbol = symbol;
         this.value = BigInteger.ZERO;
+        this.decimals = decimals;
     }
 
     public int getChainId() {
@@ -53,5 +55,13 @@ public class FeeInfo {
 
     public void setValue(BigInteger value) {
         this.value = value;
+    }
+
+    public int getDecimals() {
+        return decimals;
+    }
+
+    public void setDecimals(int decimals) {
+        this.decimals = decimals;
     }
 }
