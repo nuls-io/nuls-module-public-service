@@ -785,6 +785,12 @@ public class AccountController {
             if (assetInfo != null) {
                 ledgerInfo.setSymbol(assetInfo.getSymbol());
                 ledgerInfo.setDecimals(assetInfo.getDecimals());
+            }else if(ledgerInfo.getAssetKey().equals("2-201")){
+                ledgerInfo.setSymbol("BTC");
+                ledgerInfo.setDecimals(8);
+            }else if(ledgerInfo.getAssetKey().equals("2-202")){
+                ledgerInfo.setSymbol("ETH");
+                ledgerInfo.setDecimals(18);
             }
         }
         return RpcResult.success(list);
@@ -824,6 +830,12 @@ public class AccountController {
             if (assetInfo != null) {
                 ledgerInfo.setSymbol(assetInfo.getSymbol());
                 ledgerInfo.setDecimals(assetInfo.getDecimals());
+            }else if(ledgerInfo.getAssetKey().equals("2-201")){
+                ledgerInfo.setSymbol("BTC");
+                ledgerInfo.setDecimals(8);
+            }else if(ledgerInfo.getAssetKey().equals("2-202")){
+                ledgerInfo.setSymbol("ETH");
+                ledgerInfo.setDecimals(18);
             }
         }
         return RpcResult.success(list);

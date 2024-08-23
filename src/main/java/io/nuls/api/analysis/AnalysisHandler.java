@@ -21,6 +21,7 @@ import io.nuls.core.constant.TxStatusEnum;
 import io.nuls.core.constant.TxType;
 import io.nuls.core.crypto.HexUtil;
 import io.nuls.core.exception.NulsException;
+import io.nuls.core.log.Log;
 import io.nuls.core.parse.JSONUtils;
 import io.nuls.core.rpc.info.Constants;
 import io.nuls.core.rpc.model.ModuleE;
@@ -80,6 +81,7 @@ public class AnalysisHandler {
         if (!contactHashList.isEmpty()) {
             Result<Map<String, ContractResultInfo>> result = WalletRpcHandler.getContractResults(chainId, contactHashList);
             if (result.isFailed()) {
+                Log.warn(result.getMsg());
                 return null;
             } else {
                 resultInfoMap = result.getData();

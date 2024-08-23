@@ -125,10 +125,6 @@ public class SyncBlockTask implements Runnable {
             LoggerUtil.commonLog.info("------localBestBlock:" + (nextHeight - 1));
             first = false;
         }
-//        //todo niels temp
-//        if(nextHeight > 13646800){
-//            System.exit(1);
-//        }
         Result<BlockInfo> result = WalletRpcHandler.getBlockInfo(chainId, nextHeight);
         if (result.isFailed()) {
             LoggerUtil.commonLog.info("------get block info failed: {},{}", chainId, nextHeight);
