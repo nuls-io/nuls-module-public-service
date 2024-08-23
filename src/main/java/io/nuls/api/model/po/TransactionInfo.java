@@ -1,13 +1,16 @@
 package io.nuls.api.model.po;
 
+import io.nuls.api.constant.FeeUtils;
 import io.nuls.api.manager.CacheManager;
 import io.nuls.api.utils.DBUtil;
 import io.nuls.api.utils.DocumentTransferTool;
+import io.nuls.api.utils.NCUtils;
 import io.nuls.core.constant.TxType;
 import org.bson.Document;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 
 public class TransactionInfo {
 
@@ -161,30 +164,51 @@ public class TransactionInfo {
 //                    feeInfo.setValue(feeValue);
 //                }
 //            }
-        } else if (type == TxType.REGISTER_AGENT || type == TxType.DEPOSIT || type == TxType.CANCEL_DEPOSIT || type == TxType.STOP_AGENT) {
+        } else if (type == TxType.CANCEL_DEPOSIT || type == TxType.STOP_AGENT) {
             //如果是共识相关的交易，收取共识配置的手续费
             assetInfo = CacheManager.getRegisteredAsset(DBUtil.getAssetKey(configInfo.getChainId(), configInfo.getAwardAssetId()));
             feeInfo = new FeeInfo(assetInfo.getChainId(), assetInfo.getAssetId(), assetInfo.getSymbol());
             BigInteger feeValue = calcFeeValue(assetInfo.getChainId(), assetInfo.getAssetId());
             feeInfo.setValue(feeValue);
-        } else if (type == TxType.CREATE_CONTRACT || type == TxType.CALL_CONTRACT) {
-            ContractResultInfo resultInfo;
-            if (type == TxType.CREATE_CONTRACT) {
-                ContractInfo contractInfo = (ContractInfo) this.txData;
-                resultInfo = contractInfo.getResultInfo();
-            } else {
-                ContractCallInfo callInfo = (ContractCallInfo) this.txData;
-                resultInfo = callInfo.getResultInfo();
-            }
-            feeInfo = new FeeInfo(assetInfo.getChainId(), assetInfo.getAssetId(), assetInfo.getSymbol());
-            if (resultInfo != null) {
-                BigInteger feeValue = new BigInteger(resultInfo.getActualContractFee()).add(new BigInteger(resultInfo.getTxSizeFee()));
-                feeInfo.setValue(feeValue);
-            }
         } else {
-            //其他类型的交易,去本链默认资产手续费
-            feeInfo = new FeeInfo(assetInfo.getChainId(), assetInfo.getAssetId(), assetInfo.getSymbol());
-            feeInfo.setValue(calcFeeValue(assetInfo.getChainId(), assetInfo.getAssetId()));
+            List<Map<String, Object>> chainFeeSetting;
+            String assetkey = DBUtil.getAssetKey(configInfo.getChainId(), configInfo.getAwardAssetId());
+            if (chainId == 1) {
+                chainFeeSetting = FeeUtils.getMainNetSetting();
+            } else {
+                chainFeeSetting = FeeUtils.getTestNetSetting();
+            }
+            BigInteger totalFee = BigInteger.ZERO;
+            int[] arr = new int[0];
+
+            for (Map<String, Object> keyMap : chainFeeSetting) {
+                if (totalFee.compareTo(BigInteger.ZERO) != 0) {
+                    break;
+                }
+                assetkey = (String) keyMap.get("assetId");
+                arr = NCUtils.splitTokenId(assetkey);
+                totalFee = calcFeeValue(arr[0], arr[1]);
+            }
+            assetInfo = CacheManager.getRegisteredAsset(assetkey);
+            if (type == TxType.CREATE_CONTRACT || type == TxType.CALL_CONTRACT) {
+                ContractResultInfo resultInfo;
+                if (type == TxType.CREATE_CONTRACT) {
+                    ContractInfo contractInfo = (ContractInfo) this.txData;
+                    resultInfo = contractInfo.getResultInfo();
+                } else {
+                    ContractCallInfo callInfo = (ContractCallInfo) this.txData;
+                    resultInfo = callInfo.getResultInfo();
+                }
+                feeInfo = new FeeInfo(assetInfo.getChainId(), assetInfo.getAssetId(), assetInfo.getSymbol());
+                if (resultInfo != null) {
+                    BigInteger feeValue = new BigInteger(resultInfo.getActualContractFee()).add(new BigInteger(resultInfo.getTxSizeFee()));
+                    feeInfo.setValue(feeValue);
+                }
+            } else {
+                //其他类型的交易,去本链默认资产手续费
+                feeInfo = new FeeInfo(assetInfo.getChainId(), assetInfo.getAssetId(), assetInfo.getSymbol());
+                feeInfo.setValue(totalFee);
+            }
         }
         this.fee = feeInfo;
         return feeInfo;

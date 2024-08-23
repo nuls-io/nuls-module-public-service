@@ -886,6 +886,7 @@ public class AnalysisHandler {
         //resultInfo.setBalance((String) map.get("balance"));
         resultInfo.setEvents((List<String>) resultMap.get("events"));
         resultInfo.setRemark((String) resultMap.get("remark"));
+        resultInfo.setFeeAsset((String) resultMap.get("feeAsset"));
         resultInfo.setContractTxList((List<String>) resultMap.get("contractTxList"));
 
         List<Map<String, Object>> transfers = (List<Map<String, Object>>) resultMap.get("transfers");

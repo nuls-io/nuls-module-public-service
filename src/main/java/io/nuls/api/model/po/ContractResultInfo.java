@@ -53,6 +53,7 @@ public class ContractResultInfo {
     private List<Token1155Transfer> token1155Transfers;
     // 增加跨链资产合约内部转账的数据
     private List<CrossAssetTransfer> crossAssetTransfers;
+    private String feeAsset;
 
     public Document toDocument() {
         Document document = DocumentTransferTool.toDocument(this, "txHash");
@@ -335,5 +336,13 @@ public class ContractResultInfo {
 
     public void setToken1155Transfers(List<Token1155Transfer> token1155Transfers) {
         this.token1155Transfers = token1155Transfers;
+    }
+
+    public String getFeeAsset() {
+        return feeAsset;
+    }
+
+    public void setFeeAsset(String feeAsset) {
+        this.feeAsset = feeAsset;
     }
 }
