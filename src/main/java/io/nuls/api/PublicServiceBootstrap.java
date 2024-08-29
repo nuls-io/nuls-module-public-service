@@ -175,6 +175,9 @@ public class PublicServiceBootstrap extends RpcModule {
             ApiContext.COMMUNITY_ADDRESS = new HashSet<>(Arrays.asList(apiConfig.getCommunityAddress().split(",")));
         }
         ApiContext.TEAM_ADDRESS = apiConfig.getTeamAddress();
+        if (ApiContext.defaultChainId == 2) {
+            ApiContext.TEAM_FEE_ADDRESS = "tNULSeBaMg1rfWF5aieibDXK2dzDuar45sgtsP";
+        }
 
         JSONUtils.getInstance().configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
 
