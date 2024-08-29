@@ -191,7 +191,8 @@ public class TransactionInfo {
                 totalFee = calcFeeValue(arr[0], arr[1]);
             }
             assetInfo = CacheManager.getRegisteredAsset(assetkey);
-            if (coinTos != null && !coinTos.isEmpty()) {
+
+            /*if (coinTos != null && !coinTos.isEmpty()) {
                 for (CoinToInfo toInfo : coinTos) {
                     if (toInfo.getChainId() == assetInfo.getChainId()
                             && toInfo.getAssetsId() == assetInfo.getAssetId()
@@ -199,7 +200,8 @@ public class TransactionInfo {
                         totalFee = totalFee.add(toInfo.getAmount());
                     }
                 }
-            }
+            }*/
+
             if (type == TxType.CREATE_CONTRACT || type == TxType.CALL_CONTRACT) {
                 ContractResultInfo resultInfo;
                 if (type == TxType.CREATE_CONTRACT) {
