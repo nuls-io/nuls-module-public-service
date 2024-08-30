@@ -62,14 +62,14 @@ public class FeeUtils {
                     "        \"assetId\": \"2-201\",\n" +
                     "        \"symbol\": \"BTC\",\n" +
                     "        \"decimals\": 8,\n" +
-                    "        \"feePerKB\": \"10000\",\n" +
+                    "        \"feePerKB\": \"100\",\n" +
                     "        \"scFeeFoefficient\": \"0.0001\"\n" +
                     "    },\n" +
                     "    {\n" +
                     "        \"assetId\": \"2-202\",\n" +
                     "        \"symbol\": \"ETH\",\n" +
                     "        \"decimals\": 18,\n" +
-                    "        \"feePerKB\": \"100000000000000\",\n" +
+                    "        \"feePerKB\": \"20000000000000\",\n" +
                     "        \"scFeeFoefficient\": \"10000000\"\n" +
                     "    }\n" +
                     "]", HashMap.class);
