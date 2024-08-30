@@ -1300,13 +1300,15 @@ public class SyncService {
             accountInfo.setTotalOut(accountInfo.getTotalOut().add(input.getAmount()));
             accountInfo.setTotalBalance(accountInfo.getTotalBalance().subtract(input.getAmount()));
             if (accountInfo.getTotalBalance().compareTo(BigInteger.ZERO) < 0) {
-                throw new NulsRuntimeException(ApiErrorCode.DATA_ERROR, "account[" + accountInfo.getAddress() + "] totalBalance < 0");
+                accountInfo.setTotalBalance(BigInteger.ZERO);
+//                throw new NulsRuntimeException(ApiErrorCode.DATA_ERROR, "account[" + accountInfo.getAddress() + "] totalBalance < 0");
             }
         }
         AccountLedgerInfo ledgerInfo = this.queryLedgerInfo(chainId, input.getAddress(), input.getChainId(), input.getAssetsId());
         ledgerInfo.setTotalBalance(ledgerInfo.getTotalBalance().subtract(input.getAmount()));
         if (ledgerInfo.getTotalBalance().compareTo(BigInteger.ZERO) < 0) {
-            throw new NulsRuntimeException(ApiErrorCode.DATA_ERROR, "accountLedger[" + DBUtil.getAccountAssetKey(ledgerInfo.getAddress(), ledgerInfo.getChainId(), ledgerInfo.getAssetId()) + "] totalBalance < 0");
+            ledgerInfo.setTotalBalance(BigInteger.ZERO);
+//            throw new NulsRuntimeException(ApiErrorCode.DATA_ERROR, "accountLedger[" + DBUtil.getAccountAssetKey(ledgerInfo.getAddress(), ledgerInfo.getChainId(), ledgerInfo.getAssetId()) + "] totalBalance < 0");
         }
         return ledgerInfo;
     }
@@ -1316,13 +1318,15 @@ public class SyncService {
             accountInfo.setTotalOut(accountInfo.getTotalOut().add(fee));
             accountInfo.setTotalBalance(accountInfo.getTotalBalance().subtract(fee));
             if (accountInfo.getTotalBalance().compareTo(BigInteger.ZERO) < 0) {
-                throw new NulsRuntimeException(ApiErrorCode.DATA_ERROR, "account[" + accountInfo.getAddress() + "] totalBalance < 0");
+                accountInfo.setTotalBalance(BigInteger.ZERO);
+//                throw new NulsRuntimeException(ApiErrorCode.DATA_ERROR, "account[" + accountInfo.getAddress() + "] totalBalance < 0");
             }
         }
         AccountLedgerInfo ledgerInfo = this.queryLedgerInfo(chainId, accountInfo.getAddress(), assetChainId, assetId);
         ledgerInfo.setTotalBalance(ledgerInfo.getTotalBalance().subtract(fee));
         if (ledgerInfo.getTotalBalance().compareTo(BigInteger.ZERO) < 0) {
-            throw new NulsRuntimeException(ApiErrorCode.DATA_ERROR, "accountLedger[" + DBUtil.getAccountAssetKey(ledgerInfo.getAddress(), ledgerInfo.getChainId(), ledgerInfo.getAssetId()) + "] totalBalance < 0");
+            ledgerInfo.setTotalBalance(BigInteger.ZERO);
+//            throw new NulsRuntimeException(ApiErrorCode.DATA_ERROR, "accountLedger[" + DBUtil.getAccountAssetKey(ledgerInfo.getAddress(), ledgerInfo.getChainId(), ledgerInfo.getAssetId()) + "] totalBalance < 0");
         }
         return ledgerInfo;
     }
