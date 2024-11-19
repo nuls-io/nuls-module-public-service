@@ -692,7 +692,12 @@ public class AnalysisHandler {
         if (!internalCreates.isEmpty()) {
             Map<String, ContractInfo> contractInfoMap = new HashMap<>();
             for (ContractInternalCreateInfo internalCreate : internalCreates) {
-                contractInfoMap.put(internalCreate.getContractAddress(), toContractInfoByInternalCreate(chainId, tx, internalCreate, resultInfo));
+                try {
+                    contractInfoMap.put(internalCreate.getContractAddress(), toContractInfoByInternalCreate(chainId, tx, internalCreate, resultInfo));
+                } catch (Exception e) {
+                    Log.info(String.format("ContractInfoMap make error, hash: %s, inner contract: %s", resultInfo.getTxHash(), internalCreate.getContractAddress()), e);
+                    continue;
+                }
             }
             callInfo.setInternalCreateContractInfos(contractInfoMap);
         }
