@@ -272,11 +272,7 @@ public class AnalysisHandler {
                 info.setTxData(toTxData(chainId, tx, version));
             }
         } else {
-            try {
-                info.setTxData(toTxData(chainId, tx, resultInfo));
-            }catch (Exception e){
-                Log.error(e);
-            }
+            info.setTxData(toTxData(chainId, tx, resultInfo));
         }
         info.calcValue(chainId);
         info.calcFee(chainId);
@@ -548,7 +544,11 @@ public class AnalysisHandler {
         }
         contractInfo.setStatus(ApiConstant.CONTRACT_STATUS_NORMAL);
         contractInfo.setSuccess(true);
-        fillContractInfo(chainId, contractInfo);
+        try {
+            fillContractInfo(chainId, contractInfo);
+        }catch (Exception e){
+            Log.error(e);
+        }
 
         String remark = "";
         if (tx.getRemark() != null) {
