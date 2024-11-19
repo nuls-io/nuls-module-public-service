@@ -544,11 +544,7 @@ public class AnalysisHandler {
         }
         contractInfo.setStatus(ApiConstant.CONTRACT_STATUS_NORMAL);
         contractInfo.setSuccess(true);
-        try {
-            fillContractInfo(chainId, contractInfo);
-        }catch (Exception e){
-            Log.error(e);
-        }
+        fillContractInfo(chainId, contractInfo);
 
         String remark = "";
         if (tx.getRemark() != null) {
@@ -696,12 +692,7 @@ public class AnalysisHandler {
         if (!internalCreates.isEmpty()) {
             Map<String, ContractInfo> contractInfoMap = new HashMap<>();
             for (ContractInternalCreateInfo internalCreate : internalCreates) {
-                try {
-                    contractInfoMap.put(internalCreate.getContractAddress(), toContractInfoByInternalCreate(chainId, tx, internalCreate, resultInfo));
-                } catch (Exception e) {
-                    Log.info(String.format("ContractInfoMap make error, hash: %s, inner contract: %s", resultInfo.getTxHash(), internalCreate.getContractAddress()), e);
-                    continue;
-                }
+                contractInfoMap.put(internalCreate.getContractAddress(), toContractInfoByInternalCreate(chainId, tx, internalCreate, resultInfo));
             }
             callInfo.setInternalCreateContractInfos(contractInfoMap);
         }
