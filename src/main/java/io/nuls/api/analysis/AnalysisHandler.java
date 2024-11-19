@@ -272,7 +272,11 @@ public class AnalysisHandler {
                 info.setTxData(toTxData(chainId, tx, version));
             }
         } else {
-            info.setTxData(toTxData(chainId, tx, resultInfo));
+            try {
+                info.setTxData(toTxData(chainId, tx, resultInfo));
+            }catch (Exception e){
+                Log.error(e);
+            }
         }
         info.calcValue(chainId);
         info.calcFee(chainId);
