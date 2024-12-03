@@ -85,6 +85,10 @@ public class NerveChainVo {
     public NerveChainVo(String name) {
         this.name = name;
     }
+    public NerveChainVo(String name,String imageUrl) {
+        this.name = name;
+        this.iconUrl = imageUrl;
+    }
 
 
     public Long getId() {
