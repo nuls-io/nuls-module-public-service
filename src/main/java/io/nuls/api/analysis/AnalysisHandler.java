@@ -759,7 +759,7 @@ public class AnalysisHandler {
             contractInfo.setSymbol(tokenSymbol.toString());
             contractInfo.setOwners(new ArrayList<>());
         }
-        if (contractInfo.isNrc20()) {˚
+        if (contractInfo.isNrc20()) {
             contractInfo.setTokenName(map.get("nrc20TokenName").toString());
             contractInfo.setSymbol(map.get("nrc20TokenSymbol").toString());
             contractInfo.setDecimals((Integer) map.get("decimals"));
