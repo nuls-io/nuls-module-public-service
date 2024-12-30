@@ -247,7 +247,11 @@ public class ContractController {
         if (pageInfo != null && pageInfo.getList() != null && pageInfo.getList().size() > 0) {
             List<AccountTokenInfo> list = pageInfo.getList();
             for (AccountTokenInfo tokenInfo : list) {
-                BigInteger available = WalletRpcHandler.tokenBalance(chainId, tokenInfo.getContractAddress(), tokenInfo.getAddress()).getData();
+                Result<BigInteger> result = WalletRpcHandler.tokenBalance(chainId, tokenInfo.getContractAddress(), tokenInfo.getAddress());
+                if (null == result) {
+                    continue;
+                }
+                BigInteger available = result.getData();
                 BigInteger total = tokenInfo.getBalance();
                 BigInteger locked = total.subtract(available);
                 tokenInfo.setLockedBalance(locked);
