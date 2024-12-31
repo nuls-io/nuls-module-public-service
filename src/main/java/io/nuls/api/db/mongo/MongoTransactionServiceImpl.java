@@ -223,12 +223,8 @@ public class MongoTransactionServiceImpl implements TransactionService, Initiali
         } else if (endTime > 0) {
             filter = Filters.lte("createTime", endTime);
         }
-        long start = System.currentTimeMillis();
         long totalCount = mongoDBService.getCount(TX_TABLE + chainId, filter);
-        LoggerUtil.commonLog.info("getTxList - 1 :: use {} ms",System.currentTimeMillis()-start);
-        start = System.currentTimeMillis();
         List<Document> docList = this.mongoDBService.pageQuery(TX_TABLE + chainId, filter, Sorts.descending("createTime"), pageIndex, pageSize);
-        LoggerUtil.commonLog.info("getTxList - 2 :: use {} ms",System.currentTimeMillis()-start);
         List<MiniTransactionInfo> txList = new ArrayList<>();
         for (Document document : docList) {
             txList.add(MiniTransactionInfo.toInfo(document));
