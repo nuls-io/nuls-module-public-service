@@ -79,7 +79,7 @@ public class MongoChainAssetService implements ChainAssetService {
             filter = Filters.and(filter, Filters.eq("to", to));
         }
 
-        List<Document> docsList = this.mongoDBService.pageQuery(CHAIN_ASSET_TX_TABLE, filter, Sorts.descending("createTime"), pageNumber, pageSize);
+        List<Document> docsList = this.mongoDBService.pageQuery(CHAIN_ASSET_TX_TABLE, filter, Sorts.descending("height"), pageNumber, pageSize);
         List<ChainAssetTx> infoList = new ArrayList<>();
 //        long totalCount = mongoDBService.getCount(CHAIN_ASSET_TX_TABLE, Filters.eq("assetId", assetKey));
         for (Document document : docsList) {
