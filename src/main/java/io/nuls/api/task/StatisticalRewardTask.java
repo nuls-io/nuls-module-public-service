@@ -6,6 +6,7 @@ import io.nuls.api.db.StatisticalService;
 import io.nuls.api.manager.CacheManager;
 import io.nuls.api.model.po.BlockHeaderInfo;
 import io.nuls.api.model.po.ChainStatisticalInfo;
+import io.nuls.api.utils.AssetTool;
 import io.nuls.core.core.ioc.SpringLiteContext;
 import io.nuls.core.log.Log;
 
@@ -62,8 +63,11 @@ public class StatisticalRewardTask implements Runnable {
             statisticalInfo.setLastStatisticalHeight(endHeight);
             statisticalInfo.setTxCount(statisticalInfo.getTxCount() + count);
             statisticalService.saveChainStatisticalInfo(statisticalInfo);
-
-            apiCache.getCoinContextInfo().setTxCount(statisticalInfo.getTxCount());
+            long txCount = statisticalInfo.getTxCount();
+            if(null!=apiCache.getBestHeader()){
+                txCount = AssetTool.getTxCountByHeight(apiCache.getBestHeader().getHeight());
+            }
+            apiCache.getCoinContextInfo().setTxCount(txCount);
         } catch (Exception e) {
             Log.error(e);
         }
