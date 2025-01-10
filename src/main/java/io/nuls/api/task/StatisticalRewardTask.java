@@ -54,7 +54,6 @@ public class StatisticalRewardTask implements Runnable {
                 statisticalInfo.setLastStatisticalHeight(startHeight + 1000);
                 statisticalInfo.setTxCount(statisticalInfo.getTxCount() + count);
                 statisticalService.saveChainStatisticalInfo(statisticalInfo);
-                apiCache.getCoinContextInfo().setTxCount(statisticalInfo.getTxCount());
                 startHeight += 1000;
                 Thread.sleep(100);
 //                LoggerUtil.commonLog.info("chain statistical info calc......");
