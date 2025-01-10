@@ -349,7 +349,11 @@ public class ChainController {
         }
         CoinContextInfo coinContextInfo = apiCache.getCoinContextInfo();
         Map<String, Object> map = new HashMap<>();
-        map.put("trades", coinContextInfo.getTxCount());
+        long txCount = coinContextInfo.getTxCount();
+        if (null != apiCache.getBestHeader()) {
+            txCount = AssetTool.getTxCountByHeight(apiCache.getBestHeader().getHeight());
+        }
+        map.put("trades", txCount);
         map.put("totalAssets", AssetTool.toCoinString(coinContextInfo.getTotal()));
         map.put("circulation", AssetTool.toCoinString(coinContextInfo.getCirculation()));
         map.put("deposit", AssetTool.toCoinString(coinContextInfo.getConsensusTotal()));
