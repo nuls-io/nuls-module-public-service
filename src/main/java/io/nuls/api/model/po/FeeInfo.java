@@ -58,6 +58,15 @@ public class FeeInfo {
     }
 
     public int getDecimals() {
+        if (decimals <= 0) {
+            if ("NULS".equals(symbol)) {
+                decimals = 8;
+            } else if ("ETH".equals(symbol)) {
+                decimals = 18;
+            } else if ("BTC".equals(symbol)) {
+                decimals = 8;
+            }
+        }
         return decimals;
     }
 

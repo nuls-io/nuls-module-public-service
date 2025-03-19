@@ -14,6 +14,7 @@ import io.nuls.api.model.po.mini.MiniTransactionInfo;
 import io.nuls.api.model.rpc.BalanceInfo;
 import io.nuls.api.model.rpc.RpcResult;
 import io.nuls.api.utils.DocumentTransferTool;
+import io.nuls.api.utils.LoggerUtil;
 import io.nuls.base.basic.AddressTool;
 import io.nuls.core.basic.InitializingBean;
 import io.nuls.core.basic.Result;

@@ -123,7 +123,7 @@ public class AccountController {
 
     @RpcMethod("getAccountTxs")
     public RpcResult getAccountTxs(List<Object> params) {
-        VerifyUtils.verifyParams(params, 7);
+//        VerifyUtils.verifyParams(params, 7);
         int chainId, assetChainId, assetId, pageNumber, pageSize, type;
         String address;
         long startHeight, endHeight;
@@ -185,23 +185,16 @@ public class AccountController {
         try {
             PageInfo<TxRelationInfo> pageInfo;
             if (CacheManager.isChainExist(chainId)) {
-
-                long start = System.currentTimeMillis();
                 pageInfo = accountService.getAccountTxs(chainId, address, pageNumber, pageSize, type, startHeight, endHeight, assetChainId, assetId);
-//                LoggerUtil.commonLog.info("-getAccountTxs- Step 1 use {}ms", System.currentTimeMillis() - start);
-                start = System.currentTimeMillis();
                 result.setResult(new PageInfo<>(pageNumber, pageSize, pageInfo.getTotalCount(), pageInfo.getList().stream().map(d -> {
-                    long start2 = System.currentTimeMillis();
                     Map res = MapUtils.beanToMap(d);
                     AssetInfo assetInfo = CacheManager.getRegisteredAsset(d.getChainId() + "-" + d.getAssetId());
                     if (assetInfo != null) {
                         res.put("symbol", assetInfo.getSymbol());
                         res.put("decimals", assetInfo.getDecimals());
                     }
-//                    LoggerUtil.commonLog.info("-getAccountTxs- Step 1.1 use {}ms", System.currentTimeMillis() - start2);
                     return res;
                 }).collect(Collectors.toList())));
-//                LoggerUtil.commonLog.info("-getAccountTxs- Step 2 use {}ms", System.currentTimeMillis() - start);
             } else {
                 result.setResult(new PageInfo<>(pageNumber, pageSize));
             }
@@ -212,7 +205,7 @@ public class AccountController {
     }
 
     /**
-     * 查询账户普通转账和跨链转账交易
+     * Query account regular transfer and cross chain transfer transactions
      *
      * @param params
      * @return
@@ -424,7 +417,7 @@ public class AccountController {
         }
         if (address.equals(BlockHoleAddress)) {
             //黑洞地址特殊处理
-            accountInfo.setAlias("Black Hole Address");
+            accountInfo.setAlias("BlockHoleAddress");
             accountInfo.setBalance(BigInteger.ZERO);
             accountInfo.setTotalBalance(BigInteger.ZERO);
             accountInfo.setTotalIn(BigInteger.ZERO);

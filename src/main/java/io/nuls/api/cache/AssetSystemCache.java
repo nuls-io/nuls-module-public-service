@@ -25,11 +25,11 @@ public class AssetSystemCache {
     public static void putChainList(List<NerveChainVo> voList) {
         voList.forEach(vo -> chainMap.put(vo.getId(), vo));
         chainMap.put(1L, new NerveChainVo("NULS","https://nuls-cf.oss-us-west-1.aliyuncs.com/icon/NULS.png"));
-        chainMap.put(9L, new NerveChainVo("Nerve","https://nerve.network/img/NERVE.0a64fa4f.png"));
+        chainMap.put(9L, new NerveChainVo("Nerve","https://nerve-west.oss-us-west-1.aliyuncs.com/logo/NERVE.png"));
         chainMap.put(-1L, new NerveChainVo("NULS","https://nuls-cf.oss-us-west-1.aliyuncs.com/icon/NULS.png"));
-        chainMap.put(-2L, new NerveChainVo("Nerve","https://nerve.network/img/NERVE.0a64fa4f.png"));
+        chainMap.put(-2L, new NerveChainVo("Nerve","https://nerve-west.oss-us-west-1.aliyuncs.com/logo/NERVE.png"));
         chainMap.put(2L, new NerveChainVo("NULS-Testnet","https://nuls-cf.oss-us-west-1.aliyuncs.com/icon/NULS.png"));
-        chainMap.put(5L, new NerveChainVo("NERVE-Testnet","https://nerve.network/img/NERVE.0a64fa4f.png"));
+        chainMap.put(5L, new NerveChainVo("NERVE-Testnet","https://nerve-west.oss-us-west-1.aliyuncs.com/logo/NERVE.png"));
         chainMap.put(108L, new NerveChainVo("Tron","http://nassets.oss-us-west-1.aliyuncs.com/TRX_9.png"));
     }
 

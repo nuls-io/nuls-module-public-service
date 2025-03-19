@@ -762,13 +762,27 @@ public class AnalysisHandler {
         if (contractInfo.isNrc20()) {
             try {
                 contractInfo.setTokenName(map.get("nrc20TokenName").toString());
-                contractInfo.setSymbol(map.get("nrc20TokenSymbol").toString());
-                contractInfo.setDecimals((Integer) map.get("decimals"));
-                contractInfo.setTotalSupply(map.get("totalSupply").toString());
-                contractInfo.setOwners(new ArrayList<>());
-            }catch (Exception e){
+            } catch (Exception e) {
                 LoggerUtil.commonLog.error(e);
             }
+            try {
+                contractInfo.setSymbol(map.get("nrc20TokenSymbol").toString());
+            } catch (Exception e) {
+                LoggerUtil.commonLog.error(e);
+            }
+
+            try {
+                contractInfo.setDecimals((Integer) map.get("decimals"));
+            } catch (Exception e) {
+                LoggerUtil.commonLog.error(e);
+            }
+
+            try {
+                contractInfo.setTotalSupply(map.get("totalSupply").toString());
+            } catch (Exception e) {
+                LoggerUtil.commonLog.error(e);
+            }
+            contractInfo.setOwners(new ArrayList<>());
         }
 
         List<Map<String, Object>> methodMap = (List<Map<String, Object>>) map.get("method");

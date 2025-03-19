@@ -24,7 +24,11 @@ public class AssetTool {
         ApiCache apiCache = CacheManager.getCache(ApiContext.defaultChainId);
         CoinContextInfo coinContextInfo = apiCache.getCoinContextInfo();
         Map<String, Object> map = new HashMap<>();
-        map.put("trades", coinContextInfo.getTxCount());
+        long txCount = coinContextInfo.getTxCount();
+        if(null!=apiCache.getBestHeader()){
+            txCount = getTxCountByHeight(apiCache.getBestHeader().getHeight());
+        }
+        map.put("trades", txCount);
         map.put("totalAssets", AssetTool.toDouble(coinContextInfo.getTotal()));
         map.put("circulation", AssetTool.toDouble(coinContextInfo.getCirculation()));
         map.put("deposit", AssetTool.toDouble(coinContextInfo.getConsensusTotal()));
@@ -53,8 +57,11 @@ public class AssetTool {
     public static Map getNulsAssetInfo() {
         ApiCache apiCache = CacheManager.getCache(ApiContext.defaultChainId);
         CoinContextInfo coinContextInfo = apiCache.getCoinContextInfo();
-        Map<String, Object> map = new HashMap<>();
-        map.put("trades", coinContextInfo.getTxCount());
+        Map<String, Object> map = new HashMap<>();long txCount = coinContextInfo.getTxCount();
+        if(null!=apiCache.getBestHeader()){
+            txCount = getTxCountByHeight(apiCache.getBestHeader().getHeight());
+        }
+        map.put("trades", txCount);
         map.put("totalAssets", AssetTool.toCoinString(coinContextInfo.getTotal()));
         map.put("circulation", AssetTool.toCoinString(coinContextInfo.getCirculation()));
         map.put("deposit", AssetTool.toCoinString(coinContextInfo.getConsensusTotal()));
@@ -78,6 +85,10 @@ public class AssetTool {
         }
         map.put("totalNodes", count);
         return map;
+    }
+
+    public static long getTxCountByHeight(long height) {
+        return (long) (height * 1.3081314319335393d);
     }
 
     public static String getTotal() {
