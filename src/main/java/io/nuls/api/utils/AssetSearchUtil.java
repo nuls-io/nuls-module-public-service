@@ -63,6 +63,7 @@ public class AssetSearchUtil {
         for (Nrc20Info info : nrc20InfoList) {
             if(StringUtils.isBlank(info.getSymbol())){
                 LoggerUtil.commonLog.warn(info.getContractAddress()+", symbol is null!");
+                continue;
             }
             if (info.getSymbol().toUpperCase().startsWith(text.toUpperCase())) {
                 infoList.add(info);
