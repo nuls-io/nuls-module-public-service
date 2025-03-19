@@ -61,6 +61,9 @@ public class AssetSearchUtil {
         LoggerUtil.commonLog.info("Search nrc20 list size : {}", nrc20InfoList.size());
         List<Nrc20Info> infoList = new ArrayList<>();
         for (Nrc20Info info : nrc20InfoList) {
+            if(StringUtils.isBlank(info.getSymbol())){
+                LoggerUtil.commonLog.warn(info.getContractAddress()+", symbol is null!");
+            }
             if (info.getSymbol().toUpperCase().startsWith(text.toUpperCase())) {
                 infoList.add(info);
             }
