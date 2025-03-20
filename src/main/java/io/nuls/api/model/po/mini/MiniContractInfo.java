@@ -31,6 +31,16 @@ public class MiniContractInfo {
 
     private String totalSupply;
 
+    private int transferCount;
+
+    public int getTransferCount() {
+        return transferCount;
+    }
+
+    public void setTransferCount(int transferCount) {
+        this.transferCount = transferCount;
+    }
+
     public int getTokenType() {
         return tokenType;
     }

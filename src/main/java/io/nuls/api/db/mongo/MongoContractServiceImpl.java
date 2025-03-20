@@ -190,7 +190,7 @@ public class MongoContractServiceImpl implements ContractService {
         }
         Bson sort = Sorts.descending("createTime");
         BasicDBObject fields = new BasicDBObject();
-        fields.append("_id", 1).append("remark", 1).append("txCount", 1).append("status", 1)
+        fields.append("_id", 1).append("remark", 1).append("transferCount", 1).append("status", 1)
                 .append("createTime", 1).append("balance", 1).append("tokenName", 1).append("symbol", 1)
                 .append("decimals", 1).append("totalSupply", 1).append("creater", 1).append("alias", 1).append("tokenType", 1);
 
@@ -200,6 +200,8 @@ public class MongoContractServiceImpl implements ContractService {
 
         for (Document document : docsList) {
             MiniContractInfo contractInfo = DocumentTransferTool.toInfo(document, "contractAddress", MiniContractInfo.class);
+            // add by peter at 2025/3/20
+            contractInfo.setTxCount(contractInfo.getTransferCount());
             contractInfos.add(contractInfo);
         }
         PageInfo<MiniContractInfo> pageInfo = new PageInfo<>(pageNumber, pageSize, totalCount, contractInfos);
