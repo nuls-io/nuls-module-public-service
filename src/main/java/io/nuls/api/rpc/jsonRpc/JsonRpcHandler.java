@@ -97,6 +97,37 @@ public class JsonRpcHandler extends HttpHandler {
                 response.getWriter().write(AssetTool.getCirculation());
                 return;
             }
+
+            if (request.getRequestURI().endsWith("nai/tvl") || request.getRequestURI().endsWith("nai/tvl/")) {
+                TvlController.doGet(response);
+                return;
+            }
+            if (request.getRequestURI().endsWith("nai/assets/get") || request.getRequestURI().endsWith("nai/assets/get/")) {
+                Map<String, Object> result = new HashMap<>();
+                result.put("success", true);
+                result.put("code", 1000);
+                result.put("msg", "success");
+                result.put("data", AssetTool.getNaiAssets());
+                response.getWriter().write(JSONUtils.obj2json(result));
+                return;
+            }
+            if (request.getRequestURI().endsWith("nai/assets/all/get") || request.getRequestURI().endsWith("nai/assets/get/")) {
+                Map<String, Object> result = new HashMap<>();
+                result.put("success", true);
+                result.put("code", 1000);
+                result.put("msg", "success");
+                result.put("data", AssetTool.getNaiAssetInfo());
+                response.getWriter().write(JSONUtils.obj2json(result));
+                return;
+            }
+            if (request.getRequestURI().endsWith("nai/assets/total/get") || request.getRequestURI().endsWith("nai/assets/total/get/")) {
+                response.getWriter().write(AssetTool.getNaiTotal());
+                return;
+            }
+            if (request.getRequestURI().endsWith("nai/assets/circulation/get") || request.getRequestURI().endsWith("nai/assets/circulation/get/")) {
+                response.getWriter().write(AssetTool.getNaiCirculation());
+                return;
+            }
         }
         String content = "";
         if (!request.getMethod().equals(Method.POST)) {

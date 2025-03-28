@@ -20,6 +20,39 @@ import java.util.Map;
 
 public class AssetTool {
 
+    public static Map getNaiAssets() {
+        ApiCache apiCache = CacheManager.getCache(ApiContext.defaultChainId);
+        CoinContextInfo coinContextInfo = apiCache.getCoinContextInfo();
+        Map<String, Object> map = new HashMap<>();
+        long txCount = coinContextInfo.getTxCount();
+        if(null!=apiCache.getBestHeader()){
+            txCount = getTxCountByHeight(apiCache.getBestHeader().getHeight());
+        }
+        map.put("trades", txCount);
+        map.put("totalAssets", AssetTool.toDouble(coinContextInfo.getTotal().multiply(BigInteger.valueOf(10000))));
+        map.put("circulation", AssetTool.toDouble(coinContextInfo.getCirculation().multiply(BigInteger.valueOf(10000))));
+        map.put("deposit", AssetTool.toDouble(coinContextInfo.getConsensusTotal().multiply(BigInteger.valueOf(10000))));
+        map.put("business", AssetTool.toDouble(coinContextInfo.getBusiness().multiply(BigInteger.valueOf(10000))));
+        map.put("team", AssetTool.toDouble(coinContextInfo.getTeam().multiply(BigInteger.valueOf(10000))));
+        map.put("community", AssetTool.toDouble(coinContextInfo.getCommunity().multiply(BigInteger.valueOf(10000))));
+        map.put("unmapped", AssetTool.toDouble(coinContextInfo.getUnmapped().multiply(BigInteger.valueOf(10000))));
+        map.put("dailyReward", AssetTool.toDouble(coinContextInfo.getDailyReward().multiply(BigInteger.valueOf(10000))));
+        map.put("destroy", AssetTool.toDouble(coinContextInfo.getDestroy().multiply(BigInteger.valueOf(10000))));
+        int consensusCount = apiCache.getCurrentRound().getMemberCount() - apiCache.getChainInfo().getSeeds().size();
+        if (consensusCount < 0) {
+            consensusCount = 0;
+        }
+        map.put("consensusNodes", consensusCount);
+        long count = 0;
+        if (apiCache.getBestHeader() != null) {
+            AgentService agentService = SpringLiteContext.getBean(AgentService.class);
+            if (agentService != null) {
+                count = agentService.agentsCount(ApiContext.defaultChainId, apiCache.getBestHeader().getHeight());
+            }
+        }
+        map.put("totalNodes", count);
+        return map;
+    }
     public static Map getNulsAssets() {
         ApiCache apiCache = CacheManager.getCache(ApiContext.defaultChainId);
         CoinContextInfo coinContextInfo = apiCache.getCoinContextInfo();
@@ -87,6 +120,40 @@ public class AssetTool {
         return map;
     }
 
+
+    public static Map getNaiAssetInfo() {
+        ApiCache apiCache = CacheManager.getCache(ApiContext.defaultChainId);
+        CoinContextInfo coinContextInfo = apiCache.getCoinContextInfo();
+        Map<String, Object> map = new HashMap<>();long txCount = coinContextInfo.getTxCount();
+        if(null!=apiCache.getBestHeader()){
+            txCount = getTxCountByHeight(apiCache.getBestHeader().getHeight());
+        }
+        map.put("trades", txCount);
+        map.put("totalAssets", AssetTool.toCoinString(coinContextInfo.getTotal().multiply(BigInteger.valueOf(10000))));
+        map.put("circulation", AssetTool.toCoinString(coinContextInfo.getCirculation().multiply(BigInteger.valueOf(10000))));
+        map.put("deposit", AssetTool.toCoinString(coinContextInfo.getConsensusTotal().multiply(BigInteger.valueOf(10000))));
+        map.put("business", AssetTool.toCoinString(coinContextInfo.getBusiness().multiply(BigInteger.valueOf(10000))));
+        map.put("team", AssetTool.toCoinString(coinContextInfo.getTeam().multiply(BigInteger.valueOf(10000))));
+        map.put("community", AssetTool.toCoinString(coinContextInfo.getCommunity().multiply(BigInteger.valueOf(10000))));
+        map.put("unmapped", AssetTool.toCoinString(coinContextInfo.getUnmapped().multiply(BigInteger.valueOf(10000))));
+        map.put("dailyReward", AssetTool.toCoinString(coinContextInfo.getDailyReward().multiply(BigInteger.valueOf(10000))));
+        map.put("destroy", AssetTool.toCoinString(coinContextInfo.getDestroy().multiply(BigInteger.valueOf(10000))));
+        int consensusCount = apiCache.getCurrentRound().getMemberCount() - apiCache.getChainInfo().getSeeds().size();
+        if (consensusCount < 0) {
+            consensusCount = 0;
+        }
+        map.put("consensusNodes", consensusCount);
+        long count = 0;
+        if (apiCache.getBestHeader() != null) {
+            AgentService agentService = SpringLiteContext.getBean(AgentService.class);
+            if (agentService != null) {
+                count = agentService.agentsCount(ApiContext.defaultChainId, apiCache.getBestHeader().getHeight());
+            }
+        }
+        map.put("totalNodes", count);
+        return map;
+    }
+
     public static long getTxCountByHeight(long height) {
         return (long) (height * 1.3081314319335393d);
     }
@@ -102,6 +169,19 @@ public class AssetTool {
         CoinContextInfo coinContextInfo = apiCache.getCoinContextInfo();
         return AssetTool.toCoinString(coinContextInfo.getCirculation());
     }
+
+    public static String getNaiTotal() {
+        ApiCache apiCache = CacheManager.getCache(ApiContext.defaultChainId);
+        CoinContextInfo coinContextInfo = apiCache.getCoinContextInfo();
+        return AssetTool.toCoinString(coinContextInfo.getTotal().multiply(BigInteger.valueOf(10000)));
+    }
+
+    public static String getNaiCirculation() {
+        ApiCache apiCache = CacheManager.getCache(ApiContext.defaultChainId);
+        CoinContextInfo coinContextInfo = apiCache.getCoinContextInfo();
+        return AssetTool.toCoinString(coinContextInfo.getCirculation().multiply(BigInteger.valueOf(10000)));
+    }
+
 
     public static double toDouble(BigInteger value) {
         return new BigDecimal(value).movePointLeft(8).setScale(8, RoundingMode.HALF_DOWN).doubleValue();
