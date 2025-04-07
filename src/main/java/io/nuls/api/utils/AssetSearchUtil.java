@@ -1,14 +1,17 @@
 package io.nuls.api.utils;
 
 import io.nuls.api.cache.ApiCache;
+import io.nuls.api.cache.AssetSystemCache;
 import io.nuls.api.cache.ChainAssetCache;
 import io.nuls.api.manager.CacheManager;
+import io.nuls.api.model.dto.AssetsSystemTokenInfoVo;
 import io.nuls.api.model.dto.SearchAssetInfo;
 import io.nuls.api.model.po.Nrc1155Info;
 import io.nuls.api.model.po.Nrc20Info;
 import io.nuls.api.model.po.Nrc721Info;
 import io.nuls.api.model.po.asset.ChainAssetInfo;
 import io.nuls.api.model.po.asset.ChainAssetInfoVo;
+import io.nuls.core.model.DoubleUtils;
 import io.nuls.core.model.StringUtils;
 
 import java.util.ArrayList;
@@ -49,6 +52,26 @@ public class AssetSearchUtil {
             nrc1155List.forEach(v -> resultList.add(new SearchAssetInfo(v)));
         }
 
+        if ("nai".equalsIgnoreCase(text)) {
+            String key = chainId + "-1";
+            ChainAssetInfo nulsInfo = ChainAssetCache.getAssetInfo(key);
+            SearchAssetInfo nuls = new SearchAssetInfo();
+            nuls.setDecimals(4);
+            nuls.setId(nulsInfo.getId());
+            nuls.setType(1);
+            nuls.setSymbol("NAI");
+            nuls.setWebsite("https://nulsai.com/");
+
+            AssetsSystemTokenInfoVo vo = AssetSystemCache.getAssetCache(key);
+            if (null != vo) {
+                nuls.setPrice(DoubleUtils.div(Double.parseDouble(vo.getPrice()),10000d)+"");
+            }
+
+            nuls.setIconUrl("https://nuls-cf.oss-us-west-1.aliyuncs.com/icon/NAI.png");
+
+            resultList.add(nuls);
+        }
+
 
         return resultList;
     }
@@ -60,8 +83,8 @@ public class AssetSearchUtil {
         }
         List<Nrc20Info> infoList = new ArrayList<>();
         for (Nrc20Info info : nrc20InfoList) {
-            if(StringUtils.isBlank(info.getSymbol())){
-                LoggerUtil.commonLog.warn(info.getContractAddress()+", symbol is null!");
+            if (StringUtils.isBlank(info.getSymbol())) {
+                LoggerUtil.commonLog.warn(info.getContractAddress() + ", symbol is null!");
                 continue;
             }
             if (info.getSymbol().toUpperCase().startsWith(text.toUpperCase())) {
@@ -77,8 +100,8 @@ public class AssetSearchUtil {
         }
         List<Nrc721Info> infoList = new ArrayList<>();
         for (Nrc721Info info : tokenInfoList) {
-            if(StringUtils.isBlank(info.getSymbol())){
-                LoggerUtil.commonLog.warn(info.getContractAddress()+", symbol is null!");
+            if (StringUtils.isBlank(info.getSymbol())) {
+                LoggerUtil.commonLog.warn(info.getContractAddress() + ", symbol is null!");
                 continue;
             }
             if (info.getSymbol().toUpperCase().startsWith(text.toUpperCase())) {
@@ -94,8 +117,8 @@ public class AssetSearchUtil {
         }
         List<Nrc1155Info> infoList = new ArrayList<>();
         for (Nrc1155Info info : tokenInfoList) {
-            if(StringUtils.isBlank(info.getSymbol())){
-                LoggerUtil.commonLog.warn(info.getContractAddress()+", symbol is null!");
+            if (StringUtils.isBlank(info.getSymbol())) {
+                LoggerUtil.commonLog.warn(info.getContractAddress() + ", symbol is null!");
                 continue;
             }
             if (info.getSymbol().toUpperCase().startsWith(text.toUpperCase())) {
