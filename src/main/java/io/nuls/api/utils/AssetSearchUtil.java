@@ -69,7 +69,7 @@ public class AssetSearchUtil {
 
             nuls.setIconUrl("https://nuls-cf.oss-us-west-1.aliyuncs.com/icon/NAI.png");
 
-            resultList.add(nuls);
+            resultList.add(0,nuls);
         }
 
 
