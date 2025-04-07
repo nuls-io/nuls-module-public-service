@@ -64,7 +64,7 @@ public class AssetSearchUtil {
 
             AssetsSystemTokenInfoVo vo = AssetSystemCache.getAssetCache(key);
             if (null != vo) {
-                nuls.setPrice(DoubleUtils.div(Double.parseDouble(vo.getPrice()),10000d)+"");
+                nuls.setPrice(DoubleUtils.getRoundStr(DoubleUtils.div(Double.parseDouble(vo.getPrice()),10000d),2));
             }
 
             nuls.setIconUrl("https://nuls-cf.oss-us-west-1.aliyuncs.com/icon/NAI.png");
