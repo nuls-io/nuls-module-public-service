@@ -152,9 +152,9 @@ checkJavaVersion(){
         JAVA='java'
     fi
 
-    JAVA_EXIST=`${JAVA} -version 2>&1 |grep 11`
+    JAVA_EXIST=`${JAVA} -version 2>&1 |grep 17`
     if [ ! -n "$JAVA_EXIST" ]; then
-            log "JDK version is not 11"
+            log "JDK version is not 17"
             ${JAVA} -version
             exit 0
     fi
