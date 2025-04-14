@@ -220,7 +220,7 @@ public class PocConsensusController {
         if (pageSize <= 0 || pageSize > 1000) {
             pageSize = 10;
         }
-        long start = System.currentTimeMillis();
+//        long start = System.currentTimeMillis();
         PageInfo<AgentInfo> pageInfo;
         if (!CacheManager.isChainExist(chainId)) {
             pageInfo = new PageInfo<>(pageNumber, pageSize);
@@ -265,7 +265,7 @@ public class PocConsensusController {
         }
         Collections.sort(pageInfo.getList(), AgentComparator.getInstance());
 
-        LoggerUtil.commonLog.info("-----use {}ms", System.currentTimeMillis() - start);
+//        LoggerUtil.commonLog.info("-----use {}ms", System.currentTimeMillis() - start);
         return new RpcResult().setResult(pageInfo);
     }
 
