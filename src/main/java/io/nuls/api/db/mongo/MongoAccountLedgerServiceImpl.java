@@ -144,8 +144,10 @@ public class MongoAccountLedgerServiceImpl implements AccountLedgerService {
         List<Document> documentList = mongoDBService.pageQuery(DBTableConstant.ACCOUNT_LEDGER_TABLE + chainId, filter, sort, pageNumber, pageSize);
         List<MiniAccountInfo> list = new ArrayList<>();
         BigDecimal b2 = new BigDecimal(assetInfo.getLocalTotalCoins());
-        if (CacheManager.NonCirculatingAmount.compareTo(BigInteger.ZERO) > 0) {
-            b2 = new BigDecimal(CacheManager.NonCirculatingAmount);
+        if (CacheManager.TotalNulsAmount.compareTo(BigInteger.ZERO) > 0) {
+            b2 = new BigDecimal(CacheManager.TotalNulsAmount);
+        } else {
+            b2 = b2.add(new BigDecimal(CacheManager.NonCirculatingAmount));
         }
         for (int i = 0; i < documentList.size(); i++) {
             AccountLedgerInfo ledgerInfo = DocumentTransferTool.toInfo(documentList.get(i), "key", AccountLedgerInfo.class);

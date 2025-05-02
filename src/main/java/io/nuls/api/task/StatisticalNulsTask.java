@@ -105,7 +105,7 @@ public class StatisticalNulsTask implements Runnable {
             }
             contextInfo.setUnmapped(unmapped);
             contextInfo.setTotal(totalCoin);
-            CacheManager.NonCirculatingAmount = totalCoin;
+            CacheManager.TotalNulsAmount = totalCoin;
             contextInfo.setConsensusTotal(consensusTotal);
             contextInfo.setDestroy(destroyNuls);
 

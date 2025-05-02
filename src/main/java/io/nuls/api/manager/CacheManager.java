@@ -15,7 +15,8 @@ import static io.nuls.api.constant.ApiConstant.ENABLE;
 
 public class CacheManager {
 
-    public static BigInteger NonCirculatingAmount = BigInteger.ZERO;
+    public static BigInteger NonCirculatingAmount = BigInteger.valueOf(19070199245943546L);
+    public static BigInteger TotalNulsAmount = BigInteger.ZERO;
 
     /**
      * 缓存每条当前节点运行链的数据
@@ -53,7 +54,7 @@ public class CacheManager {
         apiCacheMap.put(chainInfo.getChainId(), apiCache);
 
         if(null != apiCache.getCoinContextInfo()) {
-            NonCirculatingAmount = apiCache.getCoinContextInfo().getTotal();
+            TotalNulsAmount = apiCache.getCoinContextInfo().getTotal();
         }
         inited = true;
 
