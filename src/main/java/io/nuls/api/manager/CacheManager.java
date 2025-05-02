@@ -15,7 +15,7 @@ import static io.nuls.api.constant.ApiConstant.ENABLE;
 
 public class CacheManager {
 
-    public static BigInteger NonCirculatingAmount = BigInteger.valueOf(19070199245943546L);
+    public static BigInteger NonCirculatingAmount = BigInteger.valueOf(1907019924594354L);
     public static BigInteger TotalNulsAmount = BigInteger.ZERO;
 
     /**
