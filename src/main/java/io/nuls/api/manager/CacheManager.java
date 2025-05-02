@@ -7,12 +7,15 @@ import io.nuls.api.model.po.ChainConfigInfo;
 import io.nuls.api.model.po.ChainInfo;
 import io.nuls.api.model.po.CoinContextInfo;
 
+import java.math.BigInteger;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static io.nuls.api.constant.ApiConstant.ENABLE;
 
 public class CacheManager {
+
+    public static BigInteger NonCirculatingAmount = BigInteger.ZERO;
 
     /**
      * 缓存每条当前节点运行链的数据
@@ -48,7 +51,12 @@ public class CacheManager {
         CoinContextInfo contextInfo = new CoinContextInfo();
         apiCache.setCoinContextInfo(contextInfo);
         apiCacheMap.put(chainInfo.getChainId(), apiCache);
+
+        if(null != apiCache.getCoinContextInfo()) {
+            NonCirculatingAmount = apiCache.getCoinContextInfo().getTotal();
+        }
         inited = true;
+
     }
 
     public static boolean isInited() {

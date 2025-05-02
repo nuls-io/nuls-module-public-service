@@ -142,6 +142,8 @@ public class MongoAccountLedgerServiceImpl implements AccountLedgerService {
         Bson sort = Sorts.descending("totalBalance");
         List<Document> documentList = mongoDBService.pageQuery(DBTableConstant.ACCOUNT_LEDGER_TABLE + chainId, filter, sort, pageNumber, pageSize);
         List<MiniAccountInfo> list = new ArrayList<>();
+        BigDecimal b2 = new BigDecimal(assetInfo.getLocalTotalCoins());
+        b2 = b2.add(new BigDecimal(CacheManager.NonCirculatingAmount));
         for (int i = 0; i < documentList.size(); i++) {
             AccountLedgerInfo ledgerInfo = DocumentTransferTool.toInfo(documentList.get(i), "key", AccountLedgerInfo.class);
             MiniAccountInfo accountInfo = accountService.getMiniAccountInfo(chainId, ledgerInfo.getAddress());
@@ -151,7 +153,6 @@ public class MongoAccountLedgerServiceImpl implements AccountLedgerService {
             accountInfo.setDecimal(assetInfo.getDecimals());
 
             BigDecimal b1 = new BigDecimal(accountInfo.getTotalBalance());
-            BigDecimal b2 = new BigDecimal(assetInfo.getLocalTotalCoins());
             double prop = 0;
             if (b2.compareTo(BigDecimal.ZERO) > 0) {
                 prop = b1.divide(b2, 5, RoundingMode.HALF_UP).doubleValue() * 100;
