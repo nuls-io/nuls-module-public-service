@@ -12,7 +12,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
-        <java.version>17</java.version>
+        <java.version>11</java.version>
         <core.version>1.0.0-SNAPSHOT</core.version>
         <base.version>1.0.0-SNAPSHOT</base.version>
         <mongodb.version>3.9.1</mongodb.version>
