@@ -255,6 +255,7 @@ public class ContractController {
                 BigInteger total = tokenInfo.getBalance();
                 if(total.compareTo(available)<0){
                     total = available;
+                    tokenInfo.setBalance(available);
                 }
                 BigInteger locked = total.subtract(available);
                 tokenInfo.setLockedBalance(locked);
