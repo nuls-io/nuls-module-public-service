@@ -1300,8 +1300,8 @@ public class SyncService {
             accountInfo.setTotalOut(accountInfo.getTotalOut().add(input.getAmount()));
             accountInfo.setTotalBalance(accountInfo.getTotalBalance().subtract(input.getAmount()));
             if (accountInfo.getTotalBalance().compareTo(BigInteger.ZERO) < 0) {
-//                accountInfo.setTotalBalance(BigInteger.ZERO);
-                throw new NulsRuntimeException(ApiErrorCode.DATA_ERROR, "account[" + accountInfo.getAddress() + "] totalBalance < 0");
+                accountInfo.setTotalBalance(BigInteger.ZERO);
+//                throw new NulsRuntimeException(ApiErrorCode.DATA_ERROR, "account[" + accountInfo.getAddress() + "] totalBalance < 0");
             }
         }
         AccountLedgerInfo ledgerInfo = this.queryLedgerInfo(chainId, input.getAddress(), input.getChainId(), input.getAssetsId());
