@@ -19,16 +19,14 @@ import io.nuls.core.constant.TxStatusEnum;
 import io.nuls.core.exception.NulsException;
 import io.nuls.core.log.Log;
 import io.nuls.core.model.StringUtils;
+import io.nuls.core.parse.JSONUtils;
 import io.nuls.core.rpc.info.Constants;
 import io.nuls.core.rpc.model.ModuleE;
 import io.nuls.core.rpc.model.message.Response;
 import io.nuls.core.rpc.netty.processor.ResponseMessageProcessor;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static io.nuls.api.constant.ApiConstant.*;
 
@@ -395,6 +393,27 @@ public class WalletRpcHandler {
         params.put("args", args);
         Map map = (Map) RpcCall.request(ModuleE.SC.abbr, CommandConstant.INVOKE_VIEW, params);
         return Result.getSuccess(null).setData(map);
+    }
+
+    public static Result<List<String>> multicall(int chainId, List contracts, List methods, List params) {
+        try {
+            Result<Map> result = invokeView(chainId, ApiContext.multicall, "aggregateStrict", null, new Object[]{
+                    contracts.toArray(),
+                    methods.toArray(),
+                    params.toArray(),
+                    false
+            });
+            Map dataMap = result.getData();
+            if (dataMap == null) {
+                return Result.getSuccess(null).setData(Collections.emptyList());
+            }
+            List<String> list = JSONUtils.json2pojo(dataMap.get("result").toString(), List.class);
+            return Result.getSuccess(null).setData(list);
+        } catch (Exception e) {
+            LoggerUtil.commonLog.error("", e);
+            Log.error(e);
+            return Result.getSuccess(null).setData(Collections.emptyList());
+        }
     }
 
     public static Result<BigInteger> tokenBalance(int chainid, Object contractAddress, Object address) {
