@@ -246,20 +246,36 @@ public class ContractController {
         }
         if (pageInfo != null && pageInfo.getList() != null && pageInfo.getList().size() > 0) {
             List<AccountTokenInfo> list = pageInfo.getList();
+            List contracts = new ArrayList();
+            List methods = new ArrayList();
+            List pars = new ArrayList();
             for (AccountTokenInfo tokenInfo : list) {
-                Result<BigInteger> result = WalletRpcHandler.tokenBalance(chainId, tokenInfo.getContractAddress(), tokenInfo.getAddress());
-                if (null == result) {
-                    continue;
-                }
-                BigInteger available = result.getData();
-                BigInteger total = tokenInfo.getBalance();
-                if(total.compareTo(available)<0){
-                    total = available;
-                    tokenInfo.setBalance(available);
-                }
-                BigInteger locked = total.subtract(available);
-                tokenInfo.setLockedBalance(locked);
+                contracts.add(tokenInfo.getContractAddress());
+                methods.add("balanceOf");
+                params.add(tokenInfo.getAddress());
             }
+            Result<List<String>> multicall = WalletRpcHandler.multicall(chainId, contracts, methods, pars);
+            List<String> datas = multicall.getData();
+            if (datas.size() == list.size()) {
+                for (int i = 0; i < list.size(); i++) {
+                    AccountTokenInfo tokenInfo = list.get(i);
+                    BigInteger available = new BigInteger(datas.get(i));
+                    BigInteger total = tokenInfo.getBalance();
+                    BigInteger locked = total.subtract(available);
+                    tokenInfo.setLockedBalance(locked);
+                }
+            }
+
+            //for (AccountTokenInfo tokenInfo : list) {
+            //    Result<BigInteger> result = WalletRpcHandler.tokenBalance(chainId, tokenInfo.getContractAddress(), tokenInfo.getAddress());
+            //    if (null == result) {
+            //        continue;
+            //    }
+            //    BigInteger available = result.getData();
+            //    BigInteger total = tokenInfo.getBalance();
+            //    BigInteger locked = total.subtract(available);
+            //    tokenInfo.setLockedBalance(locked);
+            //}
         }
 
         RpcResult result = new RpcResult();

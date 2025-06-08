@@ -127,6 +127,7 @@ public class ApiContext {
 
     // 手续费额外收益地址
     public static String TEAM_FEE_ADDRESS = "NULSd6HghHBMJ3AoQKx5tmThGBwK334LcVG32";
+    public static String multicall = "NULSd6Hgrnv1oxcdyhzZmsu7HWgk7vcaR6nMR";
 
     public static void addAndRemoveLastBlockHeader(BlockHeaderInfo headerInfo) {
         MiniBlockHeaderInfo mini = new MiniBlockHeaderInfo(headerInfo);
