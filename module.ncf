@@ -1,7 +1,7 @@
 [JAVA]
 MAIN_CLASS=io.nuls.api.PublicServiceBootstrap
-JOPT_XMS=512
-JOPT_XMX=1024
+JOPT_XMS=1024
+JOPT_XMX=2048
 
 [Core]
 APP_NAME=public-service
