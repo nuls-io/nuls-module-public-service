@@ -29,10 +29,14 @@ public class AssetLoadTask implements Runnable {
             contractService.initCache();
             ChainAssetCache.initCache(service.getList());
             while (!AssetSystemCache.isCached()) {
-                Thread.sleep(5000L);
+                try {
+                    Thread.sleep(5000L);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
             updateAssetsInfo();
-        } catch (Exception e) {
+        } catch (Error e) {
             Log.error("", e);
         }
     }

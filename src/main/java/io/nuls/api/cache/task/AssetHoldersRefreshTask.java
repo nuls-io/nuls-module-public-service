@@ -20,7 +20,7 @@ public class AssetHoldersRefreshTask implements Runnable {
                 service = SpringLiteContext.getBean(ChainAssetService.class);
             }
             service.updateHolderCount(chainId);
-        } catch (Exception e) {
+        } catch (Error e) {
             LoggerUtil.commonLog.error(e);
         }
     }
