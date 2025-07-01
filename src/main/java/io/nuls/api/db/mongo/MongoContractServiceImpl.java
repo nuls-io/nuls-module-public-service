@@ -36,7 +36,11 @@ public class MongoContractServiceImpl implements ContractService {
 //        LoggerUtil.commonLog.info("contract cache 1 , {}", CacheManager.getApiCaches().size());
         for (ApiCache apiCache : CacheManager.getApiCaches().values()) {
 //            LoggerUtil.commonLog.info("contract cache 1,1 , {}", apiCache.getChainInfo().getChainId());
-            List<Document> documentList = mongoDBService.query(DBTableConstant.CONTRACT_TABLE + apiCache.getChainInfo().getChainId());
+            BasicDBObject fields = new BasicDBObject();
+            fields.append("_id", 1).append("totalSupply", 1).append("symbol", 1).append("decimals", 1).
+                    append("tokenType", 1).append("tokenName", 1).append("tokenUri", 1).append("isNrc20", 1);
+
+            List<Document> documentList = mongoDBService.query(DBTableConstant.CONTRACT_TABLE + apiCache.getChainInfo().getChainId(),fields);
 //            LoggerUtil.commonLog.info("contract cache 2 , {}", documentList.size());
             for (Document document : documentList) {
 //                LoggerUtil.commonLog.info("contract cache 3 , {}", document.getString("_id"));
