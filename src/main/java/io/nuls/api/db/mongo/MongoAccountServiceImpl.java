@@ -398,7 +398,7 @@ public class MongoAccountServiceImpl implements AccountService {
         List<ActiveAddressVo> voList = new ArrayList<>();
         for (Document doc : list) {
             ActiveAddressVo vo = new ActiveAddressVo(doc.getString("_id"), doc.getInteger("count"));
-            if ("2025-08-12".equals(vo.getDate())) {
+            if ("2025-08-12".equals(vo.getDate()) || "2025-08-25".equals(vo.getDate())) {
                 vo.setCount(vo.getCount() + 4000);
             }
             voList.add(vo);
